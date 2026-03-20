@@ -1,1274 +1,157 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portaria SaaS | Multilojas</title>
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --card: #ffffff;
-      --muted: #64748b;
-      --line: #e5e7eb;
-      --text: #0f172a;
-      --soft: #f8fafc;
-      --primary: #2563eb;
-      --primary-2: #1d4ed8;
-      --ok: #059669;
-      --warn: #d97706;
-      --danger: #dc2626;
-      --shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-      --radius: 20px;
-    }
+<meta charset="UTF-8">
+<title>Portaria Veículos</title>
 
-    * { box-sizing: border-box; }
-    html, body { margin: 0; font-family: Inter, Arial, sans-serif; background: #eef2ff; color: var(--text); }
-    button, input, select, textarea { font: inherit; }
-    button { cursor: pointer; }
-    .hidden { display: none !important; }
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"></script>
 
-    .app { min-height: 100vh; }
+<style>
 
-    .auth-shell {
-      min-height: 100vh;
-      display: grid;
-      place-items: center;
-      background: radial-gradient(circle at top left, #dbeafe 0%, #eef2ff 32%, #f8fafc 100%);
-      padding: 20px;
-    }
-
-    .auth-card {
-      width: min(460px, 100%);
-      background: rgba(255,255,255,0.92);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.6);
-      box-shadow: var(--shadow);
-      border-radius: 28px;
-      overflow: hidden;
-    }
-
-    .auth-top {
-      padding: 28px 28px 18px;
-      color: white;
-      background: linear-gradient(135deg, #0f172a, #1d4ed8);
-    }
-
-    .auth-top h1 { margin: 0 0 8px; font-size: 28px; }
-    .auth-top p { margin: 0; color: rgba(255,255,255,0.84); }
-    .auth-body { padding: 24px 28px 28px; }
-
-    .grid { display: grid; gap: 14px; }
-    .grid-2 { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .field label { display: block; margin-bottom: 6px; font-size: 14px; color: #334155; font-weight: 600; }
-    .input, .select, .textarea {
-      width: 100%; border: 1px solid #dbe3f0; border-radius: 14px; background: white;
-      padding: 12px 14px; outline: none; transition: 0.2s ease;
-    }
-    .input:focus, .select:focus, .textarea:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(96,165,250,0.15); }
-    .textarea { min-height: 110px; resize: vertical; }
-
-    .btn {
-      border: none; border-radius: 14px; padding: 12px 16px; font-weight: 700;
-      transition: 0.2s ease; display: inline-flex; gap: 8px; align-items: center; justify-content: center;
-    }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:hover { background: var(--primary-2); }
-    .btn-light { background: white; color: #0f172a; border: 1px solid #dbe3f0; }
-    .btn-dark { background: #0f172a; color: white; }
-    .btn-danger { background: var(--danger); color: white; }
-    .btn-success { background: var(--ok); color: white; }
-    .btn-block { width: 100%; }
-
-    .app-shell { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
-    .sidebar {
-      background: #0f172a; color: white; padding: 22px 18px; position: sticky; top: 0; height: 100vh;
-    }
-    .brand { display: flex; gap: 12px; align-items: center; margin-bottom: 22px; }
-    .brand-badge {
-      width: 46px; height: 46px; border-radius: 16px; display: grid; place-items: center;
-      background: linear-gradient(135deg, #2563eb, #60a5fa); font-size: 22px;
-    }
-    .brand h2 { margin: 0; font-size: 20px; }
-    .brand p { margin: 2px 0 0; color: rgba(255,255,255,0.7); font-size: 13px; }
-
-    .user-box { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08); border-radius: 18px; padding: 14px; }
-    .user-name { font-weight: 700; }
-    .user-meta { font-size: 13px; color: rgba(255,255,255,0.74); margin-top: 4px; }
-    .nav { display: grid; gap: 8px; margin-top: 18px; }
-    .nav button {
-      text-align: left; border: none; border-radius: 14px; padding: 12px 14px;
-      background: transparent; color: rgba(255,255,255,0.82); font-weight: 600;
-    }
-    .nav button.active, .nav button:hover { background: rgba(255,255,255,0.09); color: white; }
-
-    .content { padding: 24px; }
-    .topbar {
-      display: flex; justify-content: space-between; gap: 16px; align-items: center; flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .topbar h1 { margin: 0; font-size: 30px; }
-    .topbar p { margin: 6px 0 0; color: var(--muted); }
-    .topbar-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-
-    .toolbar {
-      display: grid; grid-template-columns: 1.2fr .8fr .8fr auto auto auto; gap: 12px; margin-bottom: 18px;
-    }
-
-    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-    .card {
-      background: var(--card); border-radius: 22px; box-shadow: var(--shadow); border: 1px solid rgba(226,232,240,0.9);
-    }
-    .kpi { padding: 18px; }
-    .kpi small { color: var(--muted); }
-    .kpi strong { display: block; font-size: 34px; margin: 8px 0 4px; }
-
-    .section { margin-top: 18px; padding: 18px; }
-    .section-head {
-      display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 14px;
-    }
-    .section-head h3 { margin: 0; font-size: 20px; }
-    .section-head p { margin: 4px 0 0; color: var(--muted); }
-
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 13px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-    th { color: var(--muted); font-size: 13px; }
-    .badge {
-      display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 6px 10px; font-size: 12px; font-weight: 700;
-    }
-    .badge-blue { background: #dbeafe; color: #1d4ed8; }
-    .badge-green { background: #dcfce7; color: #166534; }
-    .badge-yellow { background: #fef3c7; color: #92400e; }
-    .badge-red { background: #fee2e2; color: #991b1b; }
-    .badge-gray { background: #e2e8f0; color: #334155; }
-
-    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-    .tabs button {
-      border: 1px solid #dbe3f0; background: white; border-radius: 999px; padding: 10px 14px; font-weight: 700;
-    }
-    .tabs button.active { background: #0f172a; color: white; border-color: #0f172a; }
-
-    .cards-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-    .mini-card { padding: 16px; }
-    .mini-card h4 { margin: 0 0 8px; }
-    .mini-card p { margin: 6px 0; color: var(--muted); }
-
-    .modal {
-      position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); display: none; align-items: center; justify-content: center;
-      z-index: 9999; padding: 20px;
-    }
-    .modal.show { display: flex; }
-    .modal-box {
-      width: min(1100px, 100%); max-height: 92vh; overflow: auto; background: white; border-radius: 28px; box-shadow: 0 30px 60px rgba(15,23,42,.35);
-    }
-    .modal-layout { display: grid; grid-template-columns: 1.15fr .85fr; }
-    .modal-main { padding: 24px; }
-    .modal-side { padding: 24px; background: #0f172a; color: white; }
-    .modal-head { display: flex; justify-content: space-between; gap: 12px; align-items: start; margin-bottom: 16px; }
-    .modal-head h2 { margin: 0 0 6px; }
-    .modal-head p { margin: 0; color: var(--muted); }
-    .close-x { border: none; background: #e2e8f0; width: 42px; height: 42px; border-radius: 14px; font-size: 18px; }
-
-    .photo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-    .photo-slot {
-      border: 1px dashed rgba(255,255,255,.24); background: rgba(255,255,255,.05); border-radius: 18px; padding: 12px; min-height: 160px;
-      display: grid; align-content: space-between; gap: 8px;
-    }
-    .photo-slot img { width: 100%; height: 110px; object-fit: cover; border-radius: 12px; }
-    .preview-row { display: grid; gap: 10px; margin-top: 12px; }
-    .preview-card {
-      border: 1px solid rgba(255,255,255,.12); border-radius: 18px; padding: 12px; background: rgba(255,255,255,.05);
-    }
-
-    .small { font-size: 12px; color: var(--muted); }
-    .white-soft { color: rgba(255,255,255,.75); }
-    .muted { color: var(--muted); }
-    .right { text-align: right; }
-    .flex { display: flex; }
-    .between { justify-content: space-between; }
-    .gap8 { gap: 8px; }
-    .gap12 { gap: 12px; }
-    .mb8 { margin-bottom: 8px; }
-    .mb14 { margin-bottom: 14px; }
-
-    @media (max-width: 1100px) {
-      .app-shell { grid-template-columns: 1fr; }
-      .sidebar { position: relative; height: auto; }
-      .toolbar { grid-template-columns: 1fr 1fr; }
-      .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .cards-grid { grid-template-columns: 1fr 1fr; }
-      .modal-layout { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 720px) {
-      .content { padding: 14px; }
-      .toolbar { grid-template-columns: 1fr; }
-      .kpis, .cards-grid, .grid-2 { grid-template-columns: 1fr; }
-      .topbar h1 { font-size: 24px; }
-      .modal-main, .modal-side { padding: 18px; }
-      table { display: block; overflow: auto; }
-    }
-  </style>
-</head>
-<body>
-  <div class="app" id="app">
-    <section class="auth-shell" id="authScreen">
-      <div class="auth-card">
-        <div class="auth-top">
-          <h1>Portaria SaaS</h1>
-          <p>Lojas, concessionárias e oficinas com controle visual, multilojas e dashboard.</p>
-        </div>
-        <div class="auth-body">
-          <div class="grid">
-            <button class="btn btn-dark btn-block" id="btnGoogleLogin">Entrar com Google</button>
-            <div class="small">Autenticação via Firebase. Para liberar múltiplas lojas por usuário, o app lê a coleção <strong>users</strong> no Firestore.</div>
-            <div id="authMsg" class="small"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="app-shell hidden" id="mainScreen">
-      <aside class="sidebar">
-        <div class="brand">
-          <div class="brand-badge">🚗</div>
-          <div>
-            <h2>Portaria SaaS</h2>
-            <p>GitHub Pages + Firebase</p>
-          </div>
-        </div>
-
-        <div class="user-box">
-          <div class="user-name" id="userName">Usuário</div>
-          <div class="user-meta" id="userMeta">Perfil</div>
-          <div class="user-meta" id="userStores">Lojas</div>
-        </div>
-
-        <div class="nav" id="navTabs">
-          <button class="active" data-view="dashboard">Dashboard</button>
-          <button data-view="historico">Histórico</button>
-          <button data-view="condutores">Condutores</button>
-          <button data-view="autorizadores">Autorizadores</button>
-          <button data-view="config">Configuração</button>
-        </div>
-
-        <div style="margin-top:18px; display:grid; gap:10px;">
-          <button class="btn btn-primary" id="btnNovaEntrada">+ Nova entrada</button>
-          <button class="btn btn-light" id="btnNovaSaida">+ Nova saída</button>
-          <button class="btn btn-light" id="btnExportar">Exportar Excel</button>
-          <button class="btn btn-danger" id="btnLogout">Sair</button>
-        </div>
-      </aside>
-
-      <main class="content">
-        <div class="topbar">
-          <div>
-            <h1>Controle de veículos</h1>
-            <p>Entrada, saída, fotos, danos, condutor, autorização e OCR de placa.</p>
-          </div>
-          <div class="topbar-actions">
-            <select class="select" id="storeSelect" style="min-width:280px;"></select>
-          </div>
-        </div>
-
-        <section id="view-dashboard" class="view">
-          <div class="kpis">
-            <div class="card kpi"><small>Entradas</small><strong id="kpiEntradas">0</strong><div class="small">Movimentações registradas</div></div>
-            <div class="card kpi"><small>Saídas</small><strong id="kpiSaidas">0</strong><div class="small">Saídas autorizadas</div></div>
-            <div class="card kpi"><small>No pátio</small><strong id="kpiPatio">0</strong><div class="small">Status atual</div></div>
-            <div class="card kpi"><small>Com danos</small><strong id="kpiDanos">0</strong><div class="small">Exigem atenção</div></div>
-          </div>
-
-          <div class="card section">
-            <div class="section-head">
-              <div>
-                <h3>Últimas movimentações</h3>
-                <p>Visão rápida da loja selecionada.</p>
-              </div>
-            </div>
-            <div style="overflow:auto;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Placa</th>
-                    <th>Tipo</th>
-                    <th>Condutor</th>
-                    <th>Autorizador</th>
-                    <th>Danos</th>
-                    <th>Horário</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="dashboardRows"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="view-historico" class="view hidden">
-          <div class="card section">
-            <div class="section-head">
-              <div>
-                <h3>Histórico de veículos</h3>
-                <p>Filtros, busca, auditoria e exportação.</p>
-              </div>
-            </div>
-            <div class="toolbar">
-              <input class="input" id="searchInput" placeholder="Buscar placa, modelo, condutor, observação..." />
-              <select class="select" id="filterTipo">
-                <option value="todos">Todos os tipos</option>
-                <option value="entrada">Entradas</option>
-                <option value="saida">Saídas</option>
-              </select>
-              <select class="select" id="filterStatus">
-                <option value="todos">Todos os status</option>
-                <option value="no_patio">No pátio</option>
-                <option value="fora">Fora</option>
-                <option value="em_reparo">Em reparo</option>
-              </select>
-              <input class="input" id="filterDate" type="date" />
-              <button class="btn btn-light" id="btnLimparFiltros">Limpar</button>
-              <button class="btn btn-primary" id="btnExportarTop">Exportar Excel</button>
-            </div>
-            <div style="overflow:auto;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Placa / Modelo</th>
-                    <th>Loja</th>
-                    <th>Tipo</th>
-                    <th>Condutor</th>
-                    <th>Autorizador</th>
-                    <th>Fotos</th>
-                    <th>OCR</th>
-                    <th>Danos</th>
-                    <th>Horário</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody id="historyRows"></tbody>
-              </table>
-            </div>
-          </div>
-        </section>
-
-        <section id="view-condutores" class="view hidden">
-          <div class="card section">
-            <div class="section-head">
-              <div>
-                <h3>Condutores</h3>
-                <p>Cadastro por loja com permissão controlada.</p>
-              </div>
-              <button class="btn btn-primary" id="btnNovoCondutor">+ Novo condutor</button>
-            </div>
-            <div class="cards-grid" id="driversGrid"></div>
-          </div>
-        </section>
-
-        <section id="view-autorizadores" class="view hidden">
-          <div class="card section">
-            <div class="section-head">
-              <div>
-                <h3>Autorizadores</h3>
-                <p>Quem pode liberar saída do veículo.</p>
-              </div>
-              <button class="btn btn-primary" id="btnNovoAutorizador">+ Novo autorizador</button>
-            </div>
-            <div class="cards-grid" id="authorizersGrid"></div>
-          </div>
-        </section>
-
-        <section id="view-config" class="view hidden">
-          <div class="tabs" id="configTabs">
-            <button class="active" data-config="firebase">Firebase</button>
-            <button data-config="regras">Permissões</button>
-            <button data-config="deploy">Deploy automático</button>
-          </div>
-
-          <div class="card section config-view" id="config-firebase">
-            <div class="section-head"><div><h3>Configuração Firebase</h3><p>Cole suas chaves abaixo.</p></div></div>
-            <div class="grid">
-              <textarea class="textarea" id="firebaseConfigInput" placeholder='Cole aqui o objeto firebaseConfig em JSON, por exemplo:
-{
-  "apiKey":"...",
-  "authDomain":"...",
-  "projectId":"...",
-  "storageBucket":"...",
-  "messagingSenderId":"...",
-  "appId":"..."
-}'></textarea>
-              <div class="flex gap12">
-                <button class="btn btn-primary" id="btnSalvarFirebaseConfig">Salvar config no navegador</button>
-                <button class="btn btn-light" id="btnCarregarDemo">Carregar modo demo</button>
-              </div>
-              <div class="small">As chaves ficam em <strong>localStorage</strong>. Para produção, você pode deixar fixo no arquivo.</div>
-            </div>
-          </div>
-
-          <div class="card section config-view hidden" id="config-regras">
-            <div class="section-head"><div><h3>Permissões por usuário</h3><p>Modelo de documento esperado no Firestore.</p></div></div>
-            <pre style="white-space:pre-wrap; background:#0f172a; color:#e2e8f0; padding:16px; border-radius:18px; overflow:auto;">users/{uid}
-{
-  name: "Gabriel Wandele",
-  role: "gerente",
-  stores: ["loja-1", "loja-2"],
-  active: true
+body{
+font-family: Arial;
+background:#f4f6f9;
+margin:0;
 }
 
-stores/{storeId}
-{
-  name: "Loja Paulista",
-  city: "São Paulo",
-  type: "Concessionária"
-}</pre>
-          </div>
-
-          <div class="card section config-view hidden" id="config-deploy">
-            <div class="section-head"><div><h3>Deploy automático</h3><p>GitHub Pages com GitHub Actions.</p></div></div>
-            <pre style="white-space:pre-wrap; background:#0f172a; color:#e2e8f0; padding:16px; border-radius:18px; overflow:auto;">name: Deploy static site to Pages
-
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
-jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-      - id: deployment
-        uses: actions/deploy-pages@v4</pre>
-          </div>
-        </section>
-      </main>
-    </section>
-  </div>
-
-  <div class="modal" id="movementModal">
-    <div class="modal-box">
-      <div class="modal-layout">
-        <div class="modal-main">
-          <div class="modal-head">
-            <div>
-              <h2 id="movementTitle">Nova movimentação</h2>
-              <p>Formulário tipo pop-up com câmera, danos, condutor e horário automático.</p>
-            </div>
-            <button class="close-x" data-close="movementModal">✕</button>
-          </div>
-
-          <div class="grid-2">
-            <div class="field">
-              <label>Tipo</label>
-              <select class="select" id="mType">
-                <option value="entrada">Entrada</option>
-                <option value="saida">Saída</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Horário automático</label>
-              <input class="input" id="mTimestamp" readonly />
-            </div>
-            <div class="field">
-              <label>Placa</label>
-              <input class="input" id="mPlate" placeholder="ABC1D23" />
-            </div>
-            <div class="field">
-              <label>Modelo</label>
-              <input class="input" id="mModel" placeholder="Ex.: Toyota Corolla" />
-            </div>
-            <div class="field">
-              <label>Cor</label>
-              <input class="input" id="mColor" placeholder="Prata" />
-            </div>
-            <div class="field">
-              <label>Status</label>
-              <select class="select" id="mStatus">
-                <option value="no_patio">No pátio</option>
-                <option value="fora">Fora</option>
-                <option value="em_reparo">Em reparo</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Condutor</label>
-              <select class="select" id="mDriver"></select>
-            </div>
-            <div class="field">
-              <label>Autorizado por</label>
-              <select class="select" id="mAuthorizer"></select>
-            </div>
-            <div class="field">
-              <label>Nível de danos</label>
-              <select class="select" id="mDamageLevel">
-                <option value="nenhum">Sem danos</option>
-                <option value="leve">Leve</option>
-                <option value="moderado">Moderado</option>
-                <option value="grave">Grave</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>OCR da placa</label>
-              <input class="input" id="mOCRResult" readonly placeholder="Resultado automático" />
-            </div>
-          </div>
-
-          <div class="field">
-            <label>Observações / danos aparentes</label>
-            <textarea class="textarea" id="mNotes" placeholder="Ex.: risco no para-choque, amassado na lateral, destino do veículo, etc."></textarea>
-          </div>
-
-          <div class="grid-2">
-            <button class="btn btn-light" id="btnRunOCR">Ler placa automaticamente</button>
-            <button class="btn btn-primary" id="btnSaveMovement">Salvar movimentação</button>
-          </div>
-        </div>
-
-        <div class="modal-side">
-          <h3 style="margin-top:0;">Câmera e fotos</h3>
-          <p class="white-soft">Você pode fotografar pelo celular ou selecionar arquivo. As imagens vão para o Firebase Storage.</p>
-
-          <div class="field mb14">
-            <label class="white-soft">Capturar / anexar fotos</label>
-            <input class="input" id="mPhotos" type="file" accept="image/*" capture="environment" multiple />
-          </div>
-
-          <div class="photo-grid" id="photoGrid"></div>
-
-          <div class="preview-row">
-            <div class="preview-card">
-              <div class="small" style="color:rgba(255,255,255,.72)">Fotos adicionadas</div>
-              <div style="font-size:32px; font-weight:800; margin-top:8px;" id="photoCount">0</div>
-            </div>
-            <div class="preview-card">
-              <div class="small" style="color:rgba(255,255,255,.72)">Observação</div>
-              <div style="margin-top:8px; line-height:1.5;" class="white-soft">Para OCR de placa no navegador, o app usa <strong>Tesseract.js</strong>. Em celulares modernos funciona bem com foto nítida e boa luz.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="driverModal">
-    <div class="modal-box" style="width:min(520px,100%)">
-      <div class="modal-main">
-        <div class="modal-head">
-          <div><h2>Novo condutor</h2><p>Cadastro vinculado à loja atual.</p></div>
-          <button class="close-x" data-close="driverModal">✕</button>
-        </div>
-        <div class="grid">
-          <div class="field"><label>Nome</label><input class="input" id="dName" /></div>
-          <div class="field"><label>Documento</label><input class="input" id="dDocument" /></div>
-          <div class="field"><label>Telefone</label><input class="input" id="dPhone" /></div>
-          <div class="field"><label>Tipo</label>
-            <select class="select" id="dKind">
-              <option value="Colaborador">Colaborador</option>
-              <option value="Cliente">Cliente</option>
-              <option value="Terceiro">Terceiro</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" id="btnSaveDriver">Salvar condutor</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="authorizerModal">
-    <div class="modal-box" style="width:min(520px,100%)">
-      <div class="modal-main">
-        <div class="modal-head">
-          <div><h2>Novo autorizador</h2><p>Quem libera a saída do veículo.</p></div>
-          <button class="close-x" data-close="authorizerModal">✕</button>
-        </div>
-        <div class="grid">
-          <div class="field"><label>Nome</label><input class="input" id="aName" /></div>
-          <div class="field"><label>Cargo</label>
-            <select class="select" id="aRole">
-              <option value="Supervisor">Supervisor</option>
-              <option value="Gerente">Gerente</option>
-              <option value="Gestor">Gestor</option>
-              <option value="Diretoria">Diretoria</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" id="btnSaveAuthorizer">Salvar autorizador</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import {
-      getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut
-    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-    import {
-      getFirestore, collection, doc, getDoc, getDocs, setDoc, addDoc, query, where, orderBy, serverTimestamp
-    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-    import {
-      getStorage, ref, uploadBytes, getDownloadURL
-    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
-
-    const DEMO_CONFIG = {
-      demo: true
-    };
-
-    const DEMO_DB = {
-      stores: [
-        { id: 'loja-1', name: 'Previni Loja Paulista', city: 'São Paulo', type: 'Concessionária' },
-        { id: 'loja-2', name: 'Previni Oficina Mooca', city: 'São Paulo', type: 'Oficina' },
-        { id: 'loja-3', name: 'Previni Loja Guarulhos', city: 'Guarulhos', type: 'Loja' }
-      ],
-      users: {
-        'demo-user': { name: 'Gabriel Wandele', role: 'gerente', stores: ['loja-1', 'loja-2'], active: true, email: 'demo@demo.com' }
-      },
-      drivers: [
-        { id: 'd1', name: 'Pedro Henrique', document: '123.456.789-10', phone: '(11) 98888-1111', kind: 'Colaborador', stores: ['loja-1', 'loja-2'], active: true },
-        { id: 'd2', name: 'Juliana Costa', document: '234.567.890-11', phone: '(11) 97777-2222', kind: 'Cliente', stores: ['loja-1'], active: true }
-      ],
-      authorizers: [
-        { id: 'a1', name: 'Denis Supervisor', role: 'Supervisor', stores: ['loja-1', 'loja-2'] },
-        { id: 'a2', name: 'Juliana Gerente', role: 'Gerente', stores: ['loja-1'] }
-      ],
-      movements: [
-        {
-          id: 'm1', storeId: 'loja-1', type: 'entrada', plate: 'ABC1D23', model: 'Toyota Corolla', color: 'Prata',
-          driverName: 'Pedro Henrique', authorizerName: 'Juliana Gerente', damageLevel: 'leve', notes: 'Risco discreto no para-choque traseiro.',
-          status: 'no_patio', photoUrls: [], photoCount: 2, ocrPlate: 'ABC1D23', createdAtISO: new Date().toISOString()
-        },
-        {
-          id: 'm2', storeId: 'loja-2', type: 'saida', plate: 'EFG4H56', model: 'Honda Civic', color: 'Branco',
-          driverName: 'Pedro Henrique', authorizerName: 'Denis Supervisor', damageLevel: 'nenhum', notes: 'Saída para alinhamento externo.',
-          status: 'fora', photoUrls: [], photoCount: 1, ocrPlate: 'EFG4H56', createdAtISO: new Date().toISOString()
-        }
-      ]
-    };
-
-    let app = null;
-    let auth = null;
-    let db = null;
-    let storage = null;
-    let isDemo = false;
-    let currentUser = null;
-    let currentProfile = null;
-    let currentStoreId = null;
-    let stores = [];
-    let drivers = [];
-    let authorizers = [];
-    let movements = [];
-    let selectedFiles = [];
-
-    const el = (id) => document.getElementById(id);
-    const authScreen = el('authScreen');
-    const mainScreen = el('mainScreen');
-    const authMsg = el('authMsg');
-
-    function saveFirebaseConfigLocal(config) {
-      localStorage.setItem('portaria_firebase_config', JSON.stringify(config));
-    }
-
-    function readFirebaseConfigLocal() {
-      try {
-        return JSON.parse(localStorage.getItem('portaria_firebase_config') || 'null');
-      } catch {
-        return null;
-      }
-    }
-
-    function showAuthMessage(msg, color = '#475569') {
-      authMsg.textContent = msg;
-      authMsg.style.color = color;
-    }
-
-    function formatDateTime(iso) {
-      if (!iso) return '-';
-      const d = new Date(iso);
-      return d.toLocaleString('pt-BR');
-    }
-
-    function toYmd(iso) {
-      if (!iso) return '';
-      const d = new Date(iso);
-      const pad = (n) => String(n).padStart(2, '0');
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    }
-
-    function nowISO() { return new Date().toISOString(); }
-
-    function escapeHtml(str = '') {
-      return String(str)
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
-    }
-
-    function badgeDamage(level) {
-      if (level === 'nenhum') return '<span class="badge badge-green">Sem danos</span>';
-      if (level === 'leve') return '<span class="badge badge-yellow">Leve</span>';
-      if (level === 'moderado') return '<span class="badge badge-yellow">Moderado</span>';
-      if (level === 'grave') return '<span class="badge badge-red">Grave</span>';
-      return '<span class="badge badge-gray">-</span>';
-    }
-
-    function badgeType(type) {
-      return `<span class="badge badge-blue">${type === 'entrada' ? 'Entrada' : 'Saída'}</span>`;
-    }
-
-    function badgeStatus(status) {
-      const map = {
-        no_patio: ['badge-green', 'No pátio'],
-        fora: ['badge-gray', 'Fora'],
-        em_reparo: ['badge-yellow', 'Em reparo']
-      };
-      const item = map[status] || ['badge-gray', status || '-'];
-      return `<span class="badge ${item[0]}">${item[1]}</span>`;
-    }
-
-    function openModal(id) { el(id).classList.add('show'); }
-    function closeModal(id) { el(id).classList.remove('show'); }
-
-    function getVisibleStores() {
-      if (!currentProfile?.stores) return [];
-      return stores.filter(s => currentProfile.stores.includes(s.id));
-    }
-
-    function getStoreName(storeId) {
-      return stores.find(s => s.id === storeId)?.name || storeId;
-    }
-
-    function setStoreOptions() {
-      const select = el('storeSelect');
-      const visible = getVisibleStores();
-      select.innerHTML = visible.map(s => `<option value="${s.id}">${escapeHtml(s.name)} · ${escapeHtml(s.city)}</option>`).join('');
-      if (!currentStoreId && visible.length) currentStoreId = visible[0].id;
-      select.value = currentStoreId || '';
-    }
-
-    function fillUserBox() {
-      el('userName').textContent = currentProfile?.name || currentUser?.displayName || 'Usuário';
-      el('userMeta').textContent = `Perfil: ${currentProfile?.role || 'sem perfil'}`;
-      el('userStores').textContent = `Lojas: ${getVisibleStores().map(s => s.city).join(', ') || '-'}`;
-    }
-
-    function renderKPIs() {
-      const visibleMovements = movements.filter(m => m.storeId === currentStoreId);
-      const entradas = visibleMovements.filter(m => m.type === 'entrada').length;
-      const saidas = visibleMovements.filter(m => m.type === 'saida').length;
-      const patio = visibleMovements.filter(m => m.status === 'no_patio').length;
-      const danos = visibleMovements.filter(m => m.damageLevel !== 'nenhum').length;
-      el('kpiEntradas').textContent = entradas;
-      el('kpiSaidas').textContent = saidas;
-      el('kpiPatio').textContent = patio;
-      el('kpiDanos').textContent = danos;
-    }
-
-    function renderDashboardRows() {
-      const rows = movements
-        .filter(m => m.storeId === currentStoreId)
-        .sort((a, b) => new Date(b.createdAtISO || 0) - new Date(a.createdAtISO || 0))
-        .slice(0, 8)
-        .map(m => `
-          <tr>
-            <td><strong>${escapeHtml(m.plate || '-')}</strong><div class="small">${escapeHtml(m.model || '')}</div></td>
-            <td>${badgeType(m.type)}</td>
-            <td>${escapeHtml(m.driverName || '-')}</td>
-            <td>${escapeHtml(m.authorizerName || '-')}</td>
-            <td>${badgeDamage(m.damageLevel)}</td>
-            <td>${formatDateTime(m.createdAtISO)}</td>
-            <td>${badgeStatus(m.status)}</td>
-          </tr>
-        `).join('');
-      el('dashboardRows').innerHTML = rows || '<tr><td colspan="7" class="muted">Nenhuma movimentação.</td></tr>';
-    }
-
-    function getFilteredMovements() {
-      const search = el('searchInput')?.value?.trim().toLowerCase() || '';
-      const type = el('filterTipo')?.value || 'todos';
-      const status = el('filterStatus')?.value || 'todos';
-      const date = el('filterDate')?.value || '';
-
-      return movements
-        .filter(m => m.storeId === currentStoreId)
-        .filter(m => type === 'todos' || m.type === type)
-        .filter(m => status === 'todos' || m.status === status)
-        .filter(m => !date || toYmd(m.createdAtISO) === date)
-        .filter(m => {
-          if (!search) return true;
-          const base = [m.plate, m.model, m.color, m.driverName, m.authorizerName, m.notes, m.ocrPlate].join(' ').toLowerCase();
-          return base.includes(search);
-        })
-        .sort((a, b) => new Date(b.createdAtISO || 0) - new Date(a.createdAtISO || 0));
-    }
-
-    function renderHistoryRows() {
-      const rows = getFilteredMovements().map(m => `
-        <tr>
-          <td><strong>${escapeHtml(m.plate || '-')}</strong><div class="small">${escapeHtml(m.model || '')} · ${escapeHtml(m.color || '')}</div></td>
-          <td>${escapeHtml(getStoreName(m.storeId))}</td>
-          <td>${badgeType(m.type)}</td>
-          <td>${escapeHtml(m.driverName || '-')}</td>
-          <td>${escapeHtml(m.authorizerName || '-')}</td>
-          <td>${m.photoCount || 0}</td>
-          <td>${escapeHtml(m.ocrPlate || '-')}</td>
-          <td>${badgeDamage(m.damageLevel)}</td>
-          <td>${formatDateTime(m.createdAtISO)}</td>
-          <td><button class="btn btn-light" data-view-movement="${m.id}">Ver</button></td>
-        </tr>
-      `).join('');
-      el('historyRows').innerHTML = rows || '<tr><td colspan="10" class="muted">Nenhum registro encontrado.</td></tr>';
-    }
-
-    function renderDrivers() {
-      const html = drivers
-        .filter(d => (d.stores || []).includes(currentStoreId))
-        .map(d => `
-          <div class="card mini-card">
-            <h4>${escapeHtml(d.name)}</h4>
-            <p>${escapeHtml(d.kind || '-')}</p>
-            <p><strong>Documento:</strong> ${escapeHtml(d.document || '-')}</p>
-            <p><strong>Telefone:</strong> ${escapeHtml(d.phone || '-')}</p>
-          </div>
-        `).join('');
-      el('driversGrid').innerHTML = html || '<div class="muted">Nenhum condutor nesta loja.</div>';
-    }
-
-    function renderAuthorizers() {
-      const html = authorizers
-        .filter(a => (a.stores || []).includes(currentStoreId))
-        .map(a => `
-          <div class="card mini-card">
-            <h4>${escapeHtml(a.name)}</h4>
-            <p>${escapeHtml(a.role || '-')}</p>
-            <p><strong>Lojas:</strong> ${(a.stores || []).map(getStoreName).join(', ')}</p>
-          </div>
-        `).join('');
-      el('authorizersGrid').innerHTML = html || '<div class="muted">Nenhum autorizador nesta loja.</div>';
-    }
-
-    function renderAll() {
-      fillUserBox();
-      setStoreOptions();
-      renderKPIs();
-      renderDashboardRows();
-      renderHistoryRows();
-      renderDrivers();
-      renderAuthorizers();
-      fillMovementSelects();
-    }
-
-    function switchView(name) {
-      document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
-      el(`view-${name}`).classList.remove('hidden');
-      document.querySelectorAll('#navTabs button').forEach(b => b.classList.toggle('active', b.dataset.view === name));
-    }
-
-    function switchConfig(name) {
-      document.querySelectorAll('.config-view').forEach(v => v.classList.add('hidden'));
-      el(`config-${name}`).classList.remove('hidden');
-      document.querySelectorAll('#configTabs button').forEach(b => b.classList.toggle('active', b.dataset.config === name));
-    }
-
-    function fillMovementSelects() {
-      const ds = drivers.filter(d => (d.stores || []).includes(currentStoreId));
-      const as = authorizers.filter(a => (a.stores || []).includes(currentStoreId));
-      el('mDriver').innerHTML = ds.map(d => `<option value="${escapeHtml(d.name)}">${escapeHtml(d.name)}</option>`).join('') || '<option value="">Sem condutor</option>';
-      el('mAuthorizer').innerHTML = as.map(a => `<option value="${escapeHtml(a.name)}">${escapeHtml(a.name)}</option>`).join('') || '<option value="">Sem autorizador</option>';
-    }
-
-    function resetMovementForm(type = 'entrada') {
-      selectedFiles = [];
-      el('mType').value = type;
-      el('mTimestamp').value = new Date().toLocaleString('pt-BR');
-      el('mPlate').value = '';
-      el('mModel').value = '';
-      el('mColor').value = '';
-      el('mStatus').value = type === 'entrada' ? 'no_patio' : 'fora';
-      el('mDamageLevel').value = 'nenhum';
-      el('mNotes').value = '';
-      el('mOCRResult').value = '';
-      el('mPhotos').value = '';
-      renderPhotoGrid();
-      fillMovementSelects();
-      el('movementTitle').textContent = type === 'entrada' ? 'Registrar entrada' : 'Registrar saída';
-    }
-
-    function renderPhotoGrid() {
-      const grid = el('photoGrid');
-      const items = selectedFiles.slice(0, 4).map((file, i) => {
-        const url = URL.createObjectURL(file);
-        return `
-          <div class="photo-slot">
-            <div class="small" style="color:rgba(255,255,255,.7)">Foto ${i + 1}</div>
-            <img src="${url}" alt="preview" />
-            <div class="small" style="color:rgba(255,255,255,.7)">${escapeHtml(file.name)}</div>
-          </div>
-        `;
-      }).join('');
-
-      const emptyCount = Math.max(0, 4 - Math.min(selectedFiles.length, 4));
-      const empties = Array.from({ length: emptyCount }).map((_, i) => `
-        <div class="photo-slot">
-          <div class="small" style="color:rgba(255,255,255,.7)">Foto ${selectedFiles.length + i + 1}</div>
-          <div class="white-soft">Aguardando captura</div>
-        </div>
-      `).join('');
-
-      grid.innerHTML = items + empties;
-      el('photoCount').textContent = selectedFiles.length;
-    }
-
-    async function runPlateOCR() {
-      if (!selectedFiles.length) {
-        alert('Adicione ao menos uma foto antes de rodar o OCR.');
-        return;
-      }
-      const btn = el('btnRunOCR');
-      const original = btn.textContent;
-      try {
-        btn.disabled = true;
-        btn.textContent = 'Lendo placa...';
-        const result = await Tesseract.recognize(selectedFiles[0], 'eng');
-        const raw = result?.data?.text || '';
-        const cleaned = raw.toUpperCase().replace(/[^A-Z0-9]/g, ' ').replace(/\s+/g, ' ').trim();
-        const match = cleaned.match(/[A-Z]{3}[0-9][A-Z0-9][0-9]{2}|[A-Z]{3}[0-9]{4}/);
-        const plate = match ? match[0] : cleaned.slice(0, 10);
-        el('mOCRResult').value = plate || '';
-        if (plate && !el('mPlate').value) el('mPlate').value = plate;
-      } catch (err) {
-        console.error(err);
-        alert('Não foi possível ler a placa automaticamente nesta imagem.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = original;
-      }
-    }
-
-    async function uploadPhotos(files, movementId) {
-      if (!files.length) return [];
-      if (isDemo) return files.map((_, i) => `demo://photo-${movementId}-${i+1}`);
-      const urls = [];
-      for (const file of files) {
-        const path = `movements/${currentStoreId}/${movementId}/${Date.now()}-${file.name}`;
-        const storageRef = ref(storage, path);
-        await uploadBytes(storageRef, file);
-        const url = await getDownloadURL(storageRef);
-        urls.push(url);
-      }
-      return urls;
-    }
-
-    async function saveMovement() {
-      const plate = el('mPlate').value.trim().toUpperCase();
-      const model = el('mModel').value.trim();
-      const color = el('mColor').value.trim();
-      const type = el('mType').value;
-      const status = el('mStatus').value;
-      const driverName = el('mDriver').value;
-      const authorizerName = el('mAuthorizer').value;
-      const damageLevel = el('mDamageLevel').value;
-      const notes = el('mNotes').value.trim();
-      const ocrPlate = el('mOCRResult').value.trim().toUpperCase();
-
-      if (!plate) return alert('Informe a placa.');
-      if (!driverName) return alert('Selecione o condutor.');
-      if (!authorizerName) return alert('Selecione o autorizador.');
-
-      const tempId = crypto.randomUUID();
-      const photoUrls = await uploadPhotos(selectedFiles, tempId);
-      const payload = {
-        storeId: currentStoreId,
-        type,
-        plate,
-        model,
-        color,
-        status,
-        driverName,
-        authorizerName,
-        damageLevel,
-        notes,
-        ocrPlate,
-        photoUrls,
-        photoCount: photoUrls.length,
-        createdAtISO: nowISO(),
-        createdByUid: currentUser?.uid || 'demo-user'
-      };
-
-      if (isDemo) {
-        movements.unshift({ id: tempId, ...payload });
-      } else {
-        const docRef = await addDoc(collection(db, 'movements'), {
-          ...payload,
-          createdAt: serverTimestamp()
-        });
-        movements.unshift({ id: docRef.id, ...payload });
-      }
-
-      closeModal('movementModal');
-      renderAll();
-      switchView('historico');
-      alert('Movimentação salva com sucesso.');
-    }
-
-    async function saveDriver() {
-      const payload = {
-        id: crypto.randomUUID(),
-        name: el('dName').value.trim(),
-        document: el('dDocument').value.trim(),
-        phone: el('dPhone').value.trim(),
-        kind: el('dKind').value,
-        stores: [currentStoreId],
-        active: true
-      };
-      if (!payload.name) return alert('Informe o nome do condutor.');
-      if (isDemo) {
-        drivers.unshift(payload);
-      } else {
-        await setDoc(doc(db, 'drivers', payload.id), payload);
-        drivers.unshift(payload);
-      }
-      closeModal('driverModal');
-      el('dName').value = '';
-      el('dDocument').value = '';
-      el('dPhone').value = '';
-      renderAll();
-    }
-
-    async function saveAuthorizer() {
-      const payload = {
-        id: crypto.randomUUID(),
-        name: el('aName').value.trim(),
-        role: el('aRole').value,
-        stores: [currentStoreId]
-      };
-      if (!payload.name) return alert('Informe o nome do autorizador.');
-      if (isDemo) {
-        authorizers.unshift(payload);
-      } else {
-        await setDoc(doc(db, 'authorizers', payload.id), payload);
-        authorizers.unshift(payload);
-      }
-      closeModal('authorizerModal');
-      el('aName').value = '';
-      renderAll();
-    }
-
-    function exportToExcel() {
-      const data = getFilteredMovements().map(m => ({
-        Loja: getStoreName(m.storeId),
-        Tipo: m.type,
-        Placa: m.plate,
-        Modelo: m.model,
-        Cor: m.color,
-        Condutor: m.driverName,
-        Autorizador: m.authorizerName,
-        Danos: m.damageLevel,
-        Observacoes: m.notes,
-        OCR_Placa: m.ocrPlate,
-        Fotos: m.photoCount || 0,
-        Status: m.status,
-        DataHora: formatDateTime(m.createdAtISO)
-      }));
-
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(data.length ? data : [{ Aviso: 'Sem registros para exportar' }]);
-      XLSX.utils.book_append_sheet(wb, ws, 'Historico');
-      XLSX.writeFile(wb, `historico_${currentStoreId || 'loja'}.xlsx`);
-    }
-
-    async function loadDemoData() {
-      isDemo = true;
-      stores = [...DEMO_DB.stores];
-      currentUser = { uid: 'demo-user', displayName: 'Gabriel Wandele', email: 'demo@demo.com' };
-      currentProfile = DEMO_DB.users['demo-user'];
-      drivers = [...DEMO_DB.drivers];
-      authorizers = [...DEMO_DB.authorizers];
-      movements = [...DEMO_DB.movements];
-      currentStoreId = currentProfile.stores[0];
-      authScreen.classList.add('hidden');
-      mainScreen.classList.remove('hidden');
-      renderAll();
-    }
-
-    async function bootstrapFirebase() {
-      const config = readFirebaseConfigLocal();
-      if (!config || config.demo) {
-        showAuthMessage('Sem configuração Firebase. Use o modo demo ou cole sua config.', '#b45309');
-        return;
-      }
-      app = initializeApp(config);
-      auth = getAuth(app);
-      db = getFirestore(app);
-      storage = getStorage(app);
-
-      onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-          authScreen.classList.remove('hidden');
-          mainScreen.classList.add('hidden');
-          currentUser = null;
-          currentProfile = null;
-          return;
-        }
-        try {
-          currentUser = user;
-          const userSnap = await getDoc(doc(db, 'users', user.uid));
-          if (!userSnap.exists()) {
-            throw new Error('Usuário autenticado, mas sem documento em users/{uid}.');
-          }
-          currentProfile = userSnap.data();
-          if (currentProfile.active === false) throw new Error('Usuário inativo.');
-
-          const storeDocs = await getDocs(collection(db, 'stores'));
-          stores = storeDocs.docs.map(d => ({ id: d.id, ...d.data() }));
-
-          const driversQ = await getDocs(collection(db, 'drivers'));
-          drivers = driversQ.docs.map(d => ({ id: d.id, ...d.data() }));
-
-          const authQ = await getDocs(collection(db, 'authorizers'));
-          authorizers = authQ.docs.map(d => ({ id: d.id, ...d.data() }));
-
-          const moveQ = await getDocs(collection(db, 'movements'));
-          movements = moveQ.docs.map(d => {
-            const data = d.data();
-            return {
-              id: d.id,
-              ...data,
-              createdAtISO: data.createdAt?.toDate ? data.createdAt.toDate().toISOString() : (data.createdAtISO || nowISO())
-            };
-          });
-
-          currentStoreId = currentProfile.stores?.[0] || stores[0]?.id || null;
-          authScreen.classList.add('hidden');
-          mainScreen.classList.remove('hidden');
-          renderAll();
-        } catch (err) {
-          console.error(err);
-          showAuthMessage(err.message || 'Erro ao carregar usuário.', '#dc2626');
-          alert(err.message || 'Erro ao carregar usuário.');
-          await signOut(auth);
-        }
-      });
-    }
-
-    async function loginGoogle() {
-      if (isDemo) return loadDemoData();
-      const config = readFirebaseConfigLocal();
-      if (!config || config.demo) {
-        alert('Cole primeiro a configuração do Firebase na aba Configuração > Firebase ou clique em modo demo.');
-        return;
-      }
-      try {
-        if (!auth) await bootstrapFirebase();
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider);
-      } catch (err) {
-        console.error(err);
-        showAuthMessage(err.message || 'Falha no login.', '#dc2626');
-      }
-    }
-
-    async function logout() {
-      if (isDemo) {
-        location.reload();
-        return;
-      }
-      await signOut(auth);
-    }
-
-    function bindEvents() {
-      el('btnGoogleLogin').addEventListener('click', loginGoogle);
-      el('btnLogout').addEventListener('click', logout);
-      el('btnNovaEntrada').addEventListener('click', () => { resetMovementForm('entrada'); openModal('movementModal'); });
-      el('btnNovaSaida').addEventListener('click', () => { resetMovementForm('saida'); openModal('movementModal'); });
-      el('btnNovoCondutor').addEventListener('click', () => openModal('driverModal'));
-      el('btnNovoAutorizador').addEventListener('click', () => openModal('authorizerModal'));
-      el('btnSaveMovement').addEventListener('click', saveMovement);
-      el('btnSaveDriver').addEventListener('click', saveDriver);
-      el('btnSaveAuthorizer').addEventListener('click', saveAuthorizer);
-      el('btnRunOCR').addEventListener('click', runPlateOCR);
-      el('btnExportar').addEventListener('click', exportToExcel);
-      el('btnExportarTop').addEventListener('click', exportToExcel);
-      el('btnLimparFiltros').addEventListener('click', () => {
-        el('searchInput').value = '';
-        el('filterTipo').value = 'todos';
-        el('filterStatus').value = 'todos';
-        el('filterDate').value = '';
-        renderHistoryRows();
-      });
-
-      document.querySelectorAll('[data-close]').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.close)));
-      document.querySelectorAll('.modal').forEach(modal => modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('show');
-      }));
-
-      document.querySelectorAll('#navTabs button').forEach(btn => btn.addEventListener('click', () => switchView(btn.dataset.view)));
-      document.querySelectorAll('#configTabs button').forEach(btn => btn.addEventListener('click', () => switchConfig(btn.dataset.config)));
-
-      ['searchInput', 'filterTipo', 'filterStatus', 'filterDate'].forEach(id => {
-        el(id).addEventListener('input', renderHistoryRows);
-        el(id).addEventListener('change', renderHistoryRows);
-      });
-
-      el('storeSelect').addEventListener('change', (e) => {
-        currentStoreId = e.target.value;
-        renderAll();
-      });
-
-      el('mPhotos').addEventListener('change', (e) => {
-        selectedFiles = Array.from(e.target.files || []);
-        renderPhotoGrid();
-      });
-
-      el('btnSalvarFirebaseConfig').addEventListener('click', async () => {
-        try {
-          const cfg = JSON.parse(el('firebaseConfigInput').value);
-          saveFirebaseConfigLocal(cfg);
-          alert('Configuração salva. Agora clique em Entrar com Google.');
-          showAuthMessage('Config Firebase salva.', '#059669');
-          await bootstrapFirebase();
-        } catch (err) {
-          alert('JSON inválido da configuração Firebase.');
-        }
-      });
-
-      el('btnCarregarDemo').addEventListener('click', () => {
-        saveFirebaseConfigLocal(DEMO_CONFIG);
-        loadDemoData();
-      });
-    }
-
-    function preloadConfigUI() {
-      const saved = readFirebaseConfigLocal();
-      if (saved && !saved.demo) {
-        el('firebaseConfigInput').value = JSON.stringify(saved, null, 2);
-      }
-    }
-
-    bindEvents();
-    preloadConfigUI();
-    bootstrapFirebase();
-    renderPhotoGrid();
-    switchView('dashboard');
-    switchConfig('firebase');
-  </script>
+header{
+background:#111827;
+color:white;
+padding:20px;
+}
+
+.dashboard{
+display:flex;
+gap:20px;
+padding:20px;
+}
+
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.1);
+}
+
+button{
+background:#2563eb;
+color:white;
+border:none;
+padding:10px 15px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.5);
+}
+
+.modal-content{
+background:white;
+width:400px;
+margin:100px auto;
+padding:20px;
+border-radius:10px;
+}
+
+input,select,textarea{
+width:100%;
+padding:8px;
+margin-top:5px;
+margin-bottom:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>Sistema de Portaria Veicular</h2>
+</header>
+
+<div class="dashboard">
+
+<div class="card">
+<h3>Entradas</h3>
+<p id="entradas">0</p>
+</div>
+
+<div class="card">
+<h3>Saídas</h3>
+<p id="saidas">0</p>
+</div>
+
+<div class="card">
+<button onclick="abrirEntrada()">Registrar Entrada</button>
+</div>
+
+<div class="card">
+<button onclick="abrirSaida()">Registrar Saída</button>
+</div>
+
+</div>
+
+
+<div class="modal" id="modalEntrada">
+
+<div class="modal-content">
+
+<h3>Entrada de Veículo</h3>
+
+<label>Placa</label>
+<input id="placa">
+
+<label>Condutor</label>
+<input id="condutor">
+
+<label>Danos</label>
+<textarea id="danos"></textarea>
+
+<label>Foto</label>
+<input type="file" accept="image/*" capture="camera">
+
+<button onclick="salvarEntrada()">Salvar</button>
+
+</div>
+</div>
+
+
+<script>
+
+function abrirEntrada(){
+document.getElementById("modalEntrada").style.display="block"
+}
+
+function abrirSaida(){
+alert("Abrir formulário de saída")
+}
+
+function salvarEntrada(){
+
+const placa = document.getElementById("placa").value
+const condutor = document.getElementById("condutor").value
+const danos = document.getElementById("danos").value
+
+console.log({
+placa,
+condutor,
+danos,
+data:new Date()
+})
+
+alert("Entrada registrada")
+
+}
+
+</script>
+
 </body>
 </html>

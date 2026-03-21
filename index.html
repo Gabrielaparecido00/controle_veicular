@@ -1043,27 +1043,58 @@
     }
 
     async function loadOperationalCollections(){
-      const lojaId = currentUserStoreId();
+  const lojaId = currentUserStoreId();
 
-      if(userIsGeneralManager()){
-        // Aqui pode usar orderBy (sem where) e fica mais rápido/organizado
-        const [movSnap, condSnap, autSnap] = await Promise.all([
-          getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))),
-          getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(3000))),
-          getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(3000)))
-        ]);
+  // helper pra testar uma coleção de cada vez
+  async function fetchLabel(label, q){
+    try{
+      const snap = await getDocs(q);
+      console.log("OK:", label, "docs:", snap.size);
+      const arr = [];
+      snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+      return arr;
+    }catch(e){
+      console.error("NEGADO:", label, e?.code, e?.message, e);
+      throw new Error(`${label}: ${e?.code || ""} ${e?.message || ""}`);
+    }
+  }
 
-        state.movimentos = [];
-        movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
+  if(userIsGeneralManager()){
+    state.movimentos = await fetchLabel(
+      "movimentos",
+      query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))
+    );
 
-        state.condutores = [];
-        condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
+    state.condutores = await fetchLabel(
+      "condutores",
+      query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(3000))
+    );
 
-        state.autorizadores = [];
-        autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
+    state.autorizadores = await fetchLabel(
+      "autorizadores",
+      query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(3000))
+    );
 
-        return;
-      }
+    return;
+  }
+
+  state.movimentos = await fetchLabel(
+    "movimentos",
+    query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(1500))
+  );
+
+  state.condutores = await fetchLabel(
+    "condutores",
+    query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(2000))
+  );
+
+  state.autorizadores = await fetchLabel(
+    "autorizadores",
+    query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(2000))
+  );
+
+  sortOperationalArrays();
+}
 
       // Para gerente_loja/controlador: evita índice composto, e ordena no JS
       const [movSnap, condSnap, autSnap] = await Promise.all([

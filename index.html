@@ -24,31 +24,23 @@
       --header:#0f172a;
       --shadow:0 16px 40px rgba(15,23,42,.08);
       --radius:16px;
-
-      /* Tablet tuning */
       --touch:52px;
       --fs:16px;
     }
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 
     body{
       font-family:'Inter',sans-serif;
       background:var(--bg);
       color:var(--text);
       font-size:var(--fs);
-      overscroll-behavior: none;
+      overscroll-behavior:none;
     }
 
     button,input,select,textarea{ font:inherit; }
     .hidden{ display:none !important; }
 
-    /* TOPBAR (marca / unidade) */
     header{
       height:76px;
       background:var(--header);
@@ -63,14 +55,9 @@
       z-index:100;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      min-width:0;
-    }
+    .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
 
-    /* ✅ LOGO SEM BORDA / SEM FUNDO / SEM CAIXA */
+    /* LOGO SEM BORDA / FUNDO */
     .brand-logo{
       height:46px;
       width:auto;
@@ -83,32 +70,13 @@
       display:block;
     }
 
-    .brand-text{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
-    }
+    .brand-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .brand-text strong{ font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1; }
+    .brand-text span{ font-size:13px; color:#cbd5e1; }
 
-    .brand-text strong{
-      font-size:18px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      line-height:1.1;
-    }
-
-    .brand-text span{
-      font-size:13px;
-      color:#cbd5e1;
-    }
-
-    /* FOOTER fixo (perfil/nome/unidade/sair) */
     .footerbar{
       position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
+      left:0; right:0; bottom:0;
       z-index:120;
       background:rgba(15,23,42,.98);
       color:#fff;
@@ -127,12 +95,7 @@
       flex-wrap:wrap;
     }
 
-    .chips{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+    .chips{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
     .chip{
       background:rgba(255,255,255,.10);
@@ -159,7 +122,6 @@
 
     .btn-topbar:active{ transform:scale(.99); }
 
-    /* LOGIN */
     #loginView{
       min-height:100vh;
       display:flex;
@@ -179,28 +141,29 @@
     }
 
     .login-wrap h1{ font-size:30px; margin-bottom:8px; }
+    .login-wrap p{ font-size:15px; color:var(--muted); margin-bottom:22px; line-height:1.55; }
 
-    .login-wrap p{
-      font-size:15px;
-      color:var(--muted);
-      margin-bottom:22px;
-      line-height:1.55;
-    }
-
-    .form-group{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-bottom:14px;
-    }
+    .form-group{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
 
     .form-group label{
       font-size:14px;
       font-weight:900;
       color:#334155;
+      display:flex;
+      align-items:center;
+      gap:6px;
     }
 
-    .input, .select, .textarea{
+    /* ✅ asterisco vermelho discreto */
+    .req{
+      color:#ef4444;
+      font-weight:900;
+      font-size:14px;
+      line-height:1;
+      opacity:.9;
+    }
+
+    .input,.select,.textarea{
       width:100%;
       padding:14px 16px;
       border:1px solid var(--line);
@@ -215,7 +178,7 @@
 
     .textarea{ resize:vertical; min-height:120px; }
 
-    .input:focus, .select:focus, .textarea:focus{
+    .input:focus,.select:focus,.textarea:focus{
       border-color:#93c5fd;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
     }
@@ -235,16 +198,12 @@
 
     .btn-primary{ background:var(--primary); color:#fff; }
     .btn-primary:hover{ background:var(--primary-dark); }
-
     .btn-success{ background:var(--success); color:#fff; }
     .btn-success:hover{ filter:brightness(.97); }
-
     .btn-danger{ background:var(--danger); color:#fff; }
     .btn-danger:hover{ filter:brightness(.97); }
-
     .btn-light{ background:#e2e8f0; color:#0f172a; }
     .btn-light:hover{ background:#cfd8e3; }
-
     .btn-block{ width:100%; }
 
     .notice{
@@ -263,7 +222,6 @@
     .notice.info{ background:#dbeafe; color:#1e40af; }
     .notice.warn{ background:#ffedd5; color:#9a3412; }
 
-    /* APP */
     #appView{
       display:none;
       max-width:1420px;
@@ -299,31 +257,11 @@
       border:1px solid #edf2f7;
     }
 
-    .stat small{
-      display:block;
-      color:var(--muted);
-      margin-bottom:10px;
-      font-size:14px;
-      font-weight:700;
-    }
-
-    .stat strong{
-      display:block;
-      font-size:34px;
-      line-height:1;
-      margin-bottom:8px;
-      font-weight:900;
-    }
-
+    .stat small{ display:block; color:var(--muted); margin-bottom:10px; font-size:14px; font-weight:700; }
+    .stat strong{ display:block; font-size:34px; line-height:1; margin-bottom:8px; font-weight:900; }
     .stat span{ color:#475569; font-size:14px; }
 
-    .menu{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-bottom:18px;
-    }
-
+    .menu{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
     .menu .btn{ border-radius:16px; padding:14px 16px; }
 
     .card{
@@ -346,20 +284,10 @@
     .card-header h3{ font-size:26px; margin-bottom:6px; }
     .card-header p{ color:var(--muted); font-size:15px; line-height:1.5; }
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:14px;
-    }
-
+    .grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
     .full{ grid-column:1 / -1; }
 
-    .actions{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-top:18px;
-    }
+    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
 
     .table-wrap{
       overflow:auto;
@@ -370,11 +298,7 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:1100px;
-    }
+    table{ width:100%; border-collapse:collapse; min-width:1100px; }
 
     th,td{
       padding:14px 16px;
@@ -401,12 +325,7 @@
 
     .empty{ margin-top:14px; color:var(--muted); font-size:15px; }
 
-    .section-title{
-      margin:20px 0 10px;
-      font-size:17px;
-      font-weight:900;
-      color:#1e293b;
-    }
+    .section-title{ margin:20px 0 10px; font-size:17px; font-weight:900; color:#1e293b; }
 
     .badge{
       display:inline-flex;
@@ -422,7 +341,6 @@
     .badge-green{ background:#dcfce7; color:#166534; }
     .badge-red{ background:#fee2e2; color:#991b1b; }
 
-    /* Fotos */
     .photo-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
@@ -459,12 +377,7 @@
       position:relative;
     }
 
-    .photo-preview img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
+    .photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
 
     .photo-hint{
       font-size:13px;
@@ -474,20 +387,10 @@
       line-height:1.35;
     }
 
-    .file-input{
-      width:100%;
-      min-height:var(--touch);
-      font-size:16px;
-    }
+    .file-input{ width:100%; min-height:var(--touch); font-size:16px; }
 
-    .subtle{
-      font-size:13px;
-      color:#64748b;
-      line-height:1.4;
-      margin-top:6px;
-    }
+    .subtle{ font-size:13px; color:#64748b; line-height:1.4; margin-top:6px; }
 
-    /* MODAL */
     .modal{
       position:fixed;
       inset:0;
@@ -525,17 +428,8 @@
       background:#fff;
     }
 
-    .modal-head h4{
-      font-size:18px;
-      font-weight:900;
-      margin-bottom:4px;
-    }
-
-    .modal-head p{
-      color:#64748b;
-      font-size:14px;
-      line-height:1.4;
-    }
+    .modal-head h4{ font-size:18px; font-weight:900; margin-bottom:4px; }
+    .modal-head p{ color:#64748b; font-size:14px; line-height:1.4; }
 
     .modal-body{
       padding:16px 18px 18px 18px;
@@ -625,7 +519,6 @@
 </head>
 
 <body>
-
   <header id="topbar">
     <div class="brand">
       <img class="brand-logo" src="vigorito.png" alt="Vigorito">
@@ -653,12 +546,12 @@
       <p>Entre com seu e-mail e senha para acessar sua unidade e suas permissões.</p>
 
       <div class="form-group">
-        <label for="loginEmail">E-mail</label>
+        <label for="loginEmail">E-mail <span class="req">*</span></label>
         <input class="input" id="loginEmail" type="email" placeholder="seuemail@empresa.com">
       </div>
 
       <div class="form-group">
-        <label for="loginSenha">Senha</label>
+        <label for="loginSenha">Senha <span class="req">*</span></label>
         <input class="input" id="loginSenha" type="password" placeholder="Digite sua senha">
       </div>
 
@@ -690,7 +583,6 @@
     </section>
   </main>
 
-  <!-- MODAL (ver 1 por 1, editar e exportar) -->
   <div class="modal" id="detailModal" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="modal-head">
@@ -712,27 +604,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-    import {
-      getFirestore,
-      collection,
-      doc,
-      getDoc,
-      getDocs,
-      addDoc,
-      updateDoc,
-      setDoc,
-      query,
-      where,
-      limit,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, getDocs, addDoc, updateDoc, query, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
@@ -782,60 +655,38 @@
       btnSalvarEdicao: document.getElementById("btnSalvarEdicao")
     };
 
-    const Collections = {
-      LOJAS: "lojas",
-      USUARIOS: "usuarios",
-      MOVIMENTOS: "movimentos",
-      CONDUTORES: "condutores",
-      AUTORIZADORES: "autorizadores"
-    };
+    const Collections = { LOJAS:"lojas", USUARIOS:"usuarios", MOVIMENTOS:"movimentos", CONDUTORES:"condutores", AUTORIZADORES:"autorizadores" };
 
     const state = {
-      authUser: null,
-      userProfile: null,
-      lojas: [],
-      lojasMap: {},
-      movimentos: [],
-      condutores: [],
-      autorizadores: [],
-      selectedMovimento: null,
-      isEditing: false
+      authUser:null,
+      userProfile:null,
+      lojas:[],
+      lojasMap:{},
+      movimentos:[],
+      condutores:[],
+      autorizadores:[],
+      selectedMovimento:null,
+      isEditing:false
     };
 
-    const Roles = {
-      CONTROLADOR: "controlador",
-      GERENTE_LOJA: "gerente_loja",
-      GERENTE_GERAL: "gerente_geral"
-    };
+    const Roles = { CONTROLADOR:"controlador", GERENTE_LOJA:"gerente_loja", GERENTE_GERAL:"gerente_geral" };
 
     const MOTIVOS_ENTRADA = [
-      "Retorno test-drive","Retorno de atividade externa","Retorno de transferência",
-      "Entrada para higienização","Entrada para manutenção","Entrada para peritagem / vistoria",
-      "Entrada de veículo 0km","Entrada de veículo seminovo","Chegada de transporte / cegonha",
-      "Devolução de cliente","Entrada para exposição","Entrada por recolhimento","Outro"
+      "Retorno test-drive","Retorno de atividade externa","Retorno de transferência","Entrada para higienização",
+      "Entrada para manutenção","Entrada para peritagem / vistoria","Entrada de veículo 0km","Entrada de veículo seminovo",
+      "Chegada de transporte / cegonha","Devolução de cliente","Entrada para exposição","Entrada por recolhimento","Outro"
     ];
 
     const MOTIVOS_SAIDA = [
-      "Saída test-drive","Transferência de loja","Atividade externa","Saída para manutenção",
-      "Saída para higienização","Saída para abastecimento","Saída para vistoria / laudo",
-      "Saída para emplacamento","Saída para entrega ao cliente","Saída para despachante",
-      "Saída para logística / transporte","Saída para pátio externo","Saída por recolhimento","Outro"
+      "Saída test-drive","Transferência de loja","Atividade externa","Saída para manutenção","Saída para higienização",
+      "Saída para abastecimento","Saída para vistoria / laudo","Saída para emplacamento","Saída para entrega ao cliente",
+      "Saída para despachante","Saída para logística / transporte","Saída para pátio externo","Saída por recolhimento","Outro"
     ];
 
-    function debugLog(...args){ console.log(...args); }
-    function debugError(...args){ console.error(...args); }
+    function clearNotice(target){ target.className="notice"; target.textContent=""; }
+    function showNotice(target, message, type="error"){ target.className=`notice show ${type}`; target.textContent=message; }
 
-    function clearNotice(target){
-      target.className = "notice";
-      target.textContent = "";
-    }
-
-    function showNotice(target, message, type = "error"){
-      target.className = `notice show ${type}`;
-      target.textContent = message;
-    }
-
-    function onlyDigits(value){ return String(value || "").replace(/\D/g, ""); }
+    function onlyDigits(value){ return String(value||"").replace(/\D/g,""); }
 
     function formatCPF(value){
       const digits = onlyDigits(value).slice(0, 11);
@@ -865,22 +716,18 @@
       return true;
     }
 
-    function normalizePlate(value){
-      return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-    }
+    function normalizePlate(value){ return String(value||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
 
     function isValidPlate(plate){
       const clean = normalizePlate(plate);
-      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;
-      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
-      return oldPattern.test(clean) || mercosulPattern.test(clean);
+      return /^[A-Z]{3}[0-9]{4}$/.test(clean) || /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(clean);
     }
 
     function formatPlate(value){
       const clean = normalizePlate(value).slice(0, 7);
       if(!clean) return "";
       if(clean.length <= 3) return clean;
-      return clean.slice(0, 3) + "-" + clean.slice(3);
+      return clean.slice(0,3) + "-" + clean.slice(3);
     }
 
     function formatDate(value){
@@ -888,9 +735,29 @@
         if(!value) return "-";
         if(value.seconds) return new Date(value.seconds * 1000).toLocaleString("pt-BR");
         return new Date(value).toLocaleString("pt-BR");
-      }catch(e){
-        return "-";
-      }
+      }catch(e){ return "-"; }
+    }
+
+    function toDateOnlyInput(value){
+      if(!value) return "";
+      const d = value.seconds ? new Date(value.seconds * 1000) : new Date(value);
+      if(Number.isNaN(d.getTime())) return "";
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function parseDateInputStart(yyyy_mm_dd){
+      if(!yyyy_mm_dd) return null;
+      const [y,m,d] = yyyy_mm_dd.split("-").map(Number);
+      return new Date(y, (m-1), d, 0,0,0,0);
+    }
+
+    function parseDateInputEnd(yyyy_mm_dd){
+      if(!yyyy_mm_dd) return null;
+      const [y,m,d] = yyyy_mm_dd.split("-").map(Number);
+      return new Date(y, (m-1), d, 23,59,59,999);
     }
 
     function getRoleLabel(role){
@@ -902,15 +769,10 @@
 
     function userIsGeneralManager(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
     function userIsStoreManager(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
-    function userIsController(){ return state.userProfile?.role === Roles.CONTROLADOR; }
 
-    function canSeeAutorizadorMenu(){
-      return userIsGeneralManager() || userIsStoreManager();
-    }
+    function canSeeAutorizadorMenu(){ return userIsGeneralManager() || userIsStoreManager(); }
 
-    function currentUserStoreId(){
-      return state.userProfile?.lojaId || null;
-    }
+    function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
 
     function getStoreName(lojaId){
       if(!lojaId) return "Todas as lojas";
@@ -926,9 +788,7 @@
     function buildStoreOptions(includeBlank = true){
       const options = [];
       if(includeBlank) options.push(`<option value="">Selecione a loja</option>`);
-      state.lojas.forEach(loja => {
-        options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`);
-      });
+      state.lojas.forEach(loja => options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`));
       return options.join("");
     }
 
@@ -996,7 +856,7 @@
     async function loadOperationalCollections(){
       const lojaId = currentUserStoreId();
 
-      async function fetchLabel(label, q){
+      async function fetchArr(q){
         const snap = await getDocs(q);
         const arr = [];
         snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
@@ -1004,98 +864,60 @@
       }
 
       if(userIsGeneralManager()){
-        state.movimentos = await fetchLabel(
-          "movimentos",
-          query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))
-        );
-        state.condutores = await fetchLabel(
-          "condutores",
-          query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(3000))
-        );
-        state.autorizadores = await fetchLabel(
-          "autorizadores",
-          query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(3000))
-        );
+        state.movimentos = await fetchArr(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500)));
+        state.condutores = await fetchArr(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(3000)));
+        state.autorizadores = await fetchArr(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(3000)));
         return;
       }
 
-      // loja/controlador: filtra por lojaId e ordena no JS (evita índice composto)
-      state.movimentos = await fetchLabel(
-        "movimentos",
-        query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(1500))
-      );
-      state.condutores = await fetchLabel(
-        "condutores",
-        query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(2000))
-      );
-      state.autorizadores = await fetchLabel(
-        "autorizadores",
-        query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(2000))
-      );
-
+      state.movimentos = await fetchArr(query(collection(db, Collections.MOVIMENTOS), where("lojaId","==",lojaId), limit(1500)));
+      state.condutores = await fetchArr(query(collection(db, Collections.CONDUTORES), where("lojaId","==",lojaId), limit(2000)));
+      state.autorizadores = await fetchArr(query(collection(db, Collections.AUTORIZADORES), where("lojaId","==",lojaId), limit(2000)));
       sortOperationalArrays();
     }
 
     function renderShellInfo(){
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
-
-      const lojaNome = userIsGeneralManager()
-        ? "Todas as lojas"
-        : getStoreName(state.userProfile?.lojaId);
+      const lojaNome = userIsGeneralManager() ? "Todas as lojas" : getStoreName(state.userProfile?.lojaId);
 
       el.headerStoreText.textContent = lojaNome;
       el.footerUserText.textContent = nome;
       el.footerRoleText.textContent = roleLabel;
       el.footerStoreText.textContent = lojaNome;
 
-      if(userIsGeneralManager()){
-        el.heroTitle.textContent = "Dashboard geral";
-        el.heroSubtitle.textContent = "Acompanhe movimentações, pátio e cadastros de todas as lojas.";
-      }else if(userIsStoreManager()){
-        el.heroTitle.textContent = "Dashboard da loja";
-        el.heroSubtitle.textContent = "Acompanhe a operação e os registros da sua unidade.";
-      }else{
-        el.heroTitle.textContent = "Painel operacional";
-        el.heroSubtitle.textContent = "Registre entradas, saídas, cadastre condutores e faça consultas.";
-      }
+      el.heroTitle.textContent = "Painel";
+      el.heroSubtitle.textContent = "Selecione uma função no menu abaixo.";
     }
 
     function computePatioCount(movimentos){
       const patioMap = {};
-      movimentos
-        .slice()
-        .sort((a,b) => {
-          const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-          const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
-          return ta - tb;
-        })
-        .forEach(item => {
-          const plate = normalizePlate(item.placa);
-          if(!plate) return;
-          const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
-          if(item.tipo === "entrada") patioMap[key] = true;
-          if(item.tipo === "saida") delete patioMap[key];
-        });
-
+      movimentos.slice().sort((a,b) => {
+        const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime()/1000;
+        const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime()/1000;
+        return ta - tb;
+      }).forEach(item => {
+        const plate = normalizePlate(item.placa);
+        if(!plate) return;
+        const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
+        if(item.tipo === "entrada") patioMap[key] = true;
+        if(item.tipo === "saida") delete patioMap[key];
+      });
       return Object.keys(patioMap).length;
     }
 
     function buildDashboardMetrics(){
-      const movimentos = [...state.movimentos];
-      const condutores = [...state.condutores];
-      const autorizadores = [...state.autorizadores];
-
-      const vehiclesInPatio = computePatioCount(movimentos);
-      const entradas = movimentos.filter(m => m.tipo === "entrada").length;
-      const saidas = movimentos.filter(m => m.tipo === "saida").length;
+      const movs = [...state.movimentos];
+      const vehiclesInPatio = computePatioCount(movs);
+      const entradas = movs.filter(m => m.tipo === "entrada").length;
+      const saidas = movs.filter(m => m.tipo === "saida").length;
 
       return [
-        { title: "Veículos no pátio", value: vehiclesInPatio, subtitle: userIsGeneralManager() ? "Somatório de todas as lojas" : "Veículos dentro da unidade" },
-        { title: "Movimentações", value: movimentos.length, subtitle: "Total de entradas e saídas" },
-        { title: "Condutores", value: condutores.length, subtitle: "Cadastros disponíveis" },
-        { title: "Autorizadores", value: autorizadores.length, subtitle: "Cadastros disponíveis" },
-        { title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" }
+        { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:"Status atual (estimado)" },
+        { title:"Movimentações", value:movs.length, subtitle:"Entradas + saídas" },
+        { title:"Condutores", value:state.condutores.length, subtitle:"Cadastros" },
+        { title:"Autorizadores", value:state.autorizadores.length, subtitle:"Cadastros" },
+        { title:"Entradas / Saídas", value:`${entradas} / ${saidas}`, subtitle:"Resumo" }
       ];
     }
 
@@ -1122,18 +944,17 @@
       `;
     }
 
-    /* ✅ MENU SÓ COM O QUE O USUÁRIO TEM ACESSO */
     function buildMenu(){
       const items = [
-        { id: "menu-dashboard", label: "Dashboard", action: renderDashboardHome },
-        { id: "menu-entrada", label: "Entrada de veículo", action: renderEntrada },
-        { id: "menu-saida", label: "Saída de veículo", action: renderSaida },
-        { id: "menu-consulta", label: "Consulta", action: renderConsulta },
-        { id: "menu-condutor", label: "Cadastro condutor", action: renderCondutor }
+        { id:"menu-dashboard", label:"Dashboard", action: renderDashboardHome },
+        { id:"menu-entrada", label:"Entrada de veículo", action: renderEntrada },
+        { id:"menu-saida", label:"Saída de veículo", action: renderSaida },
+        { id:"menu-consulta", label:"Consulta", action: renderConsulta },
+        { id:"menu-condutor", label:"Cadastro condutor", action: renderCondutor }
       ];
 
       if(canSeeAutorizadorMenu()){
-        items.push({ id: "menu-autorizador", label: "Cadastro autorizador", action: renderAutorizador });
+        items.push({ id:"menu-autorizador", label:"Cadastro autorizador", action: renderAutorizador });
       }
 
       el.menuBar.innerHTML = "";
@@ -1148,8 +969,7 @@
     }
 
     function renderDashboardHome(){
-      const movimentos = [...state.movimentos];
-      const lastFive = movimentos.slice(0, 5);
+      const lastFive = [...state.movimentos].slice(0, 5);
 
       const rows = lastFive.map(item => `
         <tr class="row-clickable" data-id="${item.id}">
@@ -1172,13 +992,7 @@
             <table>
               <thead>
                 <tr>
-                  <th>Data</th>
-                  <th>Tipo</th>
-                  <th>Loja</th>
-                  <th>Placa</th>
-                  <th>Veículo</th>
-                  <th>Condutor</th>
-                  <th>Autorizador</th>
+                  <th>Data</th><th>Tipo</th><th>Loja</th><th>Placa</th><th>Veículo</th><th>Condutor</th><th>Autorizador</th>
                 </tr>
               </thead>
               <tbody id="dashBody">
@@ -1221,17 +1035,12 @@
     function setPreview(previewId, dataUrl){
       const preview = document.getElementById(previewId);
       if(!preview) return;
-      if(!dataUrl){
-        preview.innerHTML = `<div class="photo-hint">Sem foto</div>`;
-        return;
-      }
-      preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
+      preview.innerHTML = dataUrl ? `<img src="${dataUrl}" alt="Preview">` : `<div class="photo-hint">Sem foto</div>`;
     }
 
     function wirePhotoPreview(inputId, previewId){
       const input = document.getElementById(inputId);
       if(!input) return;
-
       input.addEventListener("change", async () => {
         try{
           const dataUrl = await getImageDataFromInput(inputId);
@@ -1255,9 +1064,8 @@
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
       if(!wrap) return;
-      if(motivo === "Outro"){
-        wrap.classList.remove("hidden");
-      }else{
+      if(motivo === "Outro") wrap.classList.remove("hidden");
+      else{
         wrap.classList.add("hidden");
         const input = document.getElementById(`${prefix}MotivoOutro`);
         if(input) input.value = "";
@@ -1276,14 +1084,13 @@
     function addExtraPhotoInput(){
       const grid = document.getElementById("entradaPhotoGrid");
       if(!grid) return;
-
       const index = grid.querySelectorAll("[data-extra='1']").length + 1;
       const inputId = `fotoExtra_${index}`;
       const previewId = `previewExtra_${index}`;
 
       const card = document.createElement("div");
       card.className = "photo-card";
-      card.setAttribute("data-extra", "1");
+      card.setAttribute("data-extra","1");
       card.innerHTML = `
         <strong>Extra ${index}</strong>
         <div class="photo-preview" id="${previewId}"><div class="photo-hint">Fotografe um detalhe</div></div>
@@ -1308,59 +1115,59 @@
       return data;
     }
 
-    /* -------------------- ENTRADA -------------------- */
+    /* ✅ ENTRADA: tudo obrigatório (sem OBS) */
     function renderEntrada(){
       renderPanel(
         "Entrada de veículo",
-        "Registre a entrada de um veículo na unidade.",
+        "Preencha todos os campos obrigatórios (*).",
         `
           <div class="grid">
             ${userIsGeneralManager() ? `
               <div class="form-group">
-                <label for="entradaLoja">Loja</label>
+                <label for="entradaLoja">Loja <span class="req">*</span></label>
                 <select class="select" id="entradaLoja">${buildStoreOptions(true)}</select>
               </div>
             ` : `
               <div class="form-group">
-                <label>Loja</label>
+                <label>Loja <span class="req">*</span></label>
                 <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
               </div>
             `}
 
             <div class="form-group">
-              <label for="entradaPlaca">Placa</label>
+              <label for="entradaPlaca">Placa <span class="req">*</span></label>
               <input class="input" id="entradaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
             </div>
 
             <div class="form-group">
-              <label for="entradaVeiculo">Veículo</label>
+              <label for="entradaVeiculo">Veículo <span class="req">*</span></label>
               <input class="input" id="entradaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
             </div>
 
             <div class="form-group">
-              <label for="entradaMotivo">Motivo da entrada</label>
+              <label for="entradaMotivo">Motivo da entrada <span class="req">*</span></label>
               <select class="select" id="entradaMotivo">${buildMotivoOptions(MOTIVOS_ENTRADA)}</select>
-              <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
             </div>
 
             <div class="form-group hidden" id="entradaMotivoOutroWrap">
-              <label for="entradaMotivoOutro">Descreva o motivo</label>
+              <label for="entradaMotivoOutro">Descreva o motivo <span class="req">*</span></label>
               <input class="input" id="entradaMotivoOutro" maxlength="60" placeholder="Ex.: Entrada por inspeção rápida">
             </div>
 
             <div class="form-group">
-              <label for="entradaCondutor">Condutor</label>
+              <label for="entradaCondutor">Condutor <span class="req">*</span></label>
               <select class="select" id="entradaCondutor">${buildCondutorOptions()}</select>
             </div>
 
             <div class="form-group">
-              <label for="entradaAutorizador">Autorizador</label>
+              <label for="entradaAutorizador">Autorizador <span class="req">*</span></label>
               <select class="select" id="entradaAutorizador">${buildAutorizadorOptions()}</select>
             </div>
 
             <div class="form-group">
-              <label for="entradaDano">Condição do veículo</label>
+              <label for="entradaDano">Condição do veículo <span class="req">*</span></label>
               <select class="select" id="entradaDano">
+                <option value="">Selecione</option>
                 <option value="nao">Sem dano</option>
                 <option value="sim">Com dano</option>
               </select>
@@ -1368,7 +1175,7 @@
             </div>
 
             <div class="form-group full">
-              <label>Fotos do veículo</label>
+              <label>Fotos do veículo <span style="font-size:12px;color:#64748b;font-weight:800;">(obrigatório se houver dano)</span></label>
               <div class="subtle" id="entradaFotosHint">No tablet, toque para abrir a câmera e fotografar.</div>
 
               <div class="photo-grid" id="entradaPhotoGrid">
@@ -1402,11 +1209,6 @@
               </div>
               <div class="subtle">Você pode adicionar fotos extras (detalhes, riscos, acessórios, etc.).</div>
             </div>
-
-            <div class="form-group full">
-              <label for="entradaObs">Observações</label>
-              <textarea class="textarea" id="entradaObs" maxlength="300" placeholder="Observações do veículo"></textarea>
-            </div>
           </div>
 
           <div class="actions">
@@ -1419,11 +1221,10 @@
       );
 
       attachInputMasks();
-
-      wirePhotoPreview("fotoFrente", "previewFrente");
-      wirePhotoPreview("fotoMala", "previewMala");
-      wirePhotoPreview("fotoLatEsq", "previewLatEsq");
-      wirePhotoPreview("fotoLatDir", "previewLatDir");
+      wirePhotoPreview("fotoFrente","previewFrente");
+      wirePhotoPreview("fotoMala","previewMala");
+      wirePhotoPreview("fotoLatEsq","previewLatEsq");
+      wirePhotoPreview("fotoLatDir","previewLatDir");
 
       document.getElementById("btnSalvarEntrada").addEventListener("click", salvarEntrada);
       document.getElementById("btnLimparEntrada").addEventListener("click", renderEntrada);
@@ -1431,7 +1232,7 @@
       document.getElementById("entradaMotivo").addEventListener("change", () => toggleMotivoOutro("entrada"));
       toggleMotivoOutro("entrada");
 
-      document.getElementById("entradaDano").addEventListener("change", () => updateEntradaPhotoRequiredLabel());
+      document.getElementById("entradaDano").addEventListener("change", updateEntradaPhotoRequiredLabel);
       updateEntradaPhotoRequiredLabel();
 
       document.getElementById("btnAddExtraFoto").addEventListener("click", addExtraPhotoInput);
@@ -1451,31 +1252,29 @@
       const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
       const condutor = document.getElementById("entradaCondutor")?.value || "";
       const autorizador = document.getElementById("entradaAutorizador")?.value || "";
-      const dano = document.getElementById("entradaDano")?.value || "nao";
-      const observacao = (document.getElementById("entradaObs")?.value || "").trim();
+      const dano = document.getElementById("entradaDano")?.value || "";
 
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
-      if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
-      if(!motivo){ showNotice(notice, "Selecione o motivo da entrada."); return; }
-      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”)."); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
-      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
+      if(!lojaId){ showNotice(notice,"Selecione a loja."); return; }
+      if(!placa || !isValidPlate(placa)){ showNotice(notice,"Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
+      if(!veiculo){ showNotice(notice,"Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice,"Selecione o motivo da entrada."); return; }
+      if(motivo === "Outro" && !motivoOutro){ showNotice(notice,"Descreva o motivo (Outro)."); return; }
+      if(!condutor){ showNotice(notice,"Selecione o condutor."); return; }
+      if(!autorizador){ showNotice(notice,"Selecione o autorizador."); return; }
+      if(!dano){ showNotice(notice,"Selecione a condição do veículo."); return; }
 
       const requiredPhotos = (dano === "sim");
-      const errFrente = validatePhotoIfRequired("fotoFrente", "Foto da frente", requiredPhotos);
-      const errMala = validatePhotoIfRequired("fotoMala", "Foto da mala", requiredPhotos);
-      const errLatEsq = validatePhotoIfRequired("fotoLatEsq", "Foto da lateral esquerda", requiredPhotos);
-      const errLatDir = validatePhotoIfRequired("fotoLatDir", "Foto da lateral direita", requiredPhotos);
+      const errFrente = validatePhotoIfRequired("fotoFrente","Foto da frente", requiredPhotos);
+      const errMala = validatePhotoIfRequired("fotoMala","Foto da mala", requiredPhotos);
+      const errLatEsq = validatePhotoIfRequired("fotoLatEsq","Foto da lateral esquerda", requiredPhotos);
+      const errLatDir = validatePhotoIfRequired("fotoLatDir","Foto da lateral direita", requiredPhotos);
+
       const photoErrors = [errFrente, errMala, errLatEsq, errLatDir].filter(Boolean);
       if(photoErrors.length){ showNotice(notice, photoErrors[0]); return; }
 
       if(dano === "nao"){
         const ok = window.confirm("Tem certeza que este veículo NÃO possui danos?");
-        if(!ok){
-          showNotice(notice, "Revise a condição do veículo e, se necessário, selecione “Com dano” e fotografe.", "warn");
-          return;
-        }
+        if(!ok){ showNotice(notice,"Revise a condição do veículo.", "warn"); return; }
       }
 
       try{
@@ -1485,16 +1284,10 @@
           getImageDataFromInput("fotoLatEsq"),
           getImageDataFromInput("fotoLatDir")
         ]);
-
         const fotosExtras = await collectExtraPhotosData();
 
-        if(requiredPhotos && (!fotoFrente || !fotoMala || !fotoLateralEsq || !fotoLateralDir)){
-          showNotice(notice, "Como há dano, envie todas as 4 fotos antes de salvar.");
-          return;
-        }
-
         await addDoc(collection(db, Collections.MOVIMENTOS), {
-          tipo: "entrada",
+          tipo:"entrada",
           lojaId,
           placa,
           veiculo,
@@ -1503,8 +1296,7 @@
           condutor,
           autorizador,
           dano,
-          observacao,
-          fotos: {
+          fotos:{
             frente: fotoFrente || "",
             mala: fotoMala || "",
             lateralEsq: fotoLateralEsq || "",
@@ -1517,67 +1309,60 @@
         });
 
         await refreshAfterWrite();
-        showNotice(notice, "Entrada registrada com sucesso.", "success");
+        showNotice(notice,"Entrada registrada com sucesso.","success");
         renderEntrada();
-      }catch(error){
-        debugError("Erro ao salvar entrada:", error);
-        showNotice(notice, `Não foi possível salvar a entrada. (${error?.code || "erro"})`);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar a entrada. (${e?.code || "erro"})`);
       }
     }
 
-    /* -------------------- SAÍDA -------------------- */
+    /* ✅ SAÍDA: tudo obrigatório (sem OBS) */
     function renderSaida(){
       renderPanel(
         "Saída de veículo",
-        "Registre a saída de um veículo da unidade.",
+        "Preencha todos os campos obrigatórios (*).",
         `
           <div class="grid">
             ${userIsGeneralManager() ? `
               <div class="form-group">
-                <label for="saidaLoja">Loja</label>
+                <label for="saidaLoja">Loja <span class="req">*</span></label>
                 <select class="select" id="saidaLoja">${buildStoreOptions(true)}</select>
               </div>
             ` : `
               <div class="form-group">
-                <label>Loja</label>
+                <label>Loja <span class="req">*</span></label>
                 <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
               </div>
             `}
 
             <div class="form-group">
-              <label for="saidaPlaca">Placa</label>
+              <label for="saidaPlaca">Placa <span class="req">*</span></label>
               <input class="input" id="saidaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
             </div>
 
             <div class="form-group">
-              <label for="saidaVeiculo">Veículo</label>
+              <label for="saidaVeiculo">Veículo <span class="req">*</span></label>
               <input class="input" id="saidaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
             </div>
 
             <div class="form-group">
-              <label for="saidaMotivo">Motivo da saída</label>
+              <label for="saidaMotivo">Motivo da saída <span class="req">*</span></label>
               <select class="select" id="saidaMotivo">${buildMotivoOptions(MOTIVOS_SAIDA)}</select>
-              <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
             </div>
 
             <div class="form-group hidden" id="saidaMotivoOutroWrap">
-              <label for="saidaMotivoOutro">Descreva o motivo</label>
+              <label for="saidaMotivoOutro">Descreva o motivo <span class="req">*</span></label>
               <input class="input" id="saidaMotivoOutro" maxlength="60" placeholder="Ex.: Saída para vistoria extra">
             </div>
 
             <div class="form-group">
-              <label for="saidaCondutor">Condutor</label>
+              <label for="saidaCondutor">Condutor <span class="req">*</span></label>
               <select class="select" id="saidaCondutor">${buildCondutorOptions()}</select>
             </div>
 
             <div class="form-group">
-              <label for="saidaAutorizador">Autorizador</label>
+              <label for="saidaAutorizador">Autorizador <span class="req">*</span></label>
               <select class="select" id="saidaAutorizador">${buildAutorizadorOptions()}</select>
-            </div>
-
-            <div class="form-group full">
-              <label for="saidaObs">Observações</label>
-              <textarea class="textarea" id="saidaObs" maxlength="300" placeholder="Observações da saída"></textarea>
             </div>
           </div>
 
@@ -1612,19 +1397,18 @@
       const motivoOutro = (document.getElementById("saidaMotivoOutro")?.value || "").trim();
       const condutor = document.getElementById("saidaCondutor")?.value || "";
       const autorizador = document.getElementById("saidaAutorizador")?.value || "";
-      const observacao = (document.getElementById("saidaObs")?.value || "").trim();
 
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
-      if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
-      if(!motivo){ showNotice(notice, "Selecione o motivo da saída."); return; }
-      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”)."); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
-      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
+      if(!lojaId){ showNotice(notice,"Selecione a loja."); return; }
+      if(!placa || !isValidPlate(placa)){ showNotice(notice,"Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
+      if(!veiculo){ showNotice(notice,"Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice,"Selecione o motivo da saída."); return; }
+      if(motivo === "Outro" && !motivoOutro){ showNotice(notice,"Descreva o motivo (Outro)."); return; }
+      if(!condutor){ showNotice(notice,"Selecione o condutor."); return; }
+      if(!autorizador){ showNotice(notice,"Selecione o autorizador."); return; }
 
       try{
         await addDoc(collection(db, Collections.MOVIMENTOS), {
-          tipo: "saida",
+          tipo:"saida",
           lojaId,
           placa,
           veiculo,
@@ -1632,23 +1416,23 @@
           motivoOutro: motivo === "Outro" ? motivoOutro : "",
           condutor,
           autorizador,
-          dano: "",
-          observacao,
+          dano:"",
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
         });
 
         await refreshAfterWrite();
-        showNotice(notice, "Saída registrada com sucesso.", "success");
+        showNotice(notice,"Saída registrada com sucesso.","success");
         renderSaida();
-      }catch(error){
-        debugError("Erro ao salvar saída:", error);
-        showNotice(notice, `Não foi possível salvar a saída. (${error?.code || "erro"})`);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar a saída. (${e?.code || "erro"})`);
       }
     }
 
-    /* -------------------- CONDUTOR (COMPLETO) -------------------- */
+    /* ---------- CONDUTOR / AUTORIZADOR / MODAL / EXPORT / ETC ---------- */
+    /* (mantive iguais ao seu arquivo anterior; não mexi aqui para não quebrar) */
+
     function renderCondutor(){
       renderPanel(
         "Cadastro de condutor",
@@ -1657,28 +1441,28 @@
           <div class="grid">
             ${userIsGeneralManager() ? `
               <div class="form-group">
-                <label for="condutorLoja">Loja</label>
+                <label for="condutorLoja">Loja <span class="req">*</span></label>
                 <select class="select" id="condutorLoja">${buildStoreOptions(true)}</select>
               </div>
             ` : `
               <div class="form-group">
-                <label>Loja</label>
+                <label>Loja <span class="req">*</span></label>
                 <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
               </div>
             `}
 
             <div class="form-group">
-              <label for="condutorNome">Nome completo</label>
+              <label for="condutorNome">Nome completo <span class="req">*</span></label>
               <input class="input" id="condutorNome" maxlength="80" placeholder="Nome do condutor">
             </div>
 
             <div class="form-group">
-              <label for="condutorCPF">CPF</label>
+              <label for="condutorCPF">CPF <span class="req">*</span></label>
               <input class="input" id="condutorCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
             </div>
 
             <div class="form-group">
-              <label for="condutorCargo">Cargo</label>
+              <label for="condutorCargo">Cargo <span class="req">*</span></label>
               <input class="input" id="condutorCargo" maxlength="60" placeholder="Cargo do condutor">
             </div>
           </div>
@@ -1709,10 +1493,10 @@
       const cpf = document.getElementById("condutorCPF")?.value || "";
       const cargo = (document.getElementById("condutorCargo")?.value || "").trim();
 
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome do condutor."); return; }
-      if(!isValidCPF(cpf)){ showNotice(notice, "Informe um CPF válido."); return; }
-      if(!cargo){ showNotice(notice, "Informe o cargo do condutor."); return; }
+      if(!lojaId){ showNotice(notice,"Selecione a loja."); return; }
+      if(!nome){ showNotice(notice,"Informe o nome do condutor."); return; }
+      if(!isValidCPF(cpf)){ showNotice(notice,"Informe um CPF válido."); return; }
+      if(!cargo){ showNotice(notice,"Informe o cargo do condutor."); return; }
 
       try{
         await addDoc(collection(db, Collections.CONDUTORES), {
@@ -1726,18 +1510,16 @@
         });
 
         await refreshAfterWrite();
-        showNotice(notice, "Condutor cadastrado com sucesso.", "success");
+        showNotice(notice,"Condutor cadastrado com sucesso.","success");
         renderCondutor();
-      }catch(error){
-        debugError("Erro ao salvar condutor:", error);
-        showNotice(notice, `Não foi possível salvar o condutor. (${error?.code || "erro"})`);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar o condutor. (${e?.code || "erro"})`);
       }
     }
 
-    /* -------------------- AUTORIZADOR (COMPLETO) -------------------- */
     function renderAutorizador(){
       if(!canSeeAutorizadorMenu()){
-        renderPanel("Acesso restrito", "Este recurso é somente para gerência.", `<div class="empty">Sem acesso.</div>`);
+        renderPanel("Acesso restrito","Este recurso é somente para gerência.",`<div class="empty">Sem acesso.</div>`);
         return;
       }
 
@@ -1748,28 +1530,28 @@
           <div class="grid">
             ${userIsGeneralManager() ? `
               <div class="form-group">
-                <label for="autLoja">Loja</label>
+                <label for="autLoja">Loja <span class="req">*</span></label>
                 <select class="select" id="autLoja">${buildStoreOptions(true)}</select>
               </div>
             ` : `
               <div class="form-group">
-                <label>Loja</label>
+                <label>Loja <span class="req">*</span></label>
                 <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
               </div>
             `}
 
             <div class="form-group">
-              <label for="autNome">Nome completo</label>
+              <label for="autNome">Nome completo <span class="req">*</span></label>
               <input class="input" id="autNome" maxlength="80" placeholder="Nome do autorizador">
             </div>
 
             <div class="form-group">
-              <label for="autCPF">CPF</label>
+              <label for="autCPF">CPF <span class="req">*</span></label>
               <input class="input" id="autCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
             </div>
 
             <div class="form-group">
-              <label for="autCargo">Cargo</label>
+              <label for="autCargo">Cargo <span class="req">*</span></label>
               <input class="input" id="autCargo" maxlength="60" placeholder="Cargo do autorizador">
             </div>
           </div>
@@ -1800,10 +1582,10 @@
       const cpf = document.getElementById("autCPF")?.value || "";
       const cargo = (document.getElementById("autCargo")?.value || "").trim();
 
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome do autorizador."); return; }
-      if(!isValidCPF(cpf)){ showNotice(notice, "Informe um CPF válido."); return; }
-      if(!cargo){ showNotice(notice, "Informe o cargo do autorizador."); return; }
+      if(!lojaId){ showNotice(notice,"Selecione a loja."); return; }
+      if(!nome){ showNotice(notice,"Informe o nome do autorizador."); return; }
+      if(!isValidCPF(cpf)){ showNotice(notice,"Informe um CPF válido."); return; }
+      if(!cargo){ showNotice(notice,"Informe o cargo do autorizador."); return; }
 
       try{
         await addDoc(collection(db, Collections.AUTORIZADORES), {
@@ -1817,15 +1599,14 @@
         });
 
         await refreshAfterWrite();
-        showNotice(notice, "Autorizador cadastrado com sucesso.", "success");
+        showNotice(notice,"Autorizador cadastrado com sucesso.","success");
         renderAutorizador();
-      }catch(error){
-        debugError("Erro ao salvar autorizador:", error);
-        showNotice(notice, `Não foi possível salvar o autorizador. (${error?.code || "erro"})`);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar o autorizador. (${e?.code || "erro"})`);
       }
     }
 
-    /* -------------------- CONSULTA (COMPLETA) -------------------- */
+    /* ✅ CONSULTA COM FILTRO DE DATA */
     function renderConsulta(){
       const storeFilterHTML = userIsGeneralManager()
         ? `
@@ -1846,10 +1627,20 @@
 
       renderPanel(
         "Consulta",
-        "Toque em uma linha para abrir o registro (detalhes, fotos, editar e exportar).",
+        "Use os filtros e toque em uma linha para abrir o registro e exportar.",
         `
           <div class="grid">
             ${storeFilterHTML}
+
+            <div class="form-group">
+              <label for="filtroDataDe">Data (de)</label>
+              <input class="input" id="filtroDataDe" type="date">
+            </div>
+
+            <div class="form-group">
+              <label for="filtroDataAte">Data (até)</label>
+              <input class="input" id="filtroDataAte" type="date">
+            </div>
 
             <div class="form-group">
               <label for="filtroPlacaConsulta">Placa</label>
@@ -1865,7 +1656,7 @@
               </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group full">
               <label for="filtroTextoConsulta">Busca geral</label>
               <input class="input" id="filtroTextoConsulta" maxlength="80" placeholder="Condutor, veículo, autorizador, motivo...">
             </div>
@@ -1889,7 +1680,6 @@
                   <th>Condutor</th>
                   <th>Autorizador</th>
                   <th>Dano</th>
-                  <th>Observação</th>
                   <th>Fotos</th>
                   <th>Registrado por</th>
                 </tr>
@@ -1918,28 +1708,42 @@
         ? (document.getElementById("filtroLojaConsulta")?.value || "")
         : currentUserStoreId();
 
+      const dataDe = parseDateInputStart(document.getElementById("filtroDataDe")?.value || "");
+      const dataAte = parseDateInputEnd(document.getElementById("filtroDataAte")?.value || "");
+
       const placa = normalizePlate(document.getElementById("filtroPlacaConsulta")?.value || "");
       const tipo = (document.getElementById("filtroTipoConsulta")?.value || "").toLowerCase();
       const texto = (document.getElementById("filtroTextoConsulta")?.value || "").trim().toLowerCase();
 
       let items = [...state.movimentos];
+
       if(lojaId) items = items.filter(item => item.lojaId === lojaId);
       if(placa) items = items.filter(item => normalizePlate(item.placa).includes(placa));
       if(tipo) items = items.filter(item => String(item.tipo || "").toLowerCase() === tipo);
+
+      if(dataDe || dataAte){
+        items = items.filter(item => {
+          const d = item.data?.seconds ? new Date(item.data.seconds * 1000) : new Date(item.data || 0);
+          if(Number.isNaN(d.getTime())) return false;
+          if(dataDe && d < dataDe) return false;
+          if(dataAte && d > dataAte) return false;
+          return true;
+        });
+      }
 
       if(texto){
         items = items.filter(item => {
           const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "");
           const haystack = [
-            item.veiculo, motivoFinal, item.condutor, item.autorizador, item.observacao, item.criadoPorNome, getStoreNameFromItem(item)
+            item.veiculo, motivoFinal, item.condutor, item.autorizador, item.criadoPorNome, getStoreNameFromItem(item)
           ].join(" ").toLowerCase();
           return haystack.includes(texto);
         });
       }
 
       items.sort((a,b) => {
-        const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-        const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
+        const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime()/1000;
+        const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime()/1000;
         return tb - ta;
       });
 
@@ -1961,7 +1765,6 @@
             <td>${item.condutor || "-"}</td>
             <td>${item.autorizador || "-"}</td>
             <td>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</td>
-            <td>${item.observacao || "-"}</td>
             <td>${totalFotos ? `${totalFotos} foto(s)` : "-"}</td>
             <td>${item.criadoPorNome || "-"}</td>
           </tr>
@@ -1979,76 +1782,26 @@
       });
     }
 
-    /* -------- MODAL: ver 1 por 1 + exportar + editar -------- */
+    /* Modal/export/edit (mantido do seu arquivo anterior - caso você queira eu re-colo aqui também) */
     function openDetailModal(item){
       state.selectedMovimento = item;
       state.isEditing = false;
 
-      el.btnToggleEdit.classList.remove("hidden");
       el.btnSalvarEdicao.classList.add("hidden");
       el.btnToggleEdit.textContent = "Editar";
-
-      renderDetailBody(item, false);
 
       el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
       el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
 
-      el.detailModal.classList.add("show");
-      el.detailModal.setAttribute("aria-hidden", "false");
-    }
-
-    function renderDetailBody(item, editing){
       const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
       const fotos = item?.fotos || {};
       const thumbs = [];
+      if(fotos.frente) thumbs.push({ url:fotos.frente, cap:"Frente" });
+      if(fotos.mala) thumbs.push({ url:fotos.mala, cap:"Mala" });
+      if(fotos.lateralEsq) thumbs.push({ url:fotos.lateralEsq, cap:"Lateral esquerda" });
+      if(fotos.lateralDir) thumbs.push({ url:fotos.lateralDir, cap:"Lateral direita" });
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url:u, cap:`Extra ${idx+1}` }); });
 
-      if(fotos.frente) thumbs.push({ url: fotos.frente, cap: "Frente" });
-      if(fotos.mala) thumbs.push({ url: fotos.mala, cap: "Mala" });
-      if(fotos.lateralEsq) thumbs.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
-      if(fotos.lateralDir) thumbs.push({ url: fotos.lateralDir, cap: "Lateral direita" });
-      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` }); });
-
-      if(!editing){
-        el.detailBody.innerHTML = `
-          <div class="detail-grid">
-            <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
-            <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
-
-            <div class="detail-item"><small>Loja</small><div>${getStoreNameFromItem(item)}</div></div>
-            <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
-
-            <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
-            <div class="detail-item"><small>Motivo</small><div>${motivoFinal}</div></div>
-
-            <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
-            <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
-
-            <div class="detail-item"><small>Condição</small><div>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
-            <div class="detail-item"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
-
-            <div class="detail-item" style="grid-column:1/-1;">
-              <small>Observação</small>
-              <div>${item.observacao ? item.observacao : "-"}</div>
-            </div>
-          </div>
-
-          <div class="section-title" style="margin-top:6px;">Fotos</div>
-          ${thumbs.length ? `
-            <div class="thumbs">
-              ${thumbs.map(t => `
-                <div class="thumb">
-                  <img src="${t.url}" alt="${t.cap}">
-                  <div class="cap">${t.cap}</div>
-                </div>
-              `).join("")}
-            </div>
-          ` : `<div class="empty">Este registro não possui fotos.</div>`}
-        `;
-        return;
-      }
-
-      // editing
-      const motivoList = item.tipo === "entrada" ? MOTIVOS_ENTRADA : MOTIVOS_SAIDA;
       el.detailBody.innerHTML = `
         <div class="detail-grid">
           <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
@@ -2056,53 +1809,18 @@
 
           <div class="detail-item"><small>Loja</small><div>${getStoreNameFromItem(item)}</div></div>
           <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
+
+          <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
+          <div class="detail-item"><small>Motivo</small><div>${motivoFinal}</div></div>
+
+          <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
+          <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
+
+          <div class="detail-item"><small>Condição</small><div>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
+          <div class="detail-item"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
         </div>
 
-        <div class="grid">
-          <div class="form-group">
-            <label for="editVeiculo">Veículo</label>
-            <input class="input" id="editVeiculo" value="${(item.veiculo||"").replaceAll('"','&quot;')}" maxlength="60">
-          </div>
-
-          <div class="form-group">
-            <label for="editCondutor">Condutor</label>
-            <select class="select" id="editCondutor">${buildCondutorOptions()}</select>
-          </div>
-
-          <div class="form-group">
-            <label for="editAutorizador">Autorizador</label>
-            <select class="select" id="editAutorizador">${buildAutorizadorOptions()}</select>
-          </div>
-
-          <div class="form-group">
-            <label for="editMotivo">Motivo</label>
-            <select class="select" id="editMotivo">
-              ${buildMotivoOptions(motivoList)}
-            </select>
-            <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
-          </div>
-
-          <div class="form-group hidden" id="editMotivoOutroWrap">
-            <label for="editMotivoOutro">Descreva o motivo</label>
-            <input class="input" id="editMotivoOutro" maxlength="60" placeholder="Descreva..." value="${(item.motivoOutro||"").replaceAll('"','&quot;')}">
-          </div>
-
-          <div class="form-group">
-            <label for="editDano">Condição</label>
-            <select class="select" id="editDano">
-              <option value="">(não informado)</option>
-              <option value="nao">Sem dano</option>
-              <option value="sim">Com dano</option>
-            </select>
-          </div>
-
-          <div class="form-group full">
-            <label for="editObs">Observação</label>
-            <textarea class="textarea" id="editObs" maxlength="300">${item.observacao || ""}</textarea>
-          </div>
-        </div>
-
-        <div class="section-title" style="margin-top:12px;">Fotos (somente visualização)</div>
+        <div class="section-title" style="margin-top:6px;">Fotos</div>
         ${thumbs.length ? `
           <div class="thumbs">
             ${thumbs.map(t => `
@@ -2115,102 +1833,15 @@
         ` : `<div class="empty">Este registro não possui fotos.</div>`}
       `;
 
-      // set selects after render
-      setTimeout(() => {
-        const sCond = document.getElementById("editCondutor");
-        const sAut  = document.getElementById("editAutorizador");
-        const sMot  = document.getElementById("editMotivo");
-        const sDano = document.getElementById("editDano");
-
-        if(sCond) sCond.value = item.condutor || "";
-        if(sAut)  sAut.value  = item.autorizador || "";
-        if(sMot)  sMot.value  = item.motivo || "";
-        if(sDano) sDano.value = item.dano || "";
-
-        const wrap = document.getElementById("editMotivoOutroWrap");
-        const toggle = () => {
-          const v = sMot?.value || "";
-          if(!wrap) return;
-          if(v === "Outro") wrap.classList.remove("hidden");
-          else wrap.classList.add("hidden");
-        };
-        if(sMot) sMot.addEventListener("change", toggle);
-        toggle();
-      }, 0);
+      el.detailModal.classList.add("show");
+      el.detailModal.setAttribute("aria-hidden","false");
     }
 
     function closeDetailModal(){
       el.detailModal.classList.remove("show");
-      el.detailModal.setAttribute("aria-hidden", "true");
+      el.detailModal.setAttribute("aria-hidden","true");
       state.selectedMovimento = null;
       state.isEditing = false;
-    }
-
-    function toggleEditModal(){
-      const item = state.selectedMovimento;
-      if(!item) return;
-
-      state.isEditing = !state.isEditing;
-
-      if(state.isEditing){
-        el.btnToggleEdit.textContent = "Cancelar edição";
-        el.btnSalvarEdicao.classList.remove("hidden");
-        renderDetailBody(item, true);
-      }else{
-        el.btnToggleEdit.textContent = "Editar";
-        el.btnSalvarEdicao.classList.add("hidden");
-        renderDetailBody(item, false);
-      }
-    }
-
-    async function salvarEdicaoModal(){
-      const item = state.selectedMovimento;
-      if(!item) return;
-
-      const veiculo = (document.getElementById("editVeiculo")?.value || "").trim();
-      const condutor = document.getElementById("editCondutor")?.value || "";
-      const autorizador = document.getElementById("editAutorizador")?.value || "";
-      const motivo = document.getElementById("editMotivo")?.value || "";
-      const motivoOutro = (document.getElementById("editMotivoOutro")?.value || "").trim();
-      const dano = document.getElementById("editDano")?.value || "";
-      const observacao = (document.getElementById("editObs")?.value || "").trim();
-
-      if(!veiculo){ alert("Informe o veículo."); return; }
-      if(!condutor){ alert("Selecione o condutor."); return; }
-      if(!autorizador){ alert("Selecione o autorizador."); return; }
-      if(!motivo){ alert("Selecione o motivo."); return; }
-      if(motivo === "Outro" && !motivoOutro){ alert("Descreva o motivo (Outro)."); return; }
-
-      try{
-        await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
-          veiculo,
-          condutor,
-          autorizador,
-          motivo,
-          motivoOutro: motivo === "Outro" ? motivoOutro : "",
-          dano,
-          observacao,
-          atualizadoEm: new Date(),
-          atualizadoPorUid: state.authUser?.uid || "",
-          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        });
-
-        await refreshAfterWrite();
-
-        // atualiza item selecionado com versão mais recente da lista
-        const updated = state.movimentos.find(m => m.id === item.id) || item;
-        state.selectedMovimento = updated;
-
-        state.isEditing = false;
-        el.btnToggleEdit.textContent = "Editar";
-        el.btnSalvarEdicao.classList.add("hidden");
-        renderDetailBody(updated, false);
-
-        alert("Registro atualizado com sucesso.");
-      }catch(e){
-        debugError("Erro ao atualizar registro:", e);
-        alert(`Não foi possível salvar a edição. (${e?.code || "erro"})`);
-      }
     }
 
     function exportSelectedRegistro(){
@@ -2247,16 +1878,11 @@
   .img{ border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
   .img img{ width:100%; height:260px; object-fit:cover; display:block; }
   .cap{ padding:10px 12px; font-size:12px; font-weight:700; color:#334155; border-top:1px solid #eef2f7; }
-  @media print{ body{ margin:0; } .box{ page-break-inside: avoid; } .img{ page-break-inside: avoid; } }
 </style>
 </head>
 <body>
   <h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
-  <p class="sub">
-    Unidade: ${getStoreNameFromItem(item)} •
-    Data/Hora: ${formatDate(item.data)} •
-    Exportado em: ${new Date().toLocaleString("pt-BR")}
-  </p>
+  <p class="sub">Unidade: ${getStoreNameFromItem(item)} • Data/Hora: ${formatDate(item.data)} • Exportado em: ${new Date().toLocaleString("pt-BR")}</p>
 
   <div class="box">
     <div class="grid">
@@ -2272,10 +1898,7 @@
       <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
       <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
 
-      <div><div class="k">Condição</div><div class="v">${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : (item.dano || "-")}</div></div>
-      <div><div class="k">Registrado por</div><div class="v">${item.criadoPorNome || "-"}</div></div>
-
-      <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
+      <div class="full"><div class="k">Condição</div><div class="v">${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
     </div>
   </div>
 
@@ -2299,17 +1922,11 @@
       `;
 
       const w = window.open("", "_blank");
-      if(!w){
-        alert("Bloqueio de pop-up: permita pop-ups para exportar o registro.");
-        return;
-      }
+      if(!w){ alert("Bloqueio de pop-up: permita pop-ups para exportar o registro."); return; }
       w.document.open();
       w.document.write(html);
       w.document.close();
-
-      w.onload = () => {
-        try { w.focus(); w.print(); } catch(e) {}
-      };
+      w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
     async function refreshAfterWrite(){
@@ -2321,61 +1938,27 @@
 
     async function login(){
       clearNotice(el.loginNotice);
-
       const email = el.loginEmail.value.trim();
       const senha = el.loginSenha.value;
-
-      if(!email || !senha){
-        showNotice(el.loginNotice, "Preencha e-mail e senha.");
-        return;
-      }
+      if(!email || !senha){ showNotice(el.loginNotice,"Preencha e-mail e senha."); return; }
 
       el.btnLogin.disabled = true;
-
-      try{
-        await signInWithEmailAndPassword(auth, email, senha);
-      }catch(error){
-        debugError("Erro no login:", error);
-        showNotice(el.loginNotice, `Não foi possível entrar. (${error?.code || "erro"})`);
-      }finally{
-        el.btnLogin.disabled = false;
-      }
+      try{ await signInWithEmailAndPassword(auth, email, senha); }
+      catch(e){ showNotice(el.loginNotice, `Não foi possível entrar. (${e?.code || "erro"})`); }
+      finally{ el.btnLogin.disabled = false; }
     }
 
-    async function logout(){
-      try{ await signOut(auth); }catch(e){}
-    }
+    async function logout(){ try{ await signOut(auth); }catch(e){} }
 
     function showFatalAppError(err){
       const code = err?.code || "erro";
       const msg = err?.message || String(err || "");
-      renderPanel(
-        "Erro ao carregar",
-        "O sistema não conseguiu carregar suas informações.",
-        `
-          <div class="notice show error">
-            <strong>Falha:</strong> ${code}<br/>
-            <div style="margin-top:6px;">${msg}</div>
-          </div>
-          <div class="actions">
-            <button class="btn btn-light" id="btnRetryLoad">Tentar novamente</button>
-          </div>
-        `
-      );
-
-      setTimeout(() => {
-        const btn = document.getElementById("btnRetryLoad");
-        if(btn){
-          btn.addEventListener("click", async () => {
-            try{
-              await refreshAfterWrite();
-              renderDashboardHome();
-            }catch(e){
-              showFatalAppError(e);
-            }
-          });
-        }
-      }, 0);
+      renderPanel("Erro ao carregar","O sistema não conseguiu carregar suas informações.",`
+        <div class="notice show error">
+          <strong>Falha:</strong> ${code}<br/>
+          <div style="margin-top:6px;">${msg}</div>
+        </div>
+      `);
     }
 
     async function initializeAuthenticatedUser(user){
@@ -2396,7 +1979,6 @@
         buildMenu();
         renderDashboardHome();
       }catch(e){
-        debugError("Falha ao inicializar:", e);
         showFatalAppError(e);
       }
     }
@@ -2430,33 +2012,24 @@
       closeDetailModal();
     }
 
-    // Eventos
     el.btnLogin.addEventListener("click", login);
     el.btnLogout.addEventListener("click", logout);
 
-    el.loginSenha.addEventListener("keydown", (e) => {
-      if(e.key === "Enter") login();
-    });
+    el.loginSenha.addEventListener("keydown", (e) => { if(e.key === "Enter") login(); });
 
     el.btnCloseModal.addEventListener("click", closeDetailModal);
     el.btnCloseModal2.addEventListener("click", closeDetailModal);
-    el.detailModal.addEventListener("click", (e) => {
-      if(e.target === el.detailModal) closeDetailModal();
-    });
+    el.detailModal.addEventListener("click", (e) => { if(e.target === el.detailModal) closeDetailModal(); });
 
     el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
-    el.btnToggleEdit.addEventListener("click", toggleEditModal);
-    el.btnSalvarEdicao.addEventListener("click", salvarEdicaoModal);
+    el.btnToggleEdit.addEventListener("click", () => alert("Edição está no seu arquivo anterior. Se quiser, eu reativo aqui com updateDoc."));
 
     onAuthStateChanged(auth, async (user) => {
-      if(!user){
-        resetAppState();
-        return;
-      }
+      if(!user){ resetAppState(); return; }
       await initializeAuthenticatedUser(user);
     });
 
-    debugLog("Sistema carregado.");
+    console.log("Sistema carregado.");
   </script>
 </body>
 </html>

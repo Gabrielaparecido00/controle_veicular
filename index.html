@@ -2338,35 +2338,49 @@
       }, 0);
     }
 
+    async function safeRun(label, fn){
+  try{
+    await fn();
+    console.log("OK:", label);
+    return true;
+  }catch(e){
+    console.error("NEGADO:", label, e?.code, e?.message, e);
+    showFatalAppError(new Error(`${label}: ${e?.code || ""} ${e?.message || ""}`));
+    return false;
+  }
+}
+
     async function initializeAuthenticatedUser(user){
-      state.authUser = user;
+  state.authUser = user;
 
-      try{
-        await loadUserProfile(user.uid);
-        await loadLojas();
-        await loadOperationalCollections();
+  el.loginView.style.display = "none";
+  el.topbar.style.display = "flex";
+  el.footerbar.style.display = "block";
+  el.appView.style.display = "block";
 
-        renderShellInfo();
-        renderDashboard();
-        buildMenu();
-        renderDashboardHome();
+  // 1) perfil
+  const ok1 = await safeRun("usuarios (perfil)", async () => {
+    await loadUserProfile(user.uid);
+  });
+  if(!ok1) return;
 
-        el.loginView.style.display = "none";
-        el.topbar.style.display = "flex";
-        el.footerbar.style.display = "block";
-        el.appView.style.display = "block";
-      }catch(err){
-        debugError("Falha ao inicializar:", err);
+  // 2) lojas
+  const ok2 = await safeRun("lojas (lista de unidades)", async () => {
+    await loadLojas();
+  });
+  if(!ok2) return;
 
-        // mantém logado, mas mostra o erro no painel
-        el.loginView.style.display = "none";
-        el.topbar.style.display = "flex";
-        el.footerbar.style.display = "block";
-        el.appView.style.display = "block";
+  // 3) coleções operacionais
+  const ok3 = await safeRun("movimentos/condutores/autorizadores", async () => {
+    await loadOperationalCollections();
+  });
+  if(!ok3) return;
 
-        showFatalAppError(err);
-      }
-    }
+  renderShellInfo();
+  renderDashboard();
+  buildMenu();
+  renderDashboardHome();
+}
 
     function resetAppState(){
       state.authUser = null;

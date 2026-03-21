@@ -2151,20 +2151,25 @@
     }
 
     function exportSelectedRegistro(){
-      const item = state.selectedMovimento;
-      if(!item) return;
+  const item = state.selectedMovimento;
+  if(!item) return;
 
-      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
-      const fotos = item?.fotos || {};
-      const imagens = [];
+  const motivoFinal = item.motivo === "Outro" && item.motivoOutro
+    ? `Outro: ${item.motivoOutro}`
+    : (item.motivo || "-");
 
-      if(fotos.frente) imagens.push({ url: fotos.frente, cap: "Frente" });
-      if(fotos.mala) imagens.push({ url: fotos.mala, cap: "Mala" });
-      if(fotos.lateralEsq) imagens.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
-      if(fotos.lateralDir) imagens.push({ url: fotos.lateralDir, cap: "Lateral direita" });
-      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) imagens.push({ url: u, cap: `Extra ${idx+1}` }); });
+  const fotos = item?.fotos || {};
+  const imagens = [];
 
-      const html = `
+  if(fotos.frente) imagens.push({ url: fotos.frente, cap: "Frente" });
+  if(fotos.mala) imagens.push({ url: fotos.mala, cap: "Mala" });
+  if(fotos.lateralEsq) imagens.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
+  if(fotos.lateralDir) imagens.push({ url: fotos.lateralDir, cap: "Lateral direita" });
+  if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => {
+    if(u) imagens.push({ url: u, cap: `Extra ${idx+1}` });
+  });
+
+  const html = `
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -2189,54 +2194,67 @@
 </head>
 <body>
   <h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
-  <p class="sub">Unidade: ${getStoreNameFromItem(item)} • Data/Hora: ${formatDate(item.data)} • Exportado em: ${new Date().toLocaleString("pt-BR")}</p>
+  <p class="sub">
+    Unidade: ${getStoreNameFromItem(item)} •
+    Data/Hora: ${formatDate(item.data)} •
+    Exportado em: ${new Date().toLocaleString("pt-BR")}
+  </p>
 
   <div class="box">
     <div class="grid">
       <div><div class="k">Tipo</div><div class="v">${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
       <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
+
       <div><div class="k">Loja</div><div class="v">${getStoreNameFromItem(item)}</div></div>
       <div><div class="k">Placa</div><div class="v">${item.placa || "-"}</div></div>
+
       <div><div class="k">Veículo</div><div class="v">${item.veiculo || "-"}</div></div>
       <div><div class="k">Motivo</div><div class="v">${motivoFinal}</div></div>
+
       <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
       <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
+
       <div><div class="k">Condição</div><div class="v">${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
       <div><div class="k">Registrado por</div><div class="v">${item.criadoPorNome || "-"}</div></div>
+
       <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
     </div>
   </div>
 
   <div class="box">
     <div class="k" style="margin-bottom:10px;">Fotos</div>
-    ${imagens.length ? `
-      <div class="imgs">
-        ${imagens.map(im => `
-          <div class="img">
-            <img src="${im.url}" alt="${im.cap}">
-            <div class="cap">${im.cap}</div>
-          </div>
-        `).join("")}
-      </div>
-    ` : `<div class="v" style="font-weight:600;">Sem fotos</div>`}
+    ${
+      imagens.length ? `
+        <div class="imgs">
+          ${imagens.map(im => `
+            <div class="img">
+              <img src="${im.url}" alt="${im.cap}">
+              <div class="cap">${im.cap}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="v" style="font-weight:600;">Sem fotos</div>`
+    }
   </div>
-
-  <script>
-    window.onload = () => { window.print(); };
-  </script>
 </body>
 </html>
-      `;
+  `;
 
-      const w = window.open("", "_blank");
-      if(!w){
-        alert("Bloqueio de pop-up: permita pop-ups para exportar o registro.");
-        return;
-      }
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-    }
+  const w = window.open("", "_blank");
+  if(!w){
+    alert("Bloqueio de pop-up: permita pop-ups para exportar o registro.");
+    return;
+  }
+
+  w.document.open();
+  w.document.write(html);
+  w.document.close();
+
+  // ✅ imprime sem colocar <script> dentro do HTML (não quebra o seu site)
+  w.onload = () => {
+    try { w.focus(); w.print(); } catch(e) {}
+  };
+}
 
     function renderResumoLojas(){
       renderPanel("Resumo por loja", "Disponível apenas para gerente geral.", `<div class="empty">Use o perfil gerente geral para ver o resumo por loja.</div>`);

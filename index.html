@@ -1,153 +1,70 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Veículos</title>
+
+<title>Controle Veicular</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
-/* =====================================
-RESET
-===================================== */
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,Helvetica,sans-serif;
-}
-
 body{
-background:#f4f6fa;
-color:#222;
-min-height:100vh;
-display:flex;
-flex-direction:column;
+font-family:Inter;
+margin:0;
+background:#eef2f7;
 }
-
-/* =====================================
-HEADER
-===================================== */
 
 header{
-background:#0b1f3a;
+height:70px;
+background:#111827;
 color:white;
-padding:12px 20px;
 display:flex;
 align-items:center;
 justify-content:space-between;
-box-shadow:0 2px 10px rgba(0,0,0,.2);
+padding:0 30px;
 }
 
 header img{
-height:40px;
+height:38px;
 }
 
-header .user{
-font-size:14px;
-}
-
-header button{
-background:#ff4b4b;
-border:none;
-color:white;
-padding:8px 14px;
-border-radius:6px;
-cursor:pointer;
-}
-
-/* =====================================
-LOGIN
-===================================== */
-
-#loginScreen{
-flex:1;
-display:flex;
-align-items:center;
-justify-content:center;
-}
-
-.loginCard{
-width:350px;
-background:white;
-padding:40px;
-border-radius:10px;
-box-shadow:0 4px 20px rgba(0,0,0,.2);
-}
-
-.loginCard h2{
-margin-bottom:20px;
-}
-
-.loginCard input{
-width:100%;
-padding:10px;
-margin-bottom:12px;
-border:1px solid #ccc;
-border-radius:6px;
-}
-
-.loginCard button{
-width:100%;
-padding:10px;
-background:#0b5cff;
-color:white;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-/* =====================================
-APP
-===================================== */
-
-#app{
-display:none;
-flex:1;
-flex-direction:column;
-}
-
-.container{
-padding:20px;
+main{
+padding:25px;
 max-width:1200px;
 margin:auto;
 }
 
-/* =====================================
-BUTTON MENU
-===================================== */
+.card{
+background:white;
+padding:25px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,.08);
+margin-bottom:20px;
+}
 
 .menu{
 display:flex;
 gap:10px;
-margin-bottom:20px;
 flex-wrap:wrap;
+margin-bottom:20px;
 }
 
 .menu button{
-padding:12px 18px;
+background:#2563eb;
 border:none;
-background:#0b5cff;
 color:white;
-border-radius:6px;
+padding:10px 16px;
+border-radius:8px;
 cursor:pointer;
+font-weight:600;
 }
 
-/* =====================================
-PANEL
-===================================== */
-
-.panel{
-background:white;
-padding:20px;
-border-radius:10px;
-box-shadow:0 3px 15px rgba(0,0,0,.15);
+.menu button:hover{
+background:#1d4ed8;
 }
-
-/* =====================================
-FORM
-===================================== */
 
 .form-grid{
 display:grid;
@@ -155,12 +72,10 @@ grid-template-columns:1fr 1fr;
 gap:12px;
 }
 
-.form-grid input,
-.form-grid select,
-textarea{
+input,select,textarea{
 padding:10px;
-border:1px solid #ccc;
 border-radius:6px;
+border:1px solid #ccc;
 width:100%;
 }
 
@@ -168,9 +83,22 @@ textarea{
 grid-column:span 2;
 }
 
-/* =====================================
-PHOTO GRID
-===================================== */
+.actions{
+margin-top:15px;
+display:flex;
+gap:10px;
+}
+
+.actions button{
+border:none;
+padding:10px 16px;
+border-radius:6px;
+cursor:pointer;
+font-weight:600;
+}
+
+.save{background:#10b981;color:white;}
+.cancel{background:#e5e7eb;}
 
 .photo-grid{
 display:grid;
@@ -180,49 +108,54 @@ margin-top:15px;
 }
 
 .photo-grid input{
-border:1px dashed #aaa;
+border:1px dashed #bbb;
 padding:8px;
 }
 
-/* =====================================
-BUTTONS
-===================================== */
-
-.actions{
-margin-top:15px;
-display:flex;
-gap:10px;
-}
-
-.actions button{
-padding:10px 16px;
-border:none;
-border-radius:6px;
-cursor:pointer;
-}
-
-.save{background:#00a86b;color:white;}
-.cancel{background:#ccc;}
-.edit{background:#ffaa00;color:white;}
-
-/* =====================================
-TABLE
-===================================== */
-
 table{
 width:100%;
-margin-top:15px;
 border-collapse:collapse;
+margin-top:15px;
 }
 
 th,td{
 padding:8px;
 border-bottom:1px solid #ddd;
-text-align:left;
 }
 
 th{
-background:#eee;
+background:#f3f4f6;
+text-align:left;
+}
+
+#login{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+.loginCard{
+background:white;
+padding:40px;
+border-radius:10px;
+width:350px;
+box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.loginCard input{
+margin-bottom:10px;
+}
+
+.loginCard button{
+width:100%;
+background:#2563eb;
+border:none;
+color:white;
+padding:12px;
+border-radius:8px;
+font-weight:600;
+cursor:pointer;
 }
 
 </style>
@@ -230,145 +163,170 @@ background:#eee;
 
 <body>
 
-<header id="topBar" style="display:none">
+<header id="topbar" style="display:none">
+
 <img src="vigorito.png">
 
-<div class="user">
-Olá, <span id="userName"></span>
+<div>
+Olá, <span id="username"></span>
 </div>
 
-<button onclick="logout()">Sair</button>
 </header>
 
 <!-- LOGIN -->
 
-<div id="loginScreen">
+<div id="login">
+
 <div class="loginCard">
 
 <h2>Login</h2>
 
 <input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Senha">
+
+<input id="senha" type="password" placeholder="Senha">
 
 <button onclick="login()">Entrar</button>
 
 </div>
+
 </div>
 
 <!-- APP -->
 
-<div id="app">
-
-<div class="container">
+<main id="app" style="display:none">
 
 <div class="menu">
 
-<button onclick="showPanel('entrada')">Entrada de veículo</button>
-<button onclick="showPanel('saida')">Saída de veículo</button>
-<button onclick="showPanel('condutor')">Cadastro condutor</button>
-<button onclick="showPanel('autorizador')">Cadastro autorizador</button>
-<button onclick="showPanel('consulta')">Consulta</button>
+<button onclick="abrir('entrada')">Entrada</button>
+<button onclick="abrir('saida')">Saída</button>
+<button onclick="abrir('condutor')">Condutor</button>
+<button onclick="abrir('autorizador')">Autorizador</button>
+<button onclick="abrir('consulta')">Consulta</button>
 
 </div>
 
-<div id="panel" class="panel">
+<div id="painel" class="card">
 
 Selecione uma ação.
 
 </div>
 
-</div>
-</div>
-
-<!-- FIREBASE -->
+</main>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore,collection,addDoc,getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getStorage,ref,uploadBytes,getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+<script type="module">
+
+/* ===============================
+IMPORTS FIREBASE
+=============================== */
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+import {
+getAuth,
+signInWithEmailAndPassword,
+onAuthStateChanged,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+getFirestore,
+collection,
+addDoc,
+getDocs,
+query,
+where
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import {
+getStorage
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+/* ===============================
+CONFIG FIREBASE
+=============================== */
 
 const firebaseConfig = {
-
+apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
+authDomain: "controle-ponto-26d34.firebaseapp.com",
+projectId: "controle-ponto-26d34",
+storageBucket: "controle-ponto-26d34.firebasestorage.app",
+messagingSenderId: "730360923157",
+appId: "1:730360923157:web:cdd6ea1eeed6fd717d3a1c",
+measurementId: "G-XJ7PY0YDBH"
 };
 
-/* init */
+/* ===============================
+INICIALIZAÇÃO
+=============================== */
 
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
+
 const db = getFirestore(app);
+
 const storage = getStorage(app);
+
+console.log("Firebase inicializado")
+
+</script>
 
 /* LOGIN */
 
-window.login = async function(){
-
-console.log("Tentando login")
+window.login=async()=>{
 
 let email=document.getElementById("email").value
-let password=document.getElementById("password").value
+let senha=document.getElementById("senha").value
 
-try{
-
-await signInWithEmailAndPassword(auth,email,password)
-
-}catch(e){
-
-alert("Erro login")
-
-console.error(e)
-
-}
+await signInWithEmailAndPassword(auth,email,senha)
 
 }
 
 /* SESSION */
 
-onAuthStateChanged(auth,(user)=>{
+onAuthStateChanged(auth,user=>{
 
 if(user){
 
-console.log("Usuário logado",user.uid)
+console.log("Logado:",user.uid)
 
-document.getElementById("loginScreen").style.display="none"
+document.getElementById("login").style.display="none"
+document.getElementById("app").style.display="block"
+document.getElementById("topbar").style.display="flex"
 
-document.getElementById("app").style.display="flex"
-
-document.getElementById("topBar").style.display="flex"
-
-document.getElementById("userName").innerText=user.email
-
-}else{
-
-document.getElementById("loginScreen").style.display="flex"
-
-document.getElementById("app").style.display="none"
-
-document.getElementById("topBar").style.display="none"
+document.getElementById("username").innerText=user.email
 
 }
 
 })
 
-/* LOGOUT */
+/* PAINEL */
 
-window.logout=()=>{
-
-signOut(auth)
-
-}
-
-/* PANELS */
-
-window.showPanel=(type)=>{
+window.abrir=(t)=>{
 
 let html=""
 
-if(type=="entrada"){
+if(t=="entrada"){
 
 html=`
+
 <h3>Entrada de veículo</h3>
 
 <div class="form-grid">
@@ -390,56 +348,6 @@ html=`
 
 </div>
 
-<h4>Fotos do veículo</h4>
-
-<div class="photo-grid">
-
-<input type="file" id="f1">
-<input type="file" id="f2">
-<input type="file" id="f3">
-<input type="file" id="f4">
-<input type="file" id="f5">
-<input type="file" id="f6">
-<input type="file" id="f7">
-<input type="file" id="f8">
-
-</div>
-
-<div class="actions">
-
-<button class="save" onclick="salvarEntrada()">Salvar</button>
-<button class="cancel">Cancelar</button>
-
-</div>
-
-`
-
-}
-
-if(type=="saida"){
-
-html=`
-<h3>Saída de veículo</h3>
-
-<div class="form-grid">
-
-<input placeholder="Placa">
-
-<input placeholder="Veículo">
-
-<select></select>
-
-<select></select>
-
-<select>
-<option>Sem dano</option>
-<option>Com dano</option>
-</select>
-
-<textarea></textarea>
-
-</div>
-
 <h4>Fotos</h4>
 
 <div class="photo-grid">
@@ -457,8 +365,7 @@ html=`
 
 <div class="actions">
 
-<button class="save">Salvar</button>
-<button class="cancel">Cancelar</button>
+<button class="save" onclick="salvarEntrada()">Salvar</button>
 
 </div>
 
@@ -466,7 +373,35 @@ html=`
 
 }
 
-if(type=="condutor"){
+if(t=="saida"){
+
+html=`
+
+<h3>Saída de veículo</h3>
+
+<div class="form-grid">
+
+<input placeholder="Placa">
+
+<input placeholder="Veículo">
+
+<select></select>
+
+<select></select>
+
+</div>
+
+<div class="actions">
+
+<button class="save">Salvar</button>
+
+</div>
+
+`
+
+}
+
+if(t=="condutor"){
 
 html=`
 
@@ -492,7 +427,7 @@ html=`
 
 }
 
-if(type=="autorizador"){
+if(t=="autorizador"){
 
 html=`
 
@@ -510,7 +445,7 @@ html=`
 
 <div class="actions">
 
-<button class="save" onclick="salvarAutorizador()">Salvar</button>
+<button class="save" onclick="salvarAut()">Salvar</button>
 
 </div>
 
@@ -518,15 +453,15 @@ html=`
 
 }
 
-if(type=="consulta"){
+if(t=="consulta"){
 
 html=`
 
 <h3>Consulta</h3>
 
-<input id="buscaPlaca" placeholder="Buscar placa">
+<input id="buscaPlaca" placeholder="Placa">
 
-<button onclick="buscar()">Pesquisar</button>
+<button onclick="buscar()">Buscar</button>
 
 <table>
 
@@ -536,13 +471,10 @@ html=`
 <th>Tipo</th>
 <th>Placa</th>
 <th>Veículo</th>
-<th>Condutor</th>
 </tr>
 </thead>
 
-<tbody id="resultado">
-
-</tbody>
+<tbody id="resultado"></tbody>
 
 </table>
 
@@ -550,62 +482,47 @@ html=`
 
 }
 
-document.getElementById("panel").innerHTML=html
+document.getElementById("painel").innerHTML=html
 
 }
 
-/* CADASTROS */
+/* SALVAR */
 
 window.salvarCondutor=async()=>{
 
-let nome=document.getElementById("nomeCondutor").value
-let cpf=document.getElementById("cpfCondutor").value
-let cargo=document.getElementById("cargoCondutor").value
+await addDoc(collection(db,"condutores"),{
 
-await addDoc(collection(db,"drivers"),{
-
-nome,
-cpf,
-cargo
+nome:document.getElementById("nomeCondutor").value,
+cpf:document.getElementById("cpfCondutor").value,
+cargo:document.getElementById("cargoCondutor").value
 
 })
 
-alert("Condutor cadastrado")
+alert("Condutor salvo")
 
 }
 
-/* AUTORIZADOR */
+window.salvarAut=async()=>{
 
-window.salvarAutorizador=async()=>{
+await addDoc(collection(db,"autorizadores"),{
 
-let nome=document.getElementById("nomeAut").value
-let cpf=document.getElementById("cpfAut").value
-let cargo=document.getElementById("cargoAut").value
-
-await addDoc(collection(db,"authorizers"),{
-
-nome,
-cpf,
-cargo
+nome:document.getElementById("nomeAut").value,
+cpf:document.getElementById("cpfAut").value,
+cargo:document.getElementById("cargoAut").value
 
 })
 
-alert("Autorizador cadastrado")
+alert("Autorizador salvo")
 
 }
-
-/* ENTRADA */
 
 window.salvarEntrada=async()=>{
 
-let placa=document.getElementById("placa").value
-let veiculo=document.getElementById("veiculo").value
-
-await addDoc(collection(db,"movements"),{
+await addDoc(collection(db,"movimentos"),{
 
 tipo:"entrada",
-placa,
-veiculo,
+placa:document.getElementById("placa").value,
+veiculo:document.getElementById("veiculo").value,
 data:new Date()
 
 })
@@ -620,11 +537,11 @@ window.buscar=async()=>{
 
 let placa=document.getElementById("buscaPlaca").value
 
-let q=await getDocs(collection(db,"movements"))
+let q=await getDocs(collection(db,"movimentos"))
 
-let tbody=document.getElementById("resultado")
+let tb=document.getElementById("resultado")
 
-tbody.innerHTML=""
+tb.innerHTML=""
 
 q.forEach(doc=>{
 
@@ -632,7 +549,7 @@ let d=doc.data()
 
 if(!placa || d.placa.includes(placa)){
 
-tbody.innerHTML+=`
+tb.innerHTML+=`
 
 <tr>
 
@@ -640,7 +557,6 @@ tbody.innerHTML+=`
 <td>${d.tipo}</td>
 <td>${d.placa}</td>
 <td>${d.veiculo}</td>
-<td>-</td>
 
 </tr>
 

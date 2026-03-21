@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Controle Veicular</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,18 +24,26 @@
       --header:#0f172a;
       --shadow:0 16px 40px rgba(15,23,42,.08);
       --radius:16px;
+
+      /* Tablet tuning */
+      --touch:52px;
+      --pad:24px;
+      --fs:16px;
     }
 
     *{
       margin:0;
       padding:0;
       box-sizing:border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body{
       font-family:'Inter',sans-serif;
       background:var(--bg);
       color:var(--text);
+      font-size:var(--fs);
+      overscroll-behavior: none;
     }
 
     button,input,select,textarea{
@@ -46,9 +54,9 @@
       display:none !important;
     }
 
-    /* TOPBAR */
+    /* TOPBAR (somente marca / unidade) */
     header{
-      height:72px;
+      height:76px;
       background:var(--header);
       color:#fff;
       display:none;
@@ -64,19 +72,22 @@
     .brand{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:14px;
       min-width:0;
     }
 
+    /* LOGO: proporção 2267x814 (bem mais largo). Mantém a proporção sem distorcer */
     .brand-logo{
-      width:42px;
-      height:42px;
-      border-radius:12px;
+      height:46px;            /* altura fixa para tablet */
+      width:auto;             /* mantém proporção */
+      max-width:210px;        /* evita ocupar demais */
       object-fit:contain;
+      border-radius:10px;
       background:rgba(255,255,255,.06);
-      padding:6px;
+      padding:6px 10px;       /* cria “respiro” para logo wide */
       border:1px solid rgba(255,255,255,.10);
       flex-shrink:0;
+      display:block;
     }
 
     .brand-text{
@@ -87,46 +98,73 @@
     }
 
     .brand-text strong{
-      font-size:16px;
+      font-size:18px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      line-height:1.1;
     }
 
     .brand-text span{
-      font-size:12px;
+      font-size:13px;
       color:#cbd5e1;
     }
 
-    .topbar-right{
+    /* FOOTER (rodapé fixo com perfil/nome/sair — único lugar) */
+    .footerbar{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      z-index:120;
+      background:rgba(15,23,42,.98);
+      color:#fff;
+      padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+      box-shadow:0 -10px 28px rgba(0,0,0,.25);
+      display:none;
+    }
+
+    .footerbar .wrap{
+      max-width:1420px;
+      margin:0 auto;
       display:flex;
       align-items:center;
+      justify-content:space-between;
       gap:12px;
       flex-wrap:wrap;
-      justify-content:flex-end;
+    }
+
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
     }
 
     .chip{
-      background:rgba(255,255,255,.08);
+      background:rgba(255,255,255,.10);
       color:#fff;
-      padding:8px 12px;
+      padding:10px 14px;
       border-radius:999px;
-      font-size:12px;
-      font-weight:700;
+      font-size:13px;
+      font-weight:800;
+      line-height:1;
     }
 
     .btn-topbar{
       border:none;
       background:#1e293b;
       color:#fff;
-      padding:10px 14px;
-      border-radius:12px;
+      padding:12px 16px;
+      border-radius:14px;
       cursor:pointer;
-      font-weight:700;
+      font-weight:900;
+      min-height:var(--touch);
+      min-width:120px;
     }
 
-    .btn-topbar:hover{
-      background:#334155;
+    .btn-topbar:active{
+      transform:scale(.99);
     }
 
     /* LOGIN */
@@ -140,36 +178,36 @@
 
     .login-wrap{
       width:100%;
-      max-width:420px;
+      max-width:460px;
       background:var(--card);
       border-radius:22px;
-      padding:32px;
+      padding:34px;
       box-shadow:var(--shadow);
       border:1px solid #edf2f7;
     }
 
     .login-wrap h1{
-      font-size:28px;
+      font-size:30px;
       margin-bottom:8px;
     }
 
     .login-wrap p{
-      font-size:14px;
+      font-size:15px;
       color:var(--muted);
       margin-bottom:22px;
-      line-height:1.5;
+      line-height:1.55;
     }
 
     .form-group{
       display:flex;
       flex-direction:column;
-      gap:7px;
+      gap:8px;
       margin-bottom:14px;
     }
 
     .form-group label{
-      font-size:13px;
-      font-weight:700;
+      font-size:14px;
+      font-weight:900;
       color:#334155;
     }
 
@@ -177,18 +215,20 @@
     .select,
     .textarea{
       width:100%;
-      padding:12px 14px;
+      padding:14px 16px;
       border:1px solid var(--line);
-      border-radius:12px;
+      border-radius:14px;
       background:#fff;
       color:var(--text);
       outline:none;
       transition:.18s;
+      min-height:var(--touch);
+      font-size:16px;
     }
 
     .textarea{
       resize:vertical;
-      min-height:100px;
+      min-height:120px;
     }
 
     .input:focus,
@@ -200,11 +240,13 @@
 
     .btn{
       border:none;
-      border-radius:12px;
-      padding:12px 16px;
-      font-weight:800;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:900;
       cursor:pointer;
       transition:.18s;
+      min-height:var(--touch);
+      font-size:16px;
     }
 
     .btn:disabled{
@@ -226,68 +268,44 @@
       color:#fff;
     }
 
-    .btn-success:hover{
-      filter:brightness(.97);
-    }
+    .btn-success:hover{ filter:brightness(.97); }
 
     .btn-warning{
       background:var(--warning);
       color:#fff;
     }
 
-    .btn-warning:hover{
-      filter:brightness(.97);
-    }
+    .btn-warning:hover{ filter:brightness(.97); }
 
     .btn-danger{
       background:var(--danger);
       color:#fff;
     }
 
-    .btn-danger:hover{
-      filter:brightness(.97);
-    }
+    .btn-danger:hover{ filter:brightness(.97); }
 
     .btn-light{
       background:#e2e8f0;
       color:#0f172a;
     }
 
-    .btn-light:hover{
-      background:#cfd8e3;
-    }
+    .btn-light:hover{ background:#cfd8e3; }
 
-    .btn-block{
-      width:100%;
-    }
+    .btn-block{ width:100%; }
 
     .notice{
       display:none;
       margin-top:14px;
       padding:12px 14px;
-      border-radius:12px;
-      font-size:14px;
-      line-height:1.4;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.45;
     }
 
-    .notice.show{
-      display:block;
-    }
-
-    .notice.error{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .notice.success{
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .notice.info{
-      background:#dbeafe;
-      color:#1e40af;
-    }
+    .notice.show{ display:block; }
+    .notice.error{ background:#fee2e2; color:#991b1b; }
+    .notice.success{ background:#dcfce7; color:#166534; }
+    .notice.info{ background:#dbeafe; color:#1e40af; }
 
     /* APP */
     #appView{
@@ -295,6 +313,7 @@
       max-width:1420px;
       margin:0 auto;
       padding:24px;
+      padding-bottom:120px; /* espaço para rodapé fixo */
     }
 
     .hero{
@@ -307,36 +326,22 @@
     }
 
     .hero h2{
-      font-size:28px;
+      font-size:30px;
       margin-bottom:8px;
     }
 
     .hero p{
       color:var(--muted);
-      font-size:14px;
-      line-height:1.5;
+      font-size:15px;
+      line-height:1.55;
     }
 
-    .hero-right{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .pill{
-      background:#fff;
-      border:1px solid #e5edf5;
-      padding:10px 14px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:800;
-      color:#334155;
-      box-shadow:var(--shadow);
-    }
+    /* removido duplicação (não mostra perfil/nome aqui) */
+    .hero-right{ display:none; }
 
     .dashboard{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
       gap:14px;
       margin-bottom:18px;
     }
@@ -352,22 +357,22 @@
     .stat small{
       display:block;
       color:var(--muted);
-      margin-bottom:8px;
-      font-size:13px;
-      font-weight:600;
+      margin-bottom:10px;
+      font-size:14px;
+      font-weight:700;
     }
 
     .stat strong{
       display:block;
-      font-size:30px;
+      font-size:34px;
       line-height:1;
       margin-bottom:8px;
-      font-weight:800;
+      font-weight:900;
     }
 
     .stat span{
       color:#475569;
-      font-size:13px;
+      font-size:14px;
     }
 
     .menu{
@@ -378,8 +383,8 @@
     }
 
     .menu .btn{
-      border-radius:14px;
-      padding:12px 16px;
+      border-radius:16px;
+      padding:14px 16px;
     }
 
     .card{
@@ -400,13 +405,14 @@
     }
 
     .card-header h3{
-      font-size:24px;
+      font-size:26px;
       margin-bottom:6px;
     }
 
     .card-header p{
       color:var(--muted);
-      font-size:14px;
+      font-size:15px;
+      line-height:1.5;
     }
 
     .grid{
@@ -429,7 +435,7 @@
     .table-wrap{
       overflow:auto;
       border:1px solid #e5edf5;
-      border-radius:14px;
+      border-radius:16px;
       background:#fff;
       margin-top:18px;
     }
@@ -441,11 +447,11 @@
     }
 
     th,td{
-      padding:12px 14px;
+      padding:14px 16px;
       border-bottom:1px solid #eef2f7;
       text-align:left;
       vertical-align:top;
-      font-size:14px;
+      font-size:15px;
     }
 
     th{
@@ -454,44 +460,52 @@
       text-transform:uppercase;
       letter-spacing:.05em;
       color:#475569;
-      font-weight:800;
+      font-weight:900;
+    }
+
+    tr.row-clickable{
+      cursor:pointer;
+    }
+
+    tr.row-clickable:active{
+      background:#f8fafc;
     }
 
     .empty{
       margin-top:14px;
       color:var(--muted);
-      font-size:14px;
+      font-size:15px;
     }
 
     .section-title{
       margin:20px 0 10px;
-      font-size:16px;
-      font-weight:800;
+      font-size:17px;
+      font-weight:900;
       color:#1e293b;
     }
 
     .store-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
       gap:14px;
       margin-top:10px;
     }
 
     .store-card{
       border:1px solid #e5edf5;
-      border-radius:14px;
+      border-radius:16px;
       padding:16px;
       background:#fff;
     }
 
     .store-card h4{
-      font-size:16px;
+      font-size:17px;
       margin-bottom:8px;
     }
 
     .store-card .meta{
       color:#475569;
-      font-size:13px;
+      font-size:14px;
       line-height:1.6;
     }
 
@@ -499,62 +513,47 @@
       color:#0f172a;
     }
 
-    .row-badges{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-    }
-
     .badge{
       display:inline-flex;
       align-items:center;
-      padding:6px 10px;
+      padding:7px 11px;
       border-radius:999px;
-      font-size:11px;
-      font-weight:800;
+      font-size:12px;
+      font-weight:900;
+      line-height:1;
     }
 
-    .badge-green{
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .badge-red{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .badge-blue{
-      background:#dbeafe;
-      color:#1d4ed8;
-    }
+    .badge-green{ background:#dcfce7; color:#166534; }
+    .badge-red{ background:#fee2e2; color:#991b1b; }
+    .badge-blue{ background:#dbeafe; color:#1d4ed8; }
 
     /* FOTOS DO VEÍCULO */
     .photo-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
       gap:12px;
       margin-top:8px;
     }
 
     .photo-card{
       border:1px solid #e5edf5;
-      border-radius:14px;
+      border-radius:16px;
       padding:12px;
       background:#fff;
     }
 
     .photo-card strong{
       display:block;
-      font-size:13px;
-      margin-bottom:8px;
+      font-size:14px;
+      margin-bottom:10px;
       color:#0f172a;
+      font-weight:900;
     }
 
     .photo-preview{
       width:100%;
-      height:160px;
-      border-radius:12px;
+      height:170px;
+      border-radius:14px;
       background:#f1f5f9;
       border:1px dashed #cbd5e1;
       display:flex;
@@ -573,7 +572,7 @@
     }
 
     .photo-hint{
-      font-size:12px;
+      font-size:13px;
       color:#64748b;
       text-align:center;
       padding:10px;
@@ -582,22 +581,149 @@
 
     .file-input{
       width:100%;
+      min-height:var(--touch);
+      font-size:16px;
+    }
+
+    .subtle{
+      font-size:13px;
+      color:#64748b;
+      line-height:1.4;
+      margin-top:6px;
+    }
+
+    /* MODAL DETALHES */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.55);
+      z-index:200;
+      display:none;
+      padding:18px;
+      align-items:flex-end;
+      justify-content:center;
+    }
+
+    .modal.show{
+      display:flex;
+    }
+
+    .modal-card{
+      width:100%;
+      max-width:920px;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 24px 60px rgba(0,0,0,.22);
+      overflow:hidden;
+      border:1px solid #e5edf5;
+      max-height:calc(100vh - 32px);
+      display:flex;
+      flex-direction:column;
+    }
+
+    .modal-head{
+      padding:18px 18px 12px 18px;
+      border-bottom:1px solid #edf2f7;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+    }
+
+    .modal-head h4{
+      font-size:18px;
+      font-weight:900;
+      margin-bottom:4px;
+    }
+
+    .modal-head p{
+      color:#64748b;
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .modal-body{
+      padding:16px 18px 18px 18px;
+      overflow:auto;
+    }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .detail-item{
+      background:#f8fafc;
+      border:1px solid #e5edf5;
+      border-radius:14px;
+      padding:12px 14px;
+    }
+
+    .detail-item small{
+      display:block;
+      color:#64748b;
+      font-weight:800;
+      font-size:12px;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .detail-item div{
+      font-weight:800;
+      color:#0f172a;
+      font-size:15px;
+      line-height:1.35;
+      word-break:break-word;
+    }
+
+    .thumbs{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .thumb{
+      border:1px solid #e5edf5;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .thumb img{
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      display:block;
+    }
+
+    .thumb .cap{
+      padding:10px 12px;
+      font-size:13px;
+      color:#334155;
+      font-weight:900;
+      border-top:1px solid #eef2f7;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:14px 18px 18px 18px;
+      border-top:1px solid #edf2f7;
+      background:#fff;
     }
 
     @media (max-width:900px){
-      .grid{
-        grid-template-columns:1fr;
-      }
-
-      .hero h2{
-        font-size:24px;
-      }
-
-      header{
-        height:auto;
-        padding:14px;
-        align-items:flex-start;
-      }
+      .grid{ grid-template-columns:1fr; }
+      .hero h2{ font-size:26px; }
+      header{ padding:12px 14px; height:auto; }
+      .detail-grid{ grid-template-columns:1fr; }
+      table{ min-width:980px; }
     }
   </style>
 </head>
@@ -611,13 +737,19 @@
         <span id="headerStoreText">Carregando unidade...</span>
       </div>
     </div>
+  </header>
 
-    <div class="topbar-right">
-      <div class="chip" id="headerRoleText">Perfil</div>
-      <div class="chip" id="headerUserText">Usuário</div>
+  <!-- RODAPÉ (ÚNICO LOCAL DE PERFIL / NOME / SAIR) -->
+  <footer class="footerbar" id="footerbar">
+    <div class="wrap">
+      <div class="chips">
+        <div class="chip" id="footerRoleText">Perfil</div>
+        <div class="chip" id="footerUserText">Usuário</div>
+        <div class="chip" id="footerStoreText">Unidade</div>
+      </div>
       <button class="btn-topbar" id="btnLogout">Sair</button>
     </div>
-  </header>
+  </footer>
 
   <section id="loginView">
     <div class="login-wrap">
@@ -668,6 +800,24 @@
     </section>
   </main>
 
+  <!-- MODAL DETALHES (consulta) -->
+  <div class="modal" id="detailModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-head">
+        <div>
+          <h4 id="detailTitle">Detalhes do registro</h4>
+          <p id="detailSub">Visualize informações e fotos do veículo.</p>
+        </div>
+        <button class="btn btn-light" id="btnCloseModal" style="min-width:120px;">Fechar</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnExportRegistro">Exportar registro</button>
+        <button class="btn btn-light" id="btnCloseModal2">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
@@ -687,7 +837,6 @@
       setDoc,
       query,
       where,
-      orderBy,
       limit
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -706,6 +855,7 @@
 
     const el = {
       topbar: document.getElementById("topbar"),
+      footerbar: document.getElementById("footerbar"),
       loginView: document.getElementById("loginView"),
       appView: document.getElementById("appView"),
 
@@ -716,18 +866,25 @@
       loginNotice: document.getElementById("loginNotice"),
 
       headerStoreText: document.getElementById("headerStoreText"),
-      headerRoleText: document.getElementById("headerRoleText"),
-      headerUserText: document.getElementById("headerUserText"),
+
+      footerRoleText: document.getElementById("footerRoleText"),
+      footerUserText: document.getElementById("footerUserText"),
+      footerStoreText: document.getElementById("footerStoreText"),
 
       heroTitle: document.getElementById("heroTitle"),
       heroSubtitle: document.getElementById("heroSubtitle"),
-      heroUser: document.getElementById("heroUser"),
-      heroRole: document.getElementById("heroRole"),
-      heroStore: document.getElementById("heroStore"),
 
       dashboardCards: document.getElementById("dashboardCards"),
       menuBar: document.getElementById("menuBar"),
-      mainPanel: document.getElementById("mainPanel")
+      mainPanel: document.getElementById("mainPanel"),
+
+      detailModal: document.getElementById("detailModal"),
+      detailBody: document.getElementById("detailBody"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailSub: document.getElementById("detailSub"),
+      btnCloseModal: document.getElementById("btnCloseModal"),
+      btnCloseModal2: document.getElementById("btnCloseModal2"),
+      btnExportRegistro: document.getElementById("btnExportRegistro")
     };
 
     const Collections = {
@@ -745,7 +902,8 @@
       lojasMap: {},
       movimentos: [],
       condutores: [],
-      autorizadores: []
+      autorizadores: [],
+      selectedMovimento: null
     };
 
     const Roles = {
@@ -796,7 +954,7 @@
     }
 
     function showNotice(target, message, type = "error"){
-      target.className = `notice show ${type}`;
+      target.className = \`notice show \${type}\`;
       target.textContent = message;
     }
 
@@ -838,8 +996,8 @@
 
     function isValidPlate(plate){
       const clean = normalizePlate(plate);
-      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;           // ABC1234
-      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/; // ABC1D23
+      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;                 // ABC1234
+      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;  // ABC1D23
       return oldPattern.test(clean) || mercosulPattern.test(clean);
     }
 
@@ -893,30 +1051,30 @@
 
     function buildStoreOptions(includeBlank = true){
       const options = [];
-      if(includeBlank) options.push(`<option value="">Selecione a loja</option>`);
+      if(includeBlank) options.push(\`<option value="">Selecione a loja</option>\`);
       state.lojas.forEach(loja => {
-        options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`);
+        options.push(\`<option value="\${loja.id}">\${loja.nome || loja.id}</option>\`);
       });
       return options.join("");
     }
 
     function buildCondutorOptions(){
       const items = [...state.condutores];
-      const options = [`<option value="">Selecione o condutor</option>`];
-      items.forEach(item => options.push(`<option value="${item.nome}">${item.nome}</option>`));
+      const options = [\`<option value="">Selecione o condutor</option>\`];
+      items.forEach(item => options.push(\`<option value="\${item.nome}">\${item.nome}</option>\`));
       return options.join("");
     }
 
     function buildAutorizadorOptions(){
       const items = [...state.autorizadores];
-      const options = [`<option value="">Selecione o autorizador</option>`];
-      items.forEach(item => options.push(`<option value="${item.nome}">${item.nome}</option>`));
+      const options = [\`<option value="">Selecione o autorizador</option>\`];
+      items.forEach(item => options.push(\`<option value="\${item.nome}">\${item.nome}</option>\`));
       return options.join("");
     }
 
     function buildMotivoOptions(list){
-      const options = [`<option value="">Selecione o motivo</option>`];
-      list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
+      const options = [\`<option value="">Selecione o motivo</option>\`];
+      list.forEach(m => options.push(\`<option value="\${m}">\${m}</option>\`));
       return options.join("");
     }
 
@@ -970,15 +1128,22 @@
       state.userProfile = { id: userSnap.id, ...data };
     }
 
+    /*
+      IMPORTANTE (seu problema do gerente_loja):
+      O erro "The query requires an index" acontecia porque:
+      where(lojaId == X) + orderBy(data/nome) exige índice composto no Firestore.
+      Aqui eu removi orderBy nas queries filtradas e faço a ordenação no JavaScript.
+      Assim o gerente_loja passa a carregar condutores/autorizadores/movimentos sem criar índice.
+    */
     async function loadOperationalCollections(){
       try{
         const lojaId = currentUserStoreId();
 
         if(userIsGeneralManager()){
           const [movSnap, condSnap, autSnap] = await Promise.all([
-            getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))),
-            getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(3000))),
-            getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(3000)))
+            getDocs(query(collection(db, Collections.MOVIMENTOS), limit(1500))),
+            getDocs(query(collection(db, Collections.CONDUTORES), limit(3000))),
+            getDocs(query(collection(db, Collections.AUTORIZADORES), limit(3000)))
           ]);
 
           state.movimentos = [];
@@ -990,13 +1155,14 @@
           state.autorizadores = [];
           autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
 
+          sortOperationalArrays();
           return;
         }
 
         const [movSnap, condSnap, autSnap] = await Promise.all([
-          getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), orderBy("data", "desc"), limit(1500))),
-          getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), orderBy("nome", "asc"), limit(2000))),
-          getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), orderBy("nome", "asc"), limit(2000)))
+          getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(1500))),
+          getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(2000))),
+          getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(2000)))
         ]);
 
         state.movimentos = [];
@@ -1008,6 +1174,8 @@
         state.autorizadores = [];
         autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
 
+        sortOperationalArrays();
+
       }catch(err){
         debugError("Erro ao carregar coleções operacionais:", err);
         state.movimentos = [];
@@ -1015,6 +1183,17 @@
         state.autorizadores = [];
         throw err;
       }
+    }
+
+    function sortOperationalArrays(){
+      state.movimentos.sort((a,b) => {
+        const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
+        const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
+        return tb - ta;
+      });
+
+      state.condutores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+      state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
     }
 
     function renderShellInfo(){
@@ -1025,13 +1204,11 @@
         ? "Todas as lojas"
         : getStoreName(state.userProfile?.lojaId);
 
-      el.headerUserText.textContent = nome;
-      el.headerRoleText.textContent = roleLabel;
       el.headerStoreText.textContent = lojaNome;
 
-      el.heroUser.textContent = `Usuário: ${nome}`;
-      el.heroRole.textContent = `Perfil: ${roleLabel}`;
-      el.heroStore.textContent = `Unidade: ${lojaNome}`;
+      el.footerUserText.textContent = nome;
+      el.footerRoleText.textContent = roleLabel;
+      el.footerStoreText.textContent = lojaNome;
 
       if(userIsGeneralManager()){
         el.heroTitle.textContent = "Dashboard geral";
@@ -1057,7 +1234,7 @@
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
-          const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
+          const key = userIsGeneralManager() ? \`\${item.lojaId || ""}__\${plate}\` : plate;
           if(item.tipo === "entrada") patioMap[key] = true;
           if(item.tipo === "saida") delete patioMap[key];
         });
@@ -1100,7 +1277,7 @@
       if(userIsGeneralManager()){
         cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades cadastradas" });
       }else{
-        cards.push({ title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" });
+        cards.push({ title: "Entradas / Saídas", value: \`\${entradas} / \${saidas}\`, subtitle: "Resumo operacional" });
       }
 
       return cards;
@@ -1256,7 +1433,7 @@
       const preview = document.getElementById(previewId);
       if(!preview) return;
       if(!dataUrl){
-        preview.innerHTML = `<div class="photo-hint">Sem foto selecionada</div>`;
+        preview.innerHTML = `<div class="photo-hint">Sem foto</div>`;
         return;
       }
       preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
@@ -1277,7 +1454,8 @@
       });
     }
 
-    function validateRequiredPhotoInput(inputId, label){
+    function validatePhotoIfRequired(inputId, label, required){
+      if(!required) return "";
       const input = document.getElementById(inputId);
       const file = input?.files?.[0];
       if(!file) return `${label} é obrigatória.`;
@@ -1316,6 +1494,12 @@
             <div class="form-group">
               <label for="entradaMotivo">Motivo da entrada</label>
               <select class="select" id="entradaMotivo">${buildMotivoOptions(MOTIVOS_ENTRADA)}</select>
+              <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
+            </div>
+
+            <div class="form-group hidden" id="entradaMotivoOutroWrap">
+              <label for="entradaMotivoOutro">Descreva o motivo</label>
+              <input class="input" id="entradaMotivoOutro" maxlength="60" placeholder="Ex.: Entrada por inspeção rápida">
             </div>
 
             <div class="form-group">
@@ -1329,40 +1513,48 @@
             </div>
 
             <div class="form-group">
-              <label for="entradaDano">Condição</label>
+              <label for="entradaDano">Condição do veículo</label>
               <select class="select" id="entradaDano">
                 <option value="nao">Sem dano</option>
                 <option value="sim">Com dano</option>
               </select>
+              <div class="subtle">Se “Com dano”, as 4 fotos ficam obrigatórias.</div>
             </div>
 
             <div class="form-group full">
-              <label>Fotos do veículo (obrigatórias na entrada)</label>
-              <div class="photo-grid">
+              <label>Fotos do veículo</label>
+              <div class="subtle" id="entradaFotosHint">No tablet, toque para abrir a câmera e fotografar. Preview aparece na hora.</div>
+
+              <div class="photo-grid" id="entradaPhotoGrid">
                 <div class="photo-card">
-                  <strong>Frente (frente.png)</strong>
-                  <div class="photo-preview" id="previewFrente"><div class="photo-hint">Selecione a foto da frente</div></div>
-                  <input class="file-input" id="fotoFrente" type="file" accept="image/*">
+                  <strong>Frente</strong>
+                  <div class="photo-preview" id="previewFrente"><div class="photo-hint">Fotografe a frente</div></div>
+                  <input class="file-input" id="fotoFrente" type="file" accept="image/*" capture="environment">
                 </div>
 
                 <div class="photo-card">
-                  <strong>Mala (mala.png)</strong>
-                  <div class="photo-preview" id="previewMala"><div class="photo-hint">Selecione a foto da mala</div></div>
-                  <input class="file-input" id="fotoMala" type="file" accept="image/*">
+                  <strong>Mala</strong>
+                  <div class="photo-preview" id="previewMala"><div class="photo-hint">Fotografe a mala</div></div>
+                  <input class="file-input" id="fotoMala" type="file" accept="image/*" capture="environment">
                 </div>
 
                 <div class="photo-card">
-                  <strong>Lateral esquerda (lateralEsq.png)</strong>
-                  <div class="photo-preview" id="previewLatEsq"><div class="photo-hint">Selecione a foto da lateral esquerda</div></div>
-                  <input class="file-input" id="fotoLatEsq" type="file" accept="image/*">
+                  <strong>Lateral esquerda</strong>
+                  <div class="photo-preview" id="previewLatEsq"><div class="photo-hint">Fotografe a lateral esquerda</div></div>
+                  <input class="file-input" id="fotoLatEsq" type="file" accept="image/*" capture="environment">
                 </div>
 
                 <div class="photo-card">
-                  <strong>Lateral direita (lateralDir.png)</strong>
-                  <div class="photo-preview" id="previewLatDir"><div class="photo-hint">Selecione a foto da lateral direita</div></div>
-                  <input class="file-input" id="fotoLatDir" type="file" accept="image/*">
+                  <strong>Lateral direita</strong>
+                  <div class="photo-preview" id="previewLatDir"><div class="photo-hint">Fotografe a lateral direita</div></div>
+                  <input class="file-input" id="fotoLatDir" type="file" accept="image/*" capture="environment">
                 </div>
               </div>
+
+              <div class="actions" style="margin-top:12px;">
+                <button class="btn btn-light" id="btnAddExtraFoto">Fotografar mais partes</button>
+              </div>
+              <div class="subtle">Você pode adicionar fotos extras (detalhes, riscos, acessórios, etc.).</div>
             </div>
 
             <div class="form-group full">
@@ -1381,6 +1573,7 @@
       );
 
       attachInputMasks();
+
       wirePhotoPreview("fotoFrente", "previewFrente");
       wirePhotoPreview("fotoMala", "previewMala");
       wirePhotoPreview("fotoLatEsq", "previewLatEsq");
@@ -1388,6 +1581,74 @@
 
       document.getElementById("btnSalvarEntrada").addEventListener("click", salvarEntrada);
       document.getElementById("btnLimparEntrada").addEventListener("click", renderEntrada);
+
+      document.getElementById("entradaMotivo").addEventListener("change", () => toggleMotivoOutro("entrada"));
+      toggleMotivoOutro("entrada");
+
+      document.getElementById("entradaDano").addEventListener("change", () => updateEntradaPhotoRequiredLabel());
+      updateEntradaPhotoRequiredLabel();
+
+      document.getElementById("btnAddExtraFoto").addEventListener("click", addExtraPhotoInput);
+    }
+
+    function toggleMotivoOutro(prefix){
+      const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
+      const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
+      if(!wrap) return;
+      if(motivo === "Outro"){
+        wrap.classList.remove("hidden");
+      }else{
+        wrap.classList.add("hidden");
+        const input = document.getElementById(`${prefix}MotivoOutro`);
+        if(input) input.value = "";
+      }
+    }
+
+    function updateEntradaPhotoRequiredLabel(){
+      const dano = document.getElementById("entradaDano")?.value || "nao";
+      const hint = document.getElementById("entradaFotosHint");
+      if(!hint) return;
+      hint.textContent = (dano === "sim")
+        ? "Como há dano, as 4 fotos principais são obrigatórias (use a câmera)."
+        : "Sem dano: fotos não são obrigatórias, mas você pode fotografar para registro.";
+    }
+
+    function addExtraPhotoInput(){
+      const grid = document.getElementById("entradaPhotoGrid");
+      if(!grid) return;
+
+      const index = grid.querySelectorAll("[data-extra='1']").length + 1;
+      const inputId = `fotoExtra_${index}`;
+      const previewId = `previewExtra_${index}`;
+
+      const card = document.createElement("div");
+      card.className = "photo-card";
+      card.setAttribute("data-extra", "1");
+      card.innerHTML = `
+        <strong>Extra ${index}</strong>
+        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Fotografe um detalhe</div></div>
+        <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+      `;
+
+      grid.appendChild(card);
+      wirePhotoPreview(inputId, previewId);
+    }
+
+    async function collectExtraPhotosData(){
+      const extraInputs = Array.from(document.querySelectorAll("input[id^='fotoExtra_']"));
+      const data = [];
+      for(const input of extraInputs){
+        const file = input?.files?.[0];
+        if(!file) continue;
+        if(!file.type?.startsWith("image/")) continue;
+        try{
+          const url = await readFileAsDataURL(file);
+          if(url) data.push(url);
+        }catch(e){
+          debugError("Falha ao ler foto extra:", e);
+        }
+      }
+      return data;
     }
 
     async function salvarEntrada(){
@@ -1401,6 +1662,7 @@
       const placa = formatPlate(document.getElementById("entradaPlaca")?.value || "");
       const veiculo = (document.getElementById("entradaVeiculo")?.value || "").trim();
       const motivo = document.getElementById("entradaMotivo")?.value || "";
+      const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
       const condutor = document.getElementById("entradaCondutor")?.value || "";
       const autorizador = document.getElementById("entradaAutorizador")?.value || "";
       const dano = document.getElementById("entradaDano")?.value || "nao";
@@ -1426,6 +1688,11 @@
         return;
       }
 
+      if(motivo === "Outro" && !motivoOutro){
+        showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”).");
+        return;
+      }
+
       if(!condutor){
         showNotice(notice, "Selecione o condutor.");
         return;
@@ -1436,15 +1703,24 @@
         return;
       }
 
-      const errFrente = validateRequiredPhotoInput("fotoFrente", "Foto da frente");
-      const errMala = validateRequiredPhotoInput("fotoMala", "Foto da mala");
-      const errLatEsq = validateRequiredPhotoInput("fotoLatEsq", "Foto da lateral esquerda");
-      const errLatDir = validateRequiredPhotoInput("fotoLatDir", "Foto da lateral direita");
+      const requiredPhotos = (dano === "sim");
+      const errFrente = validatePhotoIfRequired("fotoFrente", "Foto da frente", requiredPhotos);
+      const errMala = validatePhotoIfRequired("fotoMala", "Foto da mala", requiredPhotos);
+      const errLatEsq = validatePhotoIfRequired("fotoLatEsq", "Foto da lateral esquerda", requiredPhotos);
+      const errLatDir = validatePhotoIfRequired("fotoLatDir", "Foto da lateral direita", requiredPhotos);
 
       const photoErrors = [errFrente, errMala, errLatEsq, errLatDir].filter(Boolean);
       if(photoErrors.length){
         showNotice(notice, photoErrors[0]);
         return;
+      }
+
+      if(dano === "nao"){
+        const ok = window.confirm("Tem certeza que este veículo NÃO possui danos?");
+        if(!ok){
+          showNotice(notice, "Revise a condição do veículo e, se necessário, selecione “Com dano” e fotografe.");
+          return;
+        }
       }
 
       try{
@@ -1455,9 +1731,13 @@
           getImageDataFromInput("fotoLatDir")
         ]);
 
-        if(!fotoFrente || !fotoMala || !fotoLateralEsq || !fotoLateralDir){
-          showNotice(notice, "Envie todas as 4 fotos antes de salvar.");
-          return;
+        const fotosExtras = await collectExtraPhotosData();
+
+        if(requiredPhotos){
+          if(!fotoFrente || !fotoMala || !fotoLateralEsq || !fotoLateralDir){
+            showNotice(notice, "Como há dano, envie todas as 4 fotos antes de salvar.");
+            return;
+          }
         }
 
         await addDoc(collection(db, Collections.MOVIMENTOS), {
@@ -1466,15 +1746,17 @@
           placa,
           veiculo,
           motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
           condutor,
           autorizador,
           dano,
           observacao,
           fotos: {
-            frente: fotoFrente,
-            mala: fotoMala,
-            lateralEsq: fotoLateralEsq,
-            lateralDir: fotoLateralDir
+            frente: fotoFrente || "",
+            mala: fotoMala || "",
+            lateralEsq: fotoLateralEsq || "",
+            lateralDir: fotoLateralDir || "",
+            extras: fotosExtras || []
           },
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
@@ -1521,6 +1803,12 @@
             <div class="form-group">
               <label for="saidaMotivo">Motivo da saída</label>
               <select class="select" id="saidaMotivo">${buildMotivoOptions(MOTIVOS_SAIDA)}</select>
+              <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
+            </div>
+
+            <div class="form-group hidden" id="saidaMotivoOutroWrap">
+              <label for="saidaMotivoOutro">Descreva o motivo</label>
+              <input class="input" id="saidaMotivoOutro" maxlength="60" placeholder="Ex.: Saída para vistoria extra">
             </div>
 
             <div class="form-group">
@@ -1551,6 +1839,9 @@
       attachInputMasks();
       document.getElementById("btnSalvarSaida").addEventListener("click", salvarSaida);
       document.getElementById("btnLimparSaida").addEventListener("click", renderSaida);
+
+      document.getElementById("saidaMotivo").addEventListener("change", () => toggleMotivoOutro("saida"));
+      toggleMotivoOutro("saida");
     }
 
     async function salvarSaida(){
@@ -1564,6 +1855,7 @@
       const placa = formatPlate(document.getElementById("saidaPlaca")?.value || "");
       const veiculo = (document.getElementById("saidaVeiculo")?.value || "").trim();
       const motivo = document.getElementById("saidaMotivo")?.value || "";
+      const motivoOutro = (document.getElementById("saidaMotivoOutro")?.value || "").trim();
       const condutor = document.getElementById("saidaCondutor")?.value || "";
       const autorizador = document.getElementById("saidaAutorizador")?.value || "";
       const observacao = (document.getElementById("saidaObs")?.value || "").trim();
@@ -1588,6 +1880,11 @@
         return;
       }
 
+      if(motivo === "Outro" && !motivoOutro){
+        showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”).");
+        return;
+      }
+
       if(!condutor){
         showNotice(notice, "Selecione o condutor.");
         return;
@@ -1605,6 +1902,7 @@
           placa,
           veiculo,
           motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
           condutor,
           autorizador,
           dano: "",
@@ -1853,8 +2151,8 @@
       renderPanel(
         "Consulta",
         userIsGeneralManager()
-          ? "Consulte movimentações de todas as unidades."
-          : "Consulte as movimentações da sua unidade.",
+          ? "Consulte movimentações de todas as unidades. Toque em uma linha para abrir detalhes e fotos."
+          : "Consulte as movimentações da sua unidade. Toque em uma linha para abrir detalhes e fotos.",
         `
           <div class="grid">
             ${storeFilterHTML}
@@ -1938,9 +2236,10 @@
 
       if(texto){
         items = items.filter(item => {
+          const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "");
           const haystack = [
             item.veiculo,
-            item.motivo,
+            motivoFinal,
             item.condutor,
             item.autorizador,
             item.observacao,
@@ -1959,26 +2258,204 @@
       });
 
       body.innerHTML = items.map(item => {
-        const temFotos = item?.fotos?.frente && item?.fotos?.mala && item?.fotos?.lateralEsq && item?.fotos?.lateralDir;
+        const fotos = item?.fotos || {};
+        const extrasCount = Array.isArray(fotos.extras) ? fotos.extras.length : 0;
+        const baseCount = [fotos.frente, fotos.mala, fotos.lateralEsq, fotos.lateralDir].filter(Boolean).length;
+        const totalFotos = baseCount + extrasCount;
+        const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+
         return `
-          <tr>
+          <tr class="row-clickable" data-id="${item.id}">
             <td>${formatDate(item.data)}</td>
             <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
             <td>${getStoreNameFromItem(item)}</td>
             <td>${item.placa || "-"}</td>
             <td>${item.veiculo || "-"}</td>
-            <td>${item.motivo || "-"}</td>
+            <td>${motivoFinal}</td>
             <td>${item.condutor || "-"}</td>
             <td>${item.autorizador || "-"}</td>
             <td>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</td>
             <td>${item.observacao || "-"}</td>
-            <td>${temFotos ? "4 fotos" : "-"}</td>
+            <td>${totalFotos ? `${totalFotos} foto(s)` : "-"}</td>
             <td>${item.criadoPorNome || "-"}</td>
           </tr>
         `;
       }).join("");
 
       empty.textContent = items.length ? "" : "Nenhum registro encontrado.";
+
+      // clique para abrir detalhes
+      Array.from(body.querySelectorAll("tr[data-id]")).forEach(tr => {
+        tr.addEventListener("click", () => {
+          const id = tr.getAttribute("data-id");
+          const found = state.movimentos.find(m => m.id === id);
+          if(found) openDetailModal(found);
+        });
+      });
+    }
+
+    function openDetailModal(item){
+      state.selectedMovimento = item;
+
+      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+      const fotos = item?.fotos || {};
+      const thumbs = [];
+
+      if(fotos.frente) thumbs.push({ url: fotos.frente, cap: "Frente" });
+      if(fotos.mala) thumbs.push({ url: fotos.mala, cap: "Mala" });
+      if(fotos.lateralEsq) thumbs.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
+      if(fotos.lateralDir) thumbs.push({ url: fotos.lateralDir, cap: "Lateral direita" });
+
+      if(Array.isArray(fotos.extras)){
+        fotos.extras.forEach((u, idx) => {
+          if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` });
+        });
+      }
+
+      el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
+      el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
+
+      el.detailBody.innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
+          <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
+
+          <div class="detail-item"><small>Loja</small><div>${getStoreNameFromItem(item)}</div></div>
+          <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
+
+          <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
+          <div class="detail-item"><small>Motivo</small><div>${motivoFinal}</div></div>
+
+          <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
+          <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
+
+          <div class="detail-item"><small>Condição</small><div>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
+          <div class="detail-item"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
+
+          <div class="detail-item" style="grid-column:1/-1;">
+            <small>Observação</small>
+            <div>${item.observacao ? item.observacao : "-"}</div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:6px;">Fotos</div>
+        ${thumbs.length ? `
+          <div class="thumbs">
+            ${thumbs.map(t => `
+              <div class="thumb">
+                <img src="${t.url}" alt="${t.cap}">
+                <div class="cap">${t.cap}</div>
+              </div>
+            `).join("")}
+          </div>
+        ` : `<div class="empty">Este registro não possui fotos.</div>`}
+      `;
+
+      el.detailModal.classList.add("show");
+      el.detailModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetailModal(){
+      el.detailModal.classList.remove("show");
+      el.detailModal.setAttribute("aria-hidden", "true");
+      state.selectedMovimento = null;
+    }
+
+    function exportSelectedRegistro(){
+      const item = state.selectedMovimento;
+      if(!item) return;
+
+      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+      const fotos = item?.fotos || {};
+      const imagens = [];
+
+      if(fotos.frente) imagens.push({ url: fotos.frente, cap: "Frente" });
+      if(fotos.mala) imagens.push({ url: fotos.mala, cap: "Mala" });
+      if(fotos.lateralEsq) imagens.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
+      if(fotos.lateralDir) imagens.push({ url: fotos.lateralDir, cap: "Lateral direita" });
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) imagens.push({ url: u, cap: `Extra ${idx+1}` }); });
+
+      const html = `
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registro - ${item.placa || ""}</title>
+<style>
+  body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
+  h1{ font-size:20px; margin:0 0 6px 0; }
+  .sub{ color:#475569; margin:0 0 18px 0; font-size:13px; }
+  .box{ border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:12px; }
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; margin-bottom:4px; font-weight:700; }
+  .v{ font-size:14px; font-weight:700; color:#0f172a; }
+  .full{ grid-column:1/-1; }
+  .imgs{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+  .img{ border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+  .img img{ width:100%; height:260px; object-fit:cover; display:block; }
+  .cap{ padding:10px 12px; font-size:12px; font-weight:700; color:#334155; border-top:1px solid #eef2f7; }
+  @media print{
+    body{ margin:0; }
+    .box{ page-break-inside: avoid; }
+    .img{ page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+  <h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
+  <p class="sub">Unidade: ${getStoreNameFromItem(item)} • Data/Hora: ${formatDate(item.data)} • Exportado em: ${new Date().toLocaleString("pt-BR")}</p>
+
+  <div class="box">
+    <div class="grid">
+      <div><div class="k">Tipo</div><div class="v">${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
+      <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
+
+      <div><div class="k">Loja</div><div class="v">${getStoreNameFromItem(item)}</div></div>
+      <div><div class="k">Placa</div><div class="v">${item.placa || "-"}</div></div>
+
+      <div><div class="k">Veículo</div><div class="v">${item.veiculo || "-"}</div></div>
+      <div><div class="k">Motivo</div><div class="v">${motivoFinal}</div></div>
+
+      <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
+      <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
+
+      <div><div class="k">Condição</div><div class="v">${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
+      <div><div class="k">Registrado por</div><div class="v">${item.criadoPorNome || "-"}</div></div>
+
+      <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="k" style="margin-bottom:10px;">Fotos</div>
+    ${imagens.length ? `
+      <div class="imgs">
+        ${imagens.map(im => `
+          <div class="img">
+            <img src="${im.url}" alt="${im.cap}">
+            <div class="cap">${im.cap}</div>
+          </div>
+        `).join("")}
+      </div>
+    ` : `<div class="v" style="font-weight:600;">Sem fotos</div>`}
+  </div>
+
+  <script>
+    window.onload = () => { window.print(); };
+  </script>
+</body>
+</html>
+      `;
+
+      const w = window.open("", "_blank");
+      if(!w){
+        alert("Bloqueio de pop-up: permita pop-ups para exportar o registro.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
     }
 
     function renderResumoLojas(){
@@ -2181,6 +2658,7 @@
 
       el.loginView.style.display = "none";
       el.topbar.style.display = "flex";
+      el.footerbar.style.display = "block";
       el.appView.style.display = "block";
     }
 
@@ -2192,8 +2670,10 @@
       state.movimentos = [];
       state.condutores = [];
       state.autorizadores = [];
+      state.selectedMovimento = null;
 
       el.topbar.style.display = "none";
+      el.footerbar.style.display = "none";
       el.appView.style.display = "none";
       el.loginView.style.display = "flex";
 
@@ -2207,14 +2687,24 @@
           </div>
         </div>
       `;
+      closeDetailModal();
     }
 
+    // eventos
     el.btnLogin.addEventListener("click", login);
     el.btnLogout.addEventListener("click", logout);
 
     el.loginSenha.addEventListener("keydown", (e) => {
       if(e.key === "Enter") login();
     });
+
+    el.btnCloseModal.addEventListener("click", closeDetailModal);
+    el.btnCloseModal2.addEventListener("click", closeDetailModal);
+    el.detailModal.addEventListener("click", (e) => {
+      if(e.target === el.detailModal) closeDetailModal();
+    });
+
+    el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
 
     onAuthStateChanged(auth, async (user) => {
       if(!user){

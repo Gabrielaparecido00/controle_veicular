@@ -22,7 +22,6 @@
       --warning:#f59e0b;
       --danger:#ef4444;
       --header:#0f172a;
-      --soft:#f8fafc;
       --shadow:0 16px 40px rgba(15,23,42,.08);
       --radius:16px;
     }
@@ -69,7 +68,6 @@
       min-width:0;
     }
 
-    /* LOGO VIGORITO */
     .brand-logo{
       width:42px;
       height:42px;
@@ -516,24 +514,19 @@
       font-weight:800;
     }
 
-    .badge-blue{
-      background:#dbeafe;
-      color:#1d4ed8;
-    }
-
     .badge-green{
       background:#dcfce7;
       color:#166534;
     }
 
-    .badge-amber{
-      background:#fef3c7;
-      color:#92400e;
-    }
-
     .badge-red{
       background:#fee2e2;
       color:#991b1b;
+    }
+
+    .badge-blue{
+      background:#dbeafe;
+      color:#1d4ed8;
     }
 
     /* FOTOS DO VEÍCULO */
@@ -690,7 +683,12 @@
       doc,
       getDoc,
       getDocs,
-      addDoc
+      addDoc,
+      setDoc,
+      query,
+      where,
+      orderBy,
+      limit
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -730,6 +728,14 @@
       dashboardCards: document.getElementById("dashboardCards"),
       menuBar: document.getElementById("menuBar"),
       mainPanel: document.getElementById("mainPanel")
+    };
+
+    const Collections = {
+      LOJAS: "lojas",
+      USUARIOS: "usuarios",
+      MOVIMENTOS: "movimentos",
+      CONDUTORES: "condutores",
+      AUTORIZADORES: "autorizadores"
     };
 
     const state = {
@@ -781,13 +787,8 @@
       "Outro"
     ];
 
-    function debugLog(...args){
-      console.log(...args);
-    }
-
-    function debugError(...args){
-      console.error(...args);
-    }
+    function debugLog(...args){ console.log(...args); }
+    function debugError(...args){ console.error(...args); }
 
     function clearNotice(target){
       target.className = "notice";
@@ -837,8 +838,8 @@
 
     function isValidPlate(plate){
       const clean = normalizePlate(plate);
-      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;
-      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
+      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;           // ABC1234
+      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/; // ABC1D23
       return oldPattern.test(clean) || mercosulPattern.test(clean);
     }
 
@@ -867,139 +868,159 @@
       return "Perfil não definido";
     }
 
-    function getStoreName(lojaId){
-      if(!lojaId) return "Todas as lojas";
-      return state.lojasMap[lojaId]?.nome || lojaId;
-    }
+    function userIsGeneralManager(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
+    function userIsStoreManager(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
+    function userIsController(){ return state.userProfile?.role === Roles.CONTROLADOR; }
 
     function userCanCreateAutorizador(){
       return state.userProfile?.role === Roles.GERENTE_LOJA || state.userProfile?.role === Roles.GERENTE_GERAL;
-    }
-
-    function userIsGeneralManager(){
-      return state.userProfile?.role === Roles.GERENTE_GERAL;
-    }
-
-    function userIsStoreManager(){
-      return state.userProfile?.role === Roles.GERENTE_LOJA;
-    }
-
-    function userIsController(){
-      return state.userProfile?.role === Roles.CONTROLADOR;
     }
 
     function currentUserStoreId(){
       return state.userProfile?.lojaId || null;
     }
 
-    function filteredMovementsForUser(){
-      if(userIsGeneralManager()) return [...state.movimentos];
-      return state.movimentos.filter(item => item.lojaId === currentUserStoreId());
+    function getStoreName(lojaId){
+      if(!lojaId) return "Todas as lojas";
+      return state.lojasMap[lojaId]?.nome || lojaId;
     }
 
-    function filteredCondutoresForUser(){
-      if(userIsGeneralManager()) return [...state.condutores];
-      return state.condutores.filter(item => item.lojaId === currentUserStoreId());
+    function getStoreNameFromItem(item){
+      const lojaId = item?.lojaId || "";
+      if(lojaId && state.lojasMap[lojaId]?.nome) return state.lojasMap[lojaId].nome;
+      return item?.lojaNome || (lojaId || "-");
     }
 
-    function filteredAutorizadoresForUser(){
-      if(userIsGeneralManager()) return [...state.autorizadores];
-      return state.autorizadores.filter(item => item.lojaId === currentUserStoreId());
+    function buildStoreOptions(includeBlank = true){
+      const options = [];
+      if(includeBlank) options.push(`<option value="">Selecione a loja</option>`);
+      state.lojas.forEach(loja => {
+        options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`);
+      });
+      return options.join("");
     }
 
-    async function loadCollectionsBase(){
+    function buildCondutorOptions(){
+      const items = [...state.condutores];
+      const options = [`<option value="">Selecione o condutor</option>`];
+      items.forEach(item => options.push(`<option value="${item.nome}">${item.nome}</option>`));
+      return options.join("");
+    }
+
+    function buildAutorizadorOptions(){
+      const items = [...state.autorizadores];
+      const options = [`<option value="">Selecione o autorizador</option>`];
+      items.forEach(item => options.push(`<option value="${item.nome}">${item.nome}</option>`));
+      return options.join("");
+    }
+
+    function buildMotivoOptions(list){
+      const options = [`<option value="">Selecione o motivo</option>`];
+      list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
+      return options.join("");
+    }
+
+    function attachInputMasks(){
+      const cpfInputs = document.querySelectorAll("[data-mask='cpf']");
+      cpfInputs.forEach(input => {
+        input.addEventListener("input", () => { input.value = formatCPF(input.value); });
+      });
+
+      const plateInputs = document.querySelectorAll("[data-mask='plate']");
+      plateInputs.forEach(input => {
+        input.addEventListener("input", () => { input.value = formatPlate(input.value); });
+      });
+
+      const numericOnly = document.querySelectorAll("[data-only='digits']");
+      numericOnly.forEach(input => {
+        input.addEventListener("input", () => { input.value = onlyDigits(input.value); });
+      });
+    }
+
+    async function loadLojas(){
       try{
-        const [lojasSnap, movimentosSnap, condutoresSnap, autorizadoresSnap] = await Promise.all([
-          getDocs(collection(db, "lojas")),
-          getDocs(collection(db, "movimentos")),
-          getDocs(collection(db, "condutores")),
-          getDocs(collection(db, "autorizadores"))
-        ]);
-
+        const lojasSnap = await getDocs(collection(db, Collections.LOJAS));
         state.lojas = [];
         state.lojasMap = {};
         lojasSnap.forEach(docSnap => {
           const data = docSnap.data();
-          const item = {
-            id: docSnap.id,
-            ...data
-          };
+          const item = { id: docSnap.id, ...data };
           state.lojas.push(item);
           state.lojasMap[item.id] = item;
         });
-
-        state.movimentos = [];
-        movimentosSnap.forEach(docSnap => {
-          state.movimentos.push({
-            id: docSnap.id,
-            ...docSnap.data()
-          });
-        });
-
-        state.condutores = [];
-        condutoresSnap.forEach(docSnap => {
-          state.condutores.push({
-            id: docSnap.id,
-            ...docSnap.data()
-          });
-        });
-
-        state.autorizadores = [];
-        autorizadoresSnap.forEach(docSnap => {
-          state.autorizadores.push({
-            id: docSnap.id,
-            ...docSnap.data()
-          });
-        });
-
-        state.movimentos.sort((a, b) => {
-          const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-          const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
-          return tb - ta;
-        });
-
-      }catch(error){
-        debugError("Erro ao carregar coleções:", error);
-        throw error;
+        state.lojas.sort((a,b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+      }catch(err){
+        debugError("Erro ao carregar lojas:", err);
+        state.lojas = [];
+        state.lojasMap = {};
       }
     }
 
     async function loadUserProfile(uid){
+      const userRef = doc(db, Collections.USUARIOS, uid);
+      const userSnap = await getDoc(userRef);
+
+      if(!userSnap.exists()) throw new Error("Usuário não encontrado");
+      const data = userSnap.data();
+
+      if(data.ativo === false) throw new Error("Usuário desativado");
+      if(!data.role) throw new Error("Usuário sem role");
+      if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada");
+
+      state.userProfile = { id: userSnap.id, ...data };
+    }
+
+    async function loadOperationalCollections(){
       try{
-        const userRef = doc(db, "usuarios", uid);
-        const userSnap = await getDoc(userRef);
+        const lojaId = currentUserStoreId();
 
-        if(!userSnap.exists()){
-          throw new Error("Documento do usuário não encontrado em usuarios/{uid}");
+        if(userIsGeneralManager()){
+          const [movSnap, condSnap, autSnap] = await Promise.all([
+            getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))),
+            getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(3000))),
+            getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(3000)))
+          ]);
+
+          state.movimentos = [];
+          movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
+
+          state.condutores = [];
+          condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
+
+          state.autorizadores = [];
+          autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
+
+          return;
         }
 
-        const data = userSnap.data();
+        const [movSnap, condSnap, autSnap] = await Promise.all([
+          getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), orderBy("data", "desc"), limit(1500))),
+          getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), orderBy("nome", "asc"), limit(2000))),
+          getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), orderBy("nome", "asc"), limit(2000)))
+        ]);
 
-        if(data.ativo === false){
-          throw new Error("Usuário desativado");
-        }
+        state.movimentos = [];
+        movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
 
-        if(!data.role){
-          throw new Error("Usuário sem role definida");
-        }
+        state.condutores = [];
+        condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
 
-        if(data.role !== Roles.GERENTE_GERAL && !data.lojaId){
-          throw new Error("Usuário sem loja vinculada");
-        }
+        state.autorizadores = [];
+        autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
 
-        state.userProfile = {
-          id: userSnap.id,
-          ...data
-        };
-      }catch(error){
-        debugError("Erro ao carregar perfil do usuário:", error);
-        throw error;
+      }catch(err){
+        debugError("Erro ao carregar coleções operacionais:", err);
+        state.movimentos = [];
+        state.condutores = [];
+        state.autorizadores = [];
+        throw err;
       }
     }
 
     function renderShellInfo(){
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
+
       const lojaNome = userIsGeneralManager()
         ? "Todas as lojas"
         : getStoreName(state.userProfile?.lojaId);
@@ -1024,11 +1045,7 @@
       }
     }
 
-    function buildDashboardMetrics(){
-      const movimentos = filteredMovementsForUser();
-      const condutores = filteredCondutoresForUser();
-      const autorizadores = filteredAutorizadoresForUser();
-
+    function computePatioCount(movimentos){
       const patioMap = {};
       movimentos
         .slice()
@@ -1038,13 +1055,22 @@
           return ta - tb;
         })
         .forEach(item => {
-          const key = `${item.lojaId || ""}__${normalizePlate(item.placa)}`;
-          if(!normalizePlate(item.placa)) return;
-          if(item.tipo === "entrada") patioMap[key] = item;
+          const plate = normalizePlate(item.placa);
+          if(!plate) return;
+          const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
+          if(item.tipo === "entrada") patioMap[key] = true;
           if(item.tipo === "saida") delete patioMap[key];
         });
 
-      const vehiclesInPatio = Object.keys(patioMap).length;
+      return Object.keys(patioMap).length;
+    }
+
+    function buildDashboardMetrics(){
+      const movimentos = [...state.movimentos];
+      const condutores = [...state.condutores];
+      const autorizadores = [...state.autorizadores];
+
+      const vehiclesInPatio = computePatioCount(movimentos);
       const entradas = movimentos.filter(m => m.tipo === "entrada").length;
       const saidas = movimentos.filter(m => m.tipo === "saida").length;
 
@@ -1057,32 +1083,24 @@
         {
           title: "Movimentações",
           value: movimentos.length,
-          subtitle: "Total de entradas e saídas registradas"
+          subtitle: "Total de entradas e saídas"
         },
         {
           title: "Condutores",
           value: condutores.length,
-          subtitle: "Cadastros disponíveis para a operação"
+          subtitle: "Cadastros disponíveis"
         },
         {
           title: "Autorizadores",
           value: autorizadores.length,
-          subtitle: userCanCreateAutorizador() ? "Cadastros autorizados para a unidade" : "Acesso apenas para gerência"
+          subtitle: userCanCreateAutorizador() ? "Cadastros da unidade" : "Acesso apenas para gerência"
         }
       ];
 
       if(userIsGeneralManager()){
-        cards.push({
-          title: "Lojas",
-          value: state.lojas.length,
-          subtitle: "Unidades cadastradas no sistema"
-        });
+        cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades cadastradas" });
       }else{
-        cards.push({
-          title: "Entradas / Saídas",
-          value: `${entradas} / ${saidas}`,
-          subtitle: "Resumo operacional da loja"
-        });
+        cards.push({ title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" });
       }
 
       return cards;
@@ -1099,14 +1117,25 @@
       `).join("");
     }
 
+    function renderPanel(title, subtitle, bodyHTML){
+      el.mainPanel.innerHTML = `
+        <div class="card-header">
+          <div>
+            <h3>${title}</h3>
+            <p>${subtitle}</p>
+          </div>
+        </div>
+        ${bodyHTML}
+      `;
+    }
+
     function buildMenu(){
       const items = [
-        { id: "menu-dashboard", label: userIsGeneralManager() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome }
+        { id: "menu-dashboard", label: userIsGeneralManager() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome },
+        { id: "menu-entrada", label: "Entrada de veículo", action: renderEntrada },
+        { id: "menu-saida", label: "Saída de veículo", action: renderSaida },
+        { id: "menu-condutor", label: "Cadastro condutor", action: renderCondutor }
       ];
-
-      items.push({ id: "menu-entrada", label: "Entrada de veículo", action: renderEntrada });
-      items.push({ id: "menu-saida", label: "Saída de veículo", action: renderSaida });
-      items.push({ id: "menu-condutor", label: "Cadastro condutor", action: renderCondutor });
 
       if(userCanCreateAutorizador()){
         items.push({ id: "menu-autorizador", label: "Cadastro autorizador", action: renderAutorizador });
@@ -1116,6 +1145,7 @@
 
       if(userIsGeneralManager()){
         items.push({ id: "menu-lojas", label: "Resumo por loja", action: renderResumoLojas });
+        items.push({ id: "menu-lojas-admin", label: "Gerenciar lojas", action: renderGerenciarLojas });
       }
 
       el.menuBar.innerHTML = "";
@@ -1129,45 +1159,17 @@
       });
     }
 
-    function renderPanel(title, subtitle, bodyHTML){
-      el.mainPanel.innerHTML = `
-        <div class="card-header">
-          <div>
-            <h3>${title}</h3>
-            <p>${subtitle}</p>
-          </div>
-        </div>
-        ${bodyHTML}
-      `;
-    }
-
     function renderDashboardHome(){
-      const movimentos = filteredMovementsForUser();
+      const movimentos = [...state.movimentos];
       const lastFive = movimentos.slice(0, 5);
 
       let storeSummaryHTML = "";
       if(userIsGeneralManager()){
         const blocks = state.lojas.map(loja => {
-          const lojaMovs = state.movimentos.filter(m => m.lojaId === loja.id);
+          const lojaMovs = movimentos.filter(m => m.lojaId === loja.id);
           const lojaEntradas = lojaMovs.filter(m => m.tipo === "entrada").length;
           const lojaSaidas = lojaMovs.filter(m => m.tipo === "saida").length;
-
-          const patioMap = {};
-          lojaMovs
-            .slice()
-            .sort((a,b) => {
-              const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-              const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
-              return ta - tb;
-            })
-            .forEach(item => {
-              const key = normalizePlate(item.placa);
-              if(!key) return;
-              if(item.tipo === "entrada") patioMap[key] = true;
-              if(item.tipo === "saida") delete patioMap[key];
-            });
-
-          const patio = Object.keys(patioMap).length;
+          const patio = computePatioCount(lojaMovs);
 
           return `
             <div class="store-card">
@@ -1192,7 +1194,7 @@
         <tr>
           <td>${formatDate(item.data)}</td>
           <td>${item.tipo || "-"}</td>
-          <td>${getStoreName(item.lojaId)}</td>
+          <td>${getStoreNameFromItem(item)}</td>
           <td>${item.placa || "-"}</td>
           <td>${item.veiculo || "-"}</td>
           <td>${item.condutor || "-"}</td>
@@ -1227,64 +1229,10 @@
               </tbody>
             </table>
           </div>
+
+          ${state.lojas.length ? "" : `<div class="empty">Atenção: não há lojas cadastradas na coleção "lojas".</div>`}
         `
       );
-    }
-
-    function attachInputMasks(){
-      const cpfInputs = document.querySelectorAll("[data-mask='cpf']");
-      cpfInputs.forEach(input => {
-        input.addEventListener("input", () => {
-          input.value = formatCPF(input.value);
-        });
-      });
-
-      const plateInputs = document.querySelectorAll("[data-mask='plate']");
-      plateInputs.forEach(input => {
-        input.addEventListener("input", () => {
-          input.value = formatPlate(input.value);
-        });
-      });
-
-      const numericOnly = document.querySelectorAll("[data-only='digits']");
-      numericOnly.forEach(input => {
-        input.addEventListener("input", () => {
-          input.value = onlyDigits(input.value);
-        });
-      });
-    }
-
-    function buildStoreOptions(includeBlank = true){
-      const options = [];
-      if(includeBlank) options.push(`<option value="">Selecione a loja</option>`);
-      state.lojas.forEach(loja => {
-        options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`);
-      });
-      return options.join("");
-    }
-
-    function buildCondutorOptions(){
-      const items = filteredCondutoresForUser();
-      const options = [`<option value="">Selecione o condutor</option>`];
-      items.forEach(item => {
-        options.push(`<option value="${item.nome}">${item.nome}</option>`);
-      });
-      return options.join("");
-    }
-
-    function buildAutorizadorOptions(){
-      const items = filteredAutorizadoresForUser();
-      const options = [`<option value="">Selecione o autorizador</option>`];
-      items.forEach(item => {
-        options.push(`<option value="${item.nome}">${item.nome}</option>`);
-      });
-      return options.join("");
-    }
-
-    function buildMotivoOptions(list){
-      const options = [`<option value="">Selecione o motivo</option>`];
-      list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
-      return options.join("");
     }
 
     function readFileAsDataURL(file){
@@ -1301,19 +1249,16 @@
       const file = input?.files?.[0];
       if(!file) return "";
       if(!file.type?.startsWith("image/")) return "";
-      const dataUrl = await readFileAsDataURL(file);
-      return dataUrl;
+      return await readFileAsDataURL(file);
     }
 
     function setPreview(previewId, dataUrl){
       const preview = document.getElementById(previewId);
       if(!preview) return;
-
       if(!dataUrl){
         preview.innerHTML = `<div class="photo-hint">Sem foto selecionada</div>`;
         return;
       }
-
       preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
     }
 
@@ -1436,7 +1381,6 @@
       );
 
       attachInputMasks();
-
       wirePhotoPreview("fotoFrente", "previewFrente");
       wirePhotoPreview("fotoMala", "previewMala");
       wirePhotoPreview("fotoLatEsq", "previewLatEsq");
@@ -1451,7 +1395,7 @@
       clearNotice(notice);
 
       const lojaId = userIsGeneralManager()
-        ? document.getElementById("entradaLoja")?.value || ""
+        ? (document.getElementById("entradaLoja")?.value || "")
         : currentUserStoreId();
 
       const placa = formatPlate(document.getElementById("entradaPlaca")?.value || "");
@@ -1516,10 +1460,9 @@
           return;
         }
 
-        await addDoc(collection(db, "movimentos"), {
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "entrada",
           lojaId,
-          lojaNome: getStoreName(lojaId),
           placa,
           veiculo,
           motivo,
@@ -1606,7 +1549,6 @@
       );
 
       attachInputMasks();
-
       document.getElementById("btnSalvarSaida").addEventListener("click", salvarSaida);
       document.getElementById("btnLimparSaida").addEventListener("click", renderSaida);
     }
@@ -1616,7 +1558,7 @@
       clearNotice(notice);
 
       const lojaId = userIsGeneralManager()
-        ? document.getElementById("saidaLoja")?.value || ""
+        ? (document.getElementById("saidaLoja")?.value || "")
         : currentUserStoreId();
 
       const placa = formatPlate(document.getElementById("saidaPlaca")?.value || "");
@@ -1657,10 +1599,9 @@
       }
 
       try{
-        await addDoc(collection(db, "movimentos"), {
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "saida",
           lojaId,
-          lojaNome: getStoreName(lojaId),
           placa,
           veiculo,
           motivo,
@@ -1726,7 +1667,6 @@
       );
 
       attachInputMasks();
-
       document.getElementById("btnSalvarCondutor").addEventListener("click", salvarCondutor);
       document.getElementById("btnLimparCondutor").addEventListener("click", renderCondutor);
     }
@@ -1736,7 +1676,7 @@
       clearNotice(notice);
 
       const lojaId = userIsGeneralManager()
-        ? document.getElementById("condutorLoja")?.value || ""
+        ? (document.getElementById("condutorLoja")?.value || "")
         : currentUserStoreId();
 
       const nome = (document.getElementById("condutorNome")?.value || "").trim();
@@ -1764,9 +1704,8 @@
       }
 
       try{
-        await addDoc(collection(db, "condutores"), {
+        await addDoc(collection(db, Collections.CONDUTORES), {
           lojaId,
-          lojaNome: getStoreName(lojaId),
           nome,
           cpf: onlyDigits(cpf),
           cargo,
@@ -1837,7 +1776,6 @@
       );
 
       attachInputMasks();
-
       document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
       document.getElementById("btnLimparAutorizador").addEventListener("click", renderAutorizador);
     }
@@ -1847,7 +1785,7 @@
       clearNotice(notice);
 
       const lojaId = userIsGeneralManager()
-        ? document.getElementById("autLoja")?.value || ""
+        ? (document.getElementById("autLoja")?.value || "")
         : currentUserStoreId();
 
       const nome = (document.getElementById("autNome")?.value || "").trim();
@@ -1875,9 +1813,8 @@
       }
 
       try{
-        await addDoc(collection(db, "autorizadores"), {
+        await addDoc(collection(db, Collections.AUTORIZADORES), {
           lojaId,
-          lojaNome: getStoreName(lojaId),
           nome,
           cpf: onlyDigits(cpf),
           cargo,
@@ -1916,7 +1853,7 @@
       renderPanel(
         "Consulta",
         userIsGeneralManager()
-          ? "Consulte todas as movimentações de todas as unidades."
+          ? "Consulte movimentações de todas as unidades."
           : "Consulte as movimentações da sua unidade.",
         `
           <div class="grid">
@@ -1983,7 +1920,6 @@
     function applyConsultaFilter(){
       const body = document.getElementById("consultaBody");
       const empty = document.getElementById("consultaEmpty");
-
       if(!body || !empty) return;
 
       const lojaId = userIsGeneralManager()
@@ -1994,19 +1930,11 @@
       const tipo = (document.getElementById("filtroTipoConsulta")?.value || "").toLowerCase();
       const texto = (document.getElementById("filtroTextoConsulta")?.value || "").trim().toLowerCase();
 
-      let items = filteredMovementsForUser();
+      let items = [...state.movimentos];
 
-      if(lojaId){
-        items = items.filter(item => item.lojaId === lojaId);
-      }
-
-      if(placa){
-        items = items.filter(item => normalizePlate(item.placa).includes(placa));
-      }
-
-      if(tipo){
-        items = items.filter(item => String(item.tipo || "").toLowerCase() === tipo);
-      }
+      if(lojaId) items = items.filter(item => item.lojaId === lojaId);
+      if(placa) items = items.filter(item => normalizePlate(item.placa).includes(placa));
+      if(tipo) items = items.filter(item => String(item.tipo || "").toLowerCase() === tipo);
 
       if(texto){
         items = items.filter(item => {
@@ -2017,7 +1945,8 @@
             item.autorizador,
             item.observacao,
             item.criadoPorNome,
-            item.lojaNome
+            item.lojaNome,
+            getStoreNameFromItem(item)
           ].join(" ").toLowerCase();
           return haystack.includes(texto);
         });
@@ -2034,15 +1963,8 @@
         return `
           <tr>
             <td>${formatDate(item.data)}</td>
-            <td>
-              <div class="row-badges">
-                ${item.tipo === "entrada"
-                  ? `<span class="badge badge-green">Entrada</span>`
-                  : `<span class="badge badge-red">Saída</span>`
-                }
-              </div>
-            </td>
-            <td>${getStoreName(item.lojaId)}</td>
+            <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
+            <td>${getStoreNameFromItem(item)}</td>
             <td>${item.placa || "-"}</td>
             <td>${item.veiculo || "-"}</td>
             <td>${item.motivo || "-"}</td>
@@ -2073,28 +1995,14 @@
         const movs = state.movimentos.filter(m => m.lojaId === loja.id);
         const conds = state.condutores.filter(c => c.lojaId === loja.id);
         const auts = state.autorizadores.filter(a => a.lojaId === loja.id);
-
-        const patioMap = {};
-        movs
-          .slice()
-          .sort((a,b) => {
-            const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-            const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
-            return ta - tb;
-          })
-          .forEach(item => {
-            const key = normalizePlate(item.placa);
-            if(!key) return;
-            if(item.tipo === "entrada") patioMap[key] = true;
-            if(item.tipo === "saida") delete patioMap[key];
-          });
+        const patio = computePatioCount(movs);
 
         return `
           <div class="store-card">
             <h4>${loja.nome || loja.id}</h4>
             <div class="meta">
               <div><strong>ID:</strong> ${loja.id}</div>
-              <div><strong>Veículos no pátio:</strong> ${Object.keys(patioMap).length}</div>
+              <div><strong>Veículos no pátio:</strong> ${patio}</div>
               <div><strong>Movimentações:</strong> ${movs.length}</div>
               <div><strong>Condutores:</strong> ${conds.length}</div>
               <div><strong>Autorizadores:</strong> ${auts.length}</div>
@@ -2114,10 +2022,118 @@
       );
     }
 
+    function renderGerenciarLojas(){
+      if(!userIsGeneralManager()){
+        renderPanel("Acesso restrito", "Esta função não está disponível para seu perfil.", `<div class="empty">Somente o gerente geral.</div>`);
+        return;
+      }
+
+      const rows = state.lojas.map(l => `
+        <tr>
+          <td>${l.id}</td>
+          <td>${l.nome || "-"}</td>
+          <td>${l.ativo === false ? "Não" : "Sim"}</td>
+        </tr>
+      `).join("");
+
+      renderPanel(
+        "Gerenciar lojas",
+        "Crie e mantenha a coleção de lojas (lojas/{lojaId}).",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="lojaIdNovo">ID da loja</label>
+              <input class="input" id="lojaIdNovo" maxlength="40" placeholder="Ex.: vigorito-matriz">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaNomeNovo">Nome da loja</label>
+              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: Vigorito - Matriz">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaAtivaNovo">Ativa</label>
+              <select class="select" id="lojaAtivaNovo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnCriarLoja">Salvar loja</button>
+            </div>
+          </div>
+
+          <div id="lojasNotice" class="notice"></div>
+
+          <div class="section-title">Lojas cadastradas</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Ativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `
+      );
+
+      document.getElementById("btnCriarLoja").addEventListener("click", salvarLojaAdmin);
+    }
+
+    async function salvarLojaAdmin(){
+      const notice = document.getElementById("lojasNotice");
+      clearNotice(notice);
+
+      const lojaId = (document.getElementById("lojaIdNovo")?.value || "").trim();
+      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
+      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
+
+      if(!lojaId){
+        showNotice(notice, "Informe o ID da loja.");
+        return;
+      }
+
+      if(!/^[a-zA-Z0-9_-]+$/.test(lojaId)){
+        showNotice(notice, "ID inválido. Use apenas letras, números, _ ou -.");
+        return;
+      }
+
+      if(!nome){
+        showNotice(notice, "Informe o nome da loja.");
+        return;
+      }
+
+      try{
+        await setDoc(doc(db, Collections.LOJAS, lojaId), {
+          nome,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser?.uid || "",
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        }, { merge: true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Loja salva com sucesso.", "success");
+        renderGerenciarLojas();
+      }catch(err){
+        debugError("Erro ao salvar loja:", err);
+        showNotice(notice, "Não foi possível salvar a loja.");
+      }
+    }
+
     async function refreshAfterWrite(){
-      await loadCollectionsBase();
-      renderDashboard();
+      await loadLojas();
+      await loadOperationalCollections();
       renderShellInfo();
+      renderDashboard();
     }
 
     async function login(){
@@ -2155,7 +2171,8 @@
       state.authUser = user;
 
       await loadUserProfile(user.uid);
-      await loadCollectionsBase();
+      await loadLojas();
+      await loadOperationalCollections();
 
       renderShellInfo();
       renderDashboard();

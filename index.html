@@ -1042,10 +1042,9 @@
       state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
     }
 
-    async function loadOperationalCollections(){
+   async function loadOperationalCollections(){
   const lojaId = currentUserStoreId();
 
-  // helper pra testar uma coleção de cada vez
   async function fetchLabel(label, q){
     try{
       const snap = await getDocs(q);
@@ -1055,7 +1054,7 @@
       return arr;
     }catch(e){
       console.error("NEGADO:", label, e?.code, e?.message, e);
-      throw new Error(`${label}: ${e?.code || ""} ${e?.message || ""}`);
+      throw e; // joga pra cima (vai cair no showFatalAppError)
     }
   }
 

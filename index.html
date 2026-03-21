@@ -215,23 +215,6 @@ Selecione uma ação.
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
-import {
-getAuth,
-signInWithEmailAndPassword,
-onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-getFirestore,
-collection,
-addDoc,
-getDocs
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-<script type="module">
-
 /* ===============================
 IMPORTS FIREBASE
 =============================== */
@@ -249,9 +232,7 @@ import {
 getFirestore,
 collection,
 addDoc,
-getDocs,
-query,
-where
+getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 import {
@@ -277,66 +258,73 @@ INICIALIZAÇÃO
 =============================== */
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
-
 const storage = getStorage(app);
 
-console.log("Firebase inicializado")
+console.log("Firebase inicializado");
 
-</script>
+/* ===============================
+LOGIN
+=============================== */
 
-/* LOGIN */
+window.login = async () => {
 
-window.login=async()=>{
+let email = document.getElementById("email").value;
+let senha = document.getElementById("senha").value;
 
-let email=document.getElementById("email").value
-let senha=document.getElementById("senha").value
+try {
 
-await signInWithEmailAndPassword(auth,email,senha)
+await signInWithEmailAndPassword(auth, email, senha);
+
+} catch(e){
+
+console.error(e);
+alert("Erro no login");
 
 }
 
-/* SESSION */
+};
 
-onAuthStateChanged(auth,user=>{
+/* ===============================
+SESSION
+=============================== */
+
+onAuthStateChanged(auth, user => {
 
 if(user){
 
-console.log("Logado:",user.uid)
+console.log("Logado:", user.uid);
 
-document.getElementById("login").style.display="none"
-document.getElementById("app").style.display="block"
-document.getElementById("topbar").style.display="flex"
+document.getElementById("login").style.display = "none";
+document.getElementById("app").style.display = "block";
+document.getElementById("topbar").style.display = "flex";
 
-document.getElementById("username").innerText=user.email
+document.getElementById("username").innerText = user.email;
 
 }
 
-})
+});
 
-/* PAINEL */
+/* ===============================
+PAINEL
+=============================== */
 
-window.abrir=(t)=>{
+window.abrir = (t) => {
 
-let html=""
+let html = "";
 
-if(t=="entrada"){
+if(t == "entrada"){
 
-html=`
-
+html = `
 <h3>Entrada de veículo</h3>
 
 <div class="form-grid">
 
 <input id="placa" placeholder="Placa">
-
 <input id="veiculo" placeholder="Veículo">
 
 <select id="condutor"></select>
-
 <select id="autorizador"></select>
 
 <select id="dano">
@@ -364,99 +352,35 @@ html=`
 </div>
 
 <div class="actions">
-
 <button class="save" onclick="salvarEntrada()">Salvar</button>
-
 </div>
-
-`
+`;
 
 }
 
-if(t=="saida"){
+if(t == "condutor"){
 
-html=`
-
-<h3>Saída de veículo</h3>
-
-<div class="form-grid">
-
-<input placeholder="Placa">
-
-<input placeholder="Veículo">
-
-<select></select>
-
-<select></select>
-
-</div>
-
-<div class="actions">
-
-<button class="save">Salvar</button>
-
-</div>
-
-`
-
-}
-
-if(t=="condutor"){
-
-html=`
-
+html = `
 <h3>Novo condutor</h3>
 
 <div class="form-grid">
 
 <input id="nomeCondutor" placeholder="Nome completo">
-
 <input id="cpfCondutor" placeholder="CPF">
-
 <input id="cargoCondutor" placeholder="Cargo">
 
 </div>
 
 <div class="actions">
-
 <button class="save" onclick="salvarCondutor()">Salvar</button>
-
 </div>
-
-`
+`;
 
 }
 
-if(t=="autorizador"){
+if(t == "consulta"){
 
-html=`
-
-<h3>Novo autorizador</h3>
-
-<div class="form-grid">
-
-<input id="nomeAut" placeholder="Nome completo">
-
-<input id="cpfAut" placeholder="CPF">
-
-<input id="cargoAut" placeholder="Cargo">
-
-</div>
-
-<div class="actions">
-
-<button class="save" onclick="salvarAut()">Salvar</button>
-
-</div>
-
-`
-
-}
-
-if(t=="consulta"){
-
-html=`
-
+html = `
 <h3>Consulta</h3>
 
 <input id="buscaPlaca" placeholder="Placa">
@@ -477,96 +401,85 @@ html=`
 <tbody id="resultado"></tbody>
 
 </table>
-
-`
-
-}
-
-document.getElementById("painel").innerHTML=html
+`;
 
 }
 
-/* SALVAR */
+document.getElementById("painel").innerHTML = html;
 
-window.salvarCondutor=async()=>{
+};
+
+/* ===============================
+SALVAR CONDUTOR
+=============================== */
+
+window.salvarCondutor = async () => {
 
 await addDoc(collection(db,"condutores"),{
 
-nome:document.getElementById("nomeCondutor").value,
-cpf:document.getElementById("cpfCondutor").value,
-cargo:document.getElementById("cargoCondutor").value
+nome: document.getElementById("nomeCondutor").value,
+cpf: document.getElementById("cpfCondutor").value,
+cargo: document.getElementById("cargoCondutor").value
 
-})
+});
 
-alert("Condutor salvo")
+alert("Condutor salvo");
 
-}
+};
 
-window.salvarAut=async()=>{
+/* ===============================
+ENTRADA
+=============================== */
 
-await addDoc(collection(db,"autorizadores"),{
-
-nome:document.getElementById("nomeAut").value,
-cpf:document.getElementById("cpfAut").value,
-cargo:document.getElementById("cargoAut").value
-
-})
-
-alert("Autorizador salvo")
-
-}
-
-window.salvarEntrada=async()=>{
+window.salvarEntrada = async () => {
 
 await addDoc(collection(db,"movimentos"),{
 
-tipo:"entrada",
-placa:document.getElementById("placa").value,
-veiculo:document.getElementById("veiculo").value,
-data:new Date()
+tipo: "entrada",
+placa: document.getElementById("placa").value,
+veiculo: document.getElementById("veiculo").value,
+data: new Date()
 
-})
+});
 
-alert("Entrada registrada")
+alert("Entrada registrada");
 
-}
+};
 
-/* CONSULTA */
+/* ===============================
+CONSULTA
+=============================== */
 
-window.buscar=async()=>{
+window.buscar = async () => {
 
-let placa=document.getElementById("buscaPlaca").value
+let placa = document.getElementById("buscaPlaca").value;
 
-let q=await getDocs(collection(db,"movimentos"))
+let q = await getDocs(collection(db,"movimentos"));
 
-let tb=document.getElementById("resultado")
+let tb = document.getElementById("resultado");
 
-tb.innerHTML=""
+tb.innerHTML = "";
 
-q.forEach(doc=>{
+q.forEach(doc => {
 
-let d=doc.data()
+let d = doc.data();
 
 if(!placa || d.placa.includes(placa)){
 
-tb.innerHTML+=`
-
+tb.innerHTML += `
 <tr>
-
 <td>${new Date(d.data.seconds*1000).toLocaleString()}</td>
 <td>${d.tipo}</td>
 <td>${d.placa}</td>
 <td>${d.veiculo}</td>
-
 </tr>
-
-`
-
-}
-
-})
+`;
 
 }
+
+});
+
+};
 
 </script>
 

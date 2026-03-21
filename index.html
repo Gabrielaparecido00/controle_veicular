@@ -62,10 +62,6 @@ cursor:pointer;
 font-weight:600;
 }
 
-.menu button:hover{
-background:#1d4ed8;
-}
-
 .form-grid{
 display:grid;
 grid-template-columns:1fr 1fr;
@@ -173,8 +169,6 @@ Olá, <span id="username"></span>
 
 </header>
 
-<!-- LOGIN -->
-
 <div id="login">
 
 <div class="loginCard">
@@ -182,7 +176,6 @@ Olá, <span id="username"></span>
 <h2>Login</h2>
 
 <input id="email" placeholder="Email">
-
 <input id="senha" type="password" placeholder="Senha">
 
 <button onclick="login()">Entrar</button>
@@ -190,8 +183,6 @@ Olá, <span id="username"></span>
 </div>
 
 </div>
-
-<!-- APP -->
 
 <main id="app" style="display:none">
 
@@ -206,26 +197,19 @@ Olá, <span id="username"></span>
 </div>
 
 <div id="painel" class="card">
-
-Selecione uma ação.
-
+Selecione uma ação
 </div>
 
 </main>
 
 <script type="module">
 
-/* ===============================
-IMPORTS FIREBASE
-=============================== */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
 getAuth,
 signInWithEmailAndPassword,
-onAuthStateChanged,
-signOut
+onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
@@ -235,88 +219,50 @@ addDoc,
 getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-import {
-getStorage
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
-/* ===============================
-CONFIG FIREBASE
-=============================== */
-
 const firebaseConfig = {
 apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
 authDomain: "controle-ponto-26d34.firebaseapp.com",
 projectId: "controle-ponto-26d34",
 storageBucket: "controle-ponto-26d34.firebasestorage.app",
 messagingSenderId: "730360923157",
-appId: "1:730360923157:web:cdd6ea1eeed6fd717d3a1c",
-measurementId: "G-XJ7PY0YDBH"
+appId: "1:730360923157:web:cdd6ea1eeed6fd717d3a1c"
 };
-
-/* ===============================
-INICIALIZAÇÃO
-=============================== */
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
-console.log("Firebase inicializado");
+window.login = async ()=>{
 
-/* ===============================
-LOGIN
-=============================== */
+let email=document.getElementById("email").value
+let senha=document.getElementById("senha").value
 
-window.login = async () => {
-
-let email = document.getElementById("email").value;
-let senha = document.getElementById("senha").value;
-
-try {
-
-await signInWithEmailAndPassword(auth, email, senha);
-
-} catch(e){
-
-console.error(e);
-alert("Erro no login");
+await signInWithEmailAndPassword(auth,email,senha)
 
 }
 
-};
-
-/* ===============================
-SESSION
-=============================== */
-
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth,user=>{
 
 if(user){
 
-console.log("Logado:", user.uid);
+document.getElementById("login").style.display="none"
+document.getElementById("app").style.display="block"
+document.getElementById("topbar").style.display="flex"
 
-document.getElementById("login").style.display = "none";
-document.getElementById("app").style.display = "block";
-document.getElementById("topbar").style.display = "flex";
-
-document.getElementById("username").innerText = user.email;
+document.getElementById("username").innerText=user.email
 
 }
 
-});
+})
 
-/* ===============================
-PAINEL
-=============================== */
+window.abrir=(t)=>{
 
-window.abrir = (t) => {
+let html=""
 
-let html = "";
+if(t=="entrada"){
 
-if(t == "entrada"){
+html=`
 
-html = `
 <h3>Entrada de veículo</h3>
 
 <div class="form-grid">
@@ -328,15 +274,15 @@ html = `
 <select id="autorizador"></select>
 
 <select id="dano">
-<option value="nao">Sem dano</option>
-<option value="sim">Com dano</option>
+<option>Sem dano</option>
+<option>Com dano</option>
 </select>
 
 <textarea placeholder="Observação"></textarea>
 
 </div>
 
-<h4>Fotos</h4>
+<h4>Fotos do veículo</h4>
 
 <div class="photo-grid">
 
@@ -352,15 +298,19 @@ html = `
 </div>
 
 <div class="actions">
+
 <button class="save" onclick="salvarEntrada()">Salvar</button>
+
 </div>
-`;
+
+`
 
 }
 
-if(t == "condutor"){
+if(t=="condutor"){
 
-html = `
+html=`
+
 <h3>Novo condutor</h3>
 
 <div class="form-grid">
@@ -372,15 +322,43 @@ html = `
 </div>
 
 <div class="actions">
+
 <button class="save" onclick="salvarCondutor()">Salvar</button>
+
 </div>
-`;
+
+`
 
 }
 
-if(t == "consulta"){
+if(t=="autorizador"){
 
-html = `
+html=`
+
+<h3>Novo autorizador</h3>
+
+<div class="form-grid">
+
+<input id="nomeAut" placeholder="Nome completo">
+<input id="cpfAut" placeholder="CPF">
+<input id="cargoAut" placeholder="Cargo">
+
+</div>
+
+<div class="actions">
+
+<button class="save" onclick="salvarAut()">Salvar</button>
+
+</div>
+
+`
+
+}
+
+if(t=="consulta"){
+
+html=`
+
 <h3>Consulta</h3>
 
 <input id="buscaPlaca" placeholder="Placa">
@@ -401,85 +379,133 @@ html = `
 <tbody id="resultado"></tbody>
 
 </table>
-`;
+
+`
 
 }
 
-document.getElementById("painel").innerHTML = html;
+document.getElementById("painel").innerHTML=html
 
-};
+carregarCondutores()
+carregarAutorizadores()
 
-/* ===============================
-SALVAR CONDUTOR
-=============================== */
+}
 
-window.salvarCondutor = async () => {
+async function carregarCondutores(){
+
+let q=await getDocs(collection(db,"condutores"))
+
+let s=document.getElementById("condutor")
+
+if(!s)return
+
+s.innerHTML=""
+
+q.forEach(doc=>{
+
+let d=doc.data()
+
+s.innerHTML+=`<option>${d.nome}</option>`
+
+})
+
+}
+
+async function carregarAutorizadores(){
+
+let q=await getDocs(collection(db,"autorizadores"))
+
+let s=document.getElementById("autorizador")
+
+if(!s)return
+
+s.innerHTML=""
+
+q.forEach(doc=>{
+
+let d=doc.data()
+
+s.innerHTML+=`<option>${d.nome}</option>`
+
+})
+
+}
+
+window.salvarCondutor=async()=>{
 
 await addDoc(collection(db,"condutores"),{
 
-nome: document.getElementById("nomeCondutor").value,
-cpf: document.getElementById("cpfCondutor").value,
-cargo: document.getElementById("cargoCondutor").value
+nome:document.getElementById("nomeCondutor").value,
+cpf:document.getElementById("cpfCondutor").value,
+cargo:document.getElementById("cargoCondutor").value
 
-});
+})
 
-alert("Condutor salvo");
+alert("Condutor salvo")
 
-};
+}
 
-/* ===============================
-ENTRADA
-=============================== */
+window.salvarAut=async()=>{
 
-window.salvarEntrada = async () => {
+await addDoc(collection(db,"autorizadores"),{
+
+nome:document.getElementById("nomeAut").value,
+cpf:document.getElementById("cpfAut").value,
+cargo:document.getElementById("cargoAut").value
+
+})
+
+alert("Autorizador salvo")
+
+}
+
+window.salvarEntrada=async()=>{
 
 await addDoc(collection(db,"movimentos"),{
 
-tipo: "entrada",
-placa: document.getElementById("placa").value,
-veiculo: document.getElementById("veiculo").value,
-data: new Date()
+tipo:"entrada",
+placa:document.getElementById("placa").value,
+veiculo:document.getElementById("veiculo").value,
+data:new Date()
 
-});
+})
 
-alert("Entrada registrada");
+alert("Entrada registrada")
 
-};
+}
 
-/* ===============================
-CONSULTA
-=============================== */
+window.buscar=async()=>{
 
-window.buscar = async () => {
+let placa=document.getElementById("buscaPlaca").value
 
-let placa = document.getElementById("buscaPlaca").value;
+let q=await getDocs(collection(db,"movimentos"))
 
-let q = await getDocs(collection(db,"movimentos"));
+let tb=document.getElementById("resultado")
 
-let tb = document.getElementById("resultado");
+tb.innerHTML=""
 
-tb.innerHTML = "";
+q.forEach(doc=>{
 
-q.forEach(doc => {
-
-let d = doc.data();
+let d=doc.data()
 
 if(!placa || d.placa.includes(placa)){
 
-tb.innerHTML += `
+tb.innerHTML+=`
+
 <tr>
-<td>${new Date(d.data.seconds*1000).toLocaleString()}</td>
+<td>${new Date(d.data).toLocaleString()}</td>
 <td>${d.tipo}</td>
 <td>${d.placa}</td>
 <td>${d.veiculo}</td>
 </tr>
-`;
+
+`
 
 }
 
-});
+})
 
-};
+}
 
 </script>
 

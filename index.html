@@ -1,160 +1,258 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Controle Veicular</title>
+<title>Sistema de Controle Veicular</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
-body{
-font-family:Inter;
+/* RESET */
+
+*{
+box-sizing:border-box;
 margin:0;
-background:#eef2f7;
+padding:0;
 }
 
+body{
+
+font-family:Inter;
+background:#eef2f7;
+color:#1f2937;
+
+}
+
+/* HEADER */
+
 header{
-height:70px;
-background:#111827;
+
+background:#0f172a;
 color:white;
+height:70px;
 display:flex;
 align-items:center;
 justify-content:space-between;
 padding:0 30px;
+
 }
 
 header img{
-height:38px;
+height:40px;
 }
 
-main{
-padding:25px;
-max-width:1200px;
-margin:auto;
+#userInfo{
+font-size:14px;
 }
 
-.card{
+/* LOGIN */
+
+#login{
+
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+
+}
+
+.loginCard{
+
 background:white;
-padding:25px;
-border-radius:10px;
-box-shadow:0 5px 20px rgba(0,0,0,.08);
+padding:40px;
+border-radius:12px;
+width:360px;
+box-shadow:0 20px 40px rgba(0,0,0,.1);
+
+}
+
+.loginCard h2{
 margin-bottom:20px;
 }
 
+.loginCard input{
+
+width:100%;
+padding:12px;
+margin-bottom:10px;
+border-radius:8px;
+border:1px solid #ddd;
+
+}
+
+.loginCard button{
+
+width:100%;
+padding:12px;
+background:#2563eb;
+border:none;
+border-radius:8px;
+color:white;
+font-weight:600;
+cursor:pointer;
+
+}
+
+/* APP */
+
+main{
+
+max-width:1200px;
+margin:auto;
+padding:25px;
+
+}
+
+/* MENU */
+
 .menu{
+
 display:flex;
 gap:10px;
 flex-wrap:wrap;
 margin-bottom:20px;
+
 }
 
 .menu button{
+
 background:#2563eb;
 border:none;
+padding:12px 18px;
+border-radius:10px;
 color:white;
-padding:10px 16px;
-border-radius:8px;
-cursor:pointer;
 font-weight:600;
+cursor:pointer;
+
 }
 
+/* CARD */
+
+.card{
+
+background:white;
+padding:25px;
+border-radius:12px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+}
+
+/* FORM GRID */
+
 .form-grid{
+
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:12px;
+
 }
 
 input,select,textarea{
+
 padding:10px;
-border-radius:6px;
-border:1px solid #ccc;
-width:100%;
+border-radius:8px;
+border:1px solid #ddd;
+
 }
 
 textarea{
 grid-column:span 2;
 }
 
-.actions{
-margin-top:15px;
-display:flex;
-gap:10px;
-}
-
-.actions button{
-border:none;
-padding:10px 16px;
-border-radius:6px;
-cursor:pointer;
-font-weight:600;
-}
-
-.save{background:#10b981;color:white;}
-.cancel{background:#e5e7eb;}
+/* PHOTOS */
 
 .photo-grid{
+
 display:grid;
 grid-template-columns:repeat(4,1fr);
-gap:10px;
-margin-top:15px;
+gap:12px;
+margin-top:20px;
+
 }
 
-.photo-grid input{
-border:1px dashed #bbb;
-padding:8px;
+.photo-box{
+
+border:2px dashed #cbd5e1;
+padding:10px;
+border-radius:8px;
+text-align:center;
+
 }
+
+.photo-box img{
+
+width:100%;
+opacity:.3;
+
+}
+
+.photo-box input{
+
+margin-top:5px;
+
+}
+
+/* BUTTONS */
+
+.actions{
+
+margin-top:20px;
+display:flex;
+gap:10px;
+
+}
+
+.save{
+
+background:#10b981;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+cursor:pointer;
+
+}
+
+.cancel{
+
+background:#e5e7eb;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+
+}
+
+/* TABLE */
 
 table{
+
 width:100%;
+margin-top:20px;
 border-collapse:collapse;
-margin-top:15px;
+
 }
 
 th,td{
-padding:8px;
-border-bottom:1px solid #ddd;
+
+padding:10px;
+border-bottom:1px solid #e2e8f0;
+text-align:left;
+
 }
 
 th{
-background:#f3f4f6;
-text-align:left;
-}
 
-#login{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-}
+background:#f1f5f9;
 
-.loginCard{
-background:white;
-padding:40px;
-border-radius:10px;
-width:350px;
-box-shadow:0 10px 30px rgba(0,0,0,.15);
-}
-
-.loginCard input{
-margin-bottom:10px;
-}
-
-.loginCard button{
-width:100%;
-background:#2563eb;
-border:none;
-color:white;
-padding:12px;
-border-radius:8px;
-font-weight:600;
-cursor:pointer;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -163,8 +261,10 @@ cursor:pointer;
 
 <img src="vigorito.png">
 
-<div>
+<div id="userInfo">
+
 Olá, <span id="username"></span>
+
 </div>
 
 </header>
@@ -178,7 +278,7 @@ Olá, <span id="username"></span>
 <input id="email" placeholder="Email">
 <input id="senha" type="password" placeholder="Senha">
 
-<button onclick="login()">Entrar</button>
+<button id="btnLogin">Entrar</button>
 
 </div>
 
@@ -188,28 +288,35 @@ Olá, <span id="username"></span>
 
 <div class="menu">
 
-<button onclick="abrir('entrada')">Entrada</button>
-<button onclick="abrir('saida')">Saída</button>
-<button onclick="abrir('condutor')">Condutor</button>
-<button onclick="abrir('autorizador')">Autorizador</button>
-<button onclick="abrir('consulta')">Consulta</button>
+<button id="btnEntrada">Entrada de veículo</button>
+<button id="btnSaida">Saída de veículo</button>
+<button id="btnCondutor">Cadastro condutor</button>
+<button id="btnAutorizador">Cadastro autorizador</button>
+<button id="btnConsulta">Consulta</button>
 
 </div>
 
 <div id="painel" class="card">
-Selecione uma ação
+
+Selecione uma função no menu acima
+
 </div>
 
 </main>
 
 <script type="module">
 
+/* ===============================
+IMPORTS FIREBASE
+=============================== */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
 getAuth,
 signInWithEmailAndPassword,
-onAuthStateChanged
+onAuthStateChanged,
+signOut
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
@@ -219,31 +326,66 @@ addDoc,
 getDocs
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+/* ===============================
+CONFIG FIREBASE
+=============================== */
+
 const firebaseConfig = {
+
 apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
 authDomain: "controle-ponto-26d34.firebaseapp.com",
 projectId: "controle-ponto-26d34",
 storageBucket: "controle-ponto-26d34.firebasestorage.app",
 messagingSenderId: "730360923157",
 appId: "1:730360923157:web:cdd6ea1eeed6fd717d3a1c"
+
 };
 
+/* ===============================
+INICIALIZA FIREBASE
+=============================== */
+
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 const db = getFirestore(app);
 
-window.login = async ()=>{
+console.log("Firebase inicializado");
 
-let email=document.getElementById("email").value
-let senha=document.getElementById("senha").value
+
+/* ===============================
+LOGIN
+=============================== */
+
+document.getElementById("btnLogin").addEventListener("click", async ()=>{
+
+let email = document.getElementById("email").value
+let senha = document.getElementById("senha").value
+
+try{
 
 await signInWithEmailAndPassword(auth,email,senha)
 
+}catch(e){
+
+console.error(e)
+
+alert("Erro no login")
+
 }
+
+})
+
+/* ===============================
+SESSION
+=============================== */
 
 onAuthStateChanged(auth,user=>{
 
 if(user){
+
+console.log("Usuário logado:",user.uid)
 
 document.getElementById("login").style.display="none"
 document.getElementById("app").style.display="block"
@@ -251,31 +393,77 @@ document.getElementById("topbar").style.display="flex"
 
 document.getElementById("username").innerText=user.email
 
+}else{
+
+document.getElementById("login").style.display="flex"
+document.getElementById("app").style.display="none"
+document.getElementById("topbar").style.display="none"
+
 }
 
 })
 
-window.abrir=(t)=>{
+/* ===============================
+NAVEGAÇÃO MENU
+=============================== */
 
-let html=""
+document.getElementById("btnEntrada").onclick=()=>abrirEntrada()
+document.getElementById("btnSaida").onclick=()=>abrirSaida()
+document.getElementById("btnCondutor").onclick=()=>abrirCondutor()
+document.getElementById("btnAutorizador").onclick=()=>abrirAutorizador()
+document.getElementById("btnConsulta").onclick=()=>abrirConsulta()
 
-if(t=="entrada"){
 
-html=`
+/* ===============================
+MASCARA PLACA
+=============================== */
+
+window.formatarPlaca = (input)=>{
+
+let v = input.value.toUpperCase()
+
+v = v.replace(/[^A-Z0-9]/g,'')
+
+if(v.length > 3){
+
+v = v.slice(0,3) + "-" + v.slice(3)
+
+}
+
+input.value = v
+
+}
+
+
+/* ===============================
+TELA ENTRADA
+=============================== */
+
+function abrirEntrada(){
+
+document.getElementById("painel").innerHTML = `
 
 <h3>Entrada de veículo</h3>
 
 <div class="form-grid">
 
-<input id="placa" placeholder="Placa">
+<input id="placa" placeholder="Placa" onkeyup="formatarPlaca(this)">
+
 <input id="veiculo" placeholder="Veículo">
 
-<select id="condutor"></select>
-<select id="autorizador"></select>
+<select id="condutor">
+<option>Selecione condutor</option>
+</select>
+
+<select id="autorizador">
+<option>Selecione autorizador</option>
+</select>
 
 <select id="dano">
-<option>Sem dano</option>
-<option>Com dano</option>
+
+<option value="nao">Sem dano</option>
+<option value="sim">Com dano</option>
+
 </select>
 
 <textarea placeholder="Observação"></textarea>
@@ -286,20 +474,61 @@ html=`
 
 <div class="photo-grid">
 
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Frente</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Traseira</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Lateral esquerda</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Lateral direita</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Canto dianteiro esq</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Canto dianteiro dir</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Canto traseiro esq</p>
+</div>
+
+<div class="photo-box">
+<img src="https://i.imgur.com/2DhmtJ4.png">
 <input type="file">
+<p>Canto traseiro dir</p>
+</div>
 
 </div>
 
 <div class="actions">
 
-<button class="save" onclick="salvarEntrada()">Salvar</button>
+<button class="save">Salvar entrada</button>
+
+<button class="cancel">Cancelar</button>
 
 </div>
 
@@ -307,23 +536,67 @@ html=`
 
 }
 
-if(t=="condutor"){
 
-html=`
+/* ===============================
+TELA SAIDA
+=============================== */
+
+function abrirSaida(){
+
+document.getElementById("painel").innerHTML = `
+
+<h3>Saída de veículo</h3>
+
+<div class="form-grid">
+
+<input placeholder="Placa">
+
+<input placeholder="Veículo">
+
+<select>
+<option>Condutor</option>
+</select>
+
+<select>
+<option>Autorizador</option>
+</select>
+
+</div>
+
+<div class="actions">
+
+<button class="save">Salvar saída</button>
+
+</div>
+
+`
+
+}
+
+
+/* ===============================
+TELA CONDUTOR
+=============================== */
+
+function abrirCondutor(){
+
+document.getElementById("painel").innerHTML = `
 
 <h3>Novo condutor</h3>
 
 <div class="form-grid">
 
 <input id="nomeCondutor" placeholder="Nome completo">
+
 <input id="cpfCondutor" placeholder="CPF">
+
 <input id="cargoCondutor" placeholder="Cargo">
 
 </div>
 
 <div class="actions">
 
-<button class="save" onclick="salvarCondutor()">Salvar</button>
+<button class="save" id="salvarCondutor">Salvar</button>
 
 </div>
 
@@ -331,23 +604,30 @@ html=`
 
 }
 
-if(t=="autorizador"){
 
-html=`
+/* ===============================
+TELA AUTORIZADOR
+=============================== */
+
+function abrirAutorizador(){
+
+document.getElementById("painel").innerHTML = `
 
 <h3>Novo autorizador</h3>
 
 <div class="form-grid">
 
 <input id="nomeAut" placeholder="Nome completo">
+
 <input id="cpfAut" placeholder="CPF">
+
 <input id="cargoAut" placeholder="Cargo">
 
 </div>
 
 <div class="actions">
 
-<button class="save" onclick="salvarAut()">Salvar</button>
+<button class="save" id="salvarAut">Salvar</button>
 
 </div>
 
@@ -355,28 +635,33 @@ html=`
 
 }
 
-if(t=="consulta"){
 
-html=`
+/* ===============================
+TELA CONSULTA
+=============================== */
+
+function abrirConsulta(){
+
+document.getElementById("painel").innerHTML = `
 
 <h3>Consulta</h3>
 
-<input id="buscaPlaca" placeholder="Placa">
-
-<button onclick="buscar()">Buscar</button>
+<input placeholder="Placa">
 
 <table>
 
 <thead>
+
 <tr>
 <th>Data</th>
 <th>Tipo</th>
 <th>Placa</th>
 <th>Veículo</th>
 </tr>
+
 </thead>
 
-<tbody id="resultado"></tbody>
+<tbody></tbody>
 
 </table>
 
@@ -384,88 +669,192 @@ html=`
 
 }
 
-document.getElementById("painel").innerHTML=html
+</script>
 
-carregarCondutores()
-carregarAutorizadores()
+/* ===============================
+VALIDAÇÃO CPF
+=============================== */
 
-}
+function validarCPF(cpf){
 
-async function carregarCondutores(){
+cpf = cpf.replace(/\D/g,'')
 
-let q=await getDocs(collection(db,"condutores"))
+if(cpf.length !== 11) return false
 
-let s=document.getElementById("condutor")
-
-if(!s)return
-
-s.innerHTML=""
-
-q.forEach(doc=>{
-
-let d=doc.data()
-
-s.innerHTML+=`<option>${d.nome}</option>`
-
-})
+return true
 
 }
 
-async function carregarAutorizadores(){
 
-let q=await getDocs(collection(db,"autorizadores"))
+/* ===============================
+SALVAR CONDUTOR
+=============================== */
 
-let s=document.getElementById("autorizador")
+document.addEventListener("click",async(e)=>{
 
-if(!s)return
+if(e.target.id === "salvarCondutor"){
 
-s.innerHTML=""
+let nome = document.getElementById("nomeCondutor").value
+let cpf = document.getElementById("cpfCondutor").value
+let cargo = document.getElementById("cargoCondutor").value
 
-q.forEach(doc=>{
-
-let d=doc.data()
-
-s.innerHTML+=`<option>${d.nome}</option>`
-
-})
-
+if(!validarCPF(cpf)){
+alert("CPF inválido")
+return
 }
-
-window.salvarCondutor=async()=>{
 
 await addDoc(collection(db,"condutores"),{
 
-nome:document.getElementById("nomeCondutor").value,
-cpf:document.getElementById("cpfCondutor").value,
-cargo:document.getElementById("cargoCondutor").value
+nome:nome,
+cpf:cpf,
+cargo:cargo,
+criadoEm:new Date()
 
 })
 
-alert("Condutor salvo")
+alert("Condutor cadastrado")
 
 }
 
-window.salvarAut=async()=>{
+})
+
+
+
+/* ===============================
+SALVAR AUTORIZADOR
+=============================== */
+
+document.addEventListener("click",async(e)=>{
+
+if(e.target.id === "salvarAut"){
+
+let nome = document.getElementById("nomeAut").value
+let cpf = document.getElementById("cpfAut").value
+let cargo = document.getElementById("cargoAut").value
+
+if(!validarCPF(cpf)){
+alert("CPF inválido")
+return
+}
 
 await addDoc(collection(db,"autorizadores"),{
 
-nome:document.getElementById("nomeAut").value,
-cpf:document.getElementById("cpfAut").value,
-cargo:document.getElementById("cargoAut").value
+nome:nome,
+cpf:cpf,
+cargo:cargo,
+criadoEm:new Date()
 
 })
 
-alert("Autorizador salvo")
+alert("Autorizador cadastrado")
 
 }
 
-window.salvarEntrada=async()=>{
+})
+
+
+/* ===============================
+CARREGAR CONDUTORES
+=============================== */
+
+async function carregarCondutores(){
+
+let q = await getDocs(collection(db,"condutores"))
+
+let select = document.getElementById("condutor")
+
+if(!select) return
+
+select.innerHTML = "<option>Selecione</option>"
+
+q.forEach(doc=>{
+
+let d = doc.data()
+
+select.innerHTML += `<option value="${d.nome}">${d.nome}</option>`
+
+})
+
+}
+
+
+/* ===============================
+CARREGAR AUTORIZADORES
+=============================== */
+
+async function carregarAutorizadores(){
+
+let q = await getDocs(collection(db,"autorizadores"))
+
+let select = document.getElementById("autorizador")
+
+if(!select) return
+
+select.innerHTML = "<option>Selecione</option>"
+
+q.forEach(doc=>{
+
+let d = doc.data()
+
+select.innerHTML += `<option value="${d.nome}">${d.nome}</option>`
+
+})
+
+}
+
+
+/* ===============================
+PREVIEW FOTO
+=============================== */
+
+document.addEventListener("change",(e)=>{
+
+if(e.target.type === "file"){
+
+let reader = new FileReader()
+
+reader.onload = function(){
+
+let img = e.target.parentElement.querySelector("img")
+
+if(img){
+
+img.src = reader.result
+img.style.opacity = "1"
+
+}
+
+}
+
+reader.readAsDataURL(e.target.files[0])
+
+}
+
+})
+
+
+/* ===============================
+SALVAR ENTRADA
+=============================== */
+
+document.addEventListener("click",async(e)=>{
+
+if(e.target.innerText === "Salvar entrada"){
+
+let placa = document.getElementById("placa").value
+let veiculo = document.getElementById("veiculo").value
+let condutor = document.getElementById("condutor").value
+let autorizador = document.getElementById("autorizador").value
+let dano = document.getElementById("dano").value
 
 await addDoc(collection(db,"movimentos"),{
 
 tipo:"entrada",
-placa:document.getElementById("placa").value,
-veiculo:document.getElementById("veiculo").value,
+placa:placa,
+veiculo:veiculo,
+condutor:condutor,
+autorizador:autorizador,
+dano:dano,
 data:new Date()
 
 })
@@ -474,29 +863,148 @@ alert("Entrada registrada")
 
 }
 
-window.buscar=async()=>{
+})
 
-let placa=document.getElementById("buscaPlaca").value
 
-let q=await getDocs(collection(db,"movimentos"))
+/* ===============================
+CARREGAR LISTAS AUTOMATICAMENTE
+=============================== */
 
-let tb=document.getElementById("resultado")
+document.addEventListener("click",(e)=>{
 
-tb.innerHTML=""
+if(e.target.id === "btnEntrada"){
+
+setTimeout(()=>{
+
+carregarCondutores()
+carregarAutorizadores()
+
+},300)
+
+}
+
+})
+
+/* ===============================
+MÁSCARA PLACA MELHORADA
+=============================== */
+
+window.formatarPlaca = (input)=>{
+
+let v = input.value.toUpperCase()
+
+v = v.replace(/[^A-Z0-9]/g,'')
+
+if(v.length > 3){
+
+v = v.slice(0,3) + "-" + v.slice(3)
+
+}
+
+input.value = v
+
+}
+
+
+/* ===============================
+SALVAR SAÍDA DE VEÍCULO
+=============================== */
+
+document.addEventListener("click",async(e)=>{
+
+if(e.target.innerText === "Salvar saída"){
+
+let placa = document.querySelector("#painel input[placeholder='Placa']").value
+let veiculo = document.querySelector("#painel input[placeholder='Veículo']").value
+
+await addDoc(collection(db,"movimentos"),{
+
+tipo:"saida",
+placa:placa,
+veiculo:veiculo,
+data:new Date()
+
+})
+
+alert("Saída registrada")
+
+}
+
+})
+
+
+
+/* ===============================
+CONSULTA HISTÓRICA
+=============================== */
+
+async function carregarHistorico(){
+
+let q = await getDocs(collection(db,"movimentos"))
+
+let tbody = document.querySelector("#painel tbody")
+
+if(!tbody) return
+
+tbody.innerHTML = ""
 
 q.forEach(doc=>{
 
-let d=doc.data()
+let d = doc.data()
 
-if(!placa || d.placa.includes(placa)){
-
-tb.innerHTML+=`
+let linha = `
 
 <tr>
+
 <td>${new Date(d.data).toLocaleString()}</td>
 <td>${d.tipo}</td>
 <td>${d.placa}</td>
 <td>${d.veiculo}</td>
+
+</tr>
+
+`
+
+tbody.innerHTML += linha
+
+})
+
+}
+
+
+/* ===============================
+CONSULTA POR PLACA
+=============================== */
+
+document.addEventListener("keyup",async(e)=>{
+
+if(e.target.placeholder === "Placa"){
+
+let placa = e.target.value.toUpperCase()
+
+let q = await getDocs(collection(db,"movimentos"))
+
+let tbody = document.querySelector("#painel tbody")
+
+if(!tbody) return
+
+tbody.innerHTML=""
+
+q.forEach(doc=>{
+
+let d = doc.data()
+
+if(d.placa.includes(placa)){
+
+tbody.innerHTML += `
+
+<tr>
+
+<td>${new Date(d.data).toLocaleString()}</td>
+<td>${d.tipo}</td>
+<td>${d.placa}</td>
+<td>${d.veiculo}</td>
+
 </tr>
 
 `
@@ -507,7 +1015,71 @@ tb.innerHTML+=`
 
 }
 
-</script>
+})
 
-</body>
-</html>
+
+
+/* ===============================
+CARREGAR HISTÓRICO AO ABRIR CONSULTA
+=============================== */
+
+document.addEventListener("click",(e)=>{
+
+if(e.target.id === "btnConsulta"){
+
+setTimeout(()=>{
+
+carregarHistorico()
+
+},300)
+
+}
+
+})
+
+
+
+/* ===============================
+DASHBOARD VEÍCULOS NO PÁTIO
+=============================== */
+
+async function calcularPatio(){
+
+let q = await getDocs(collection(db,"movimentos"))
+
+let patio = {}
+
+q.forEach(doc=>{
+
+let d = doc.data()
+
+if(d.tipo === "entrada"){
+
+patio[d.placa] = true
+
+}
+
+if(d.tipo === "saida"){
+
+delete patio[d.placa]
+
+}
+
+})
+
+let total = Object.keys(patio).length
+
+console.log("Veículos no pátio:",total)
+
+}
+
+
+/* ===============================
+ATUALIZA DASHBOARD
+=============================== */
+
+setInterval(()=>{
+
+calcularPatio()
+
+},10000)

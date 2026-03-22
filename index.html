@@ -1,5 +1,4 @@
-
-<<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -69,10 +68,11 @@
       min-width:0;
     }
 
+    /* APENAS LOGO (sem borda/caixa) */
     .brand-logo{
       height:46px;
       width:auto;
-      max-width:260px;
+      max-width:320px;
       object-fit:contain;
       display:block;
     }
@@ -386,6 +386,7 @@
 
     .badge-green{ background:#dcfce7; color:#166534; }
     .badge-red{ background:#fee2e2; color:#991b1b; }
+    .badge-blue{ background:#dbeafe; color:#1d4ed8; }
 
     .photo-grid{
       display:grid;
@@ -438,6 +439,7 @@
       line-height:1.35;
     }
 
+    /* input invisível, botão abre câmera */
     .file-input{
       position:absolute;
       left:-99999px;
@@ -602,43 +604,13 @@
       background:#fff;
     }
 
-    /* Autocomplete */
-    .ac-wrap{ position:relative; width:100%; }
-    .ac-list{
-      position:absolute;
-      left:0;
-      right:0;
-      top:calc(100% + 6px);
-      background:#fff;
-      border:1px solid #e5edf5;
-      border-radius:14px;
-      box-shadow:0 18px 40px rgba(15,23,42,.12);
-      z-index:50;
-      overflow:hidden;
-      display:none;
-      max-height:260px;
-      overflow:auto;
-      -webkit-overflow-scrolling: touch;
-    }
-    .ac-item{
-      padding:12px 14px;
-      cursor:pointer;
-      font-weight:800;
-      font-size:14px;
-      border-bottom:1px solid #f1f5f9;
-    }
-    .ac-item:last-child{ border-bottom:none; }
-    .ac-item:active{ background:#f8fafc; }
-    .ac-muted{ color:#64748b; font-weight:800; }
-    .ac-disabled{ color:#94a3b8; cursor:not-allowed; }
-
     @media (max-width:900px){
       .grid{ grid-template-columns:1fr; }
       .hero h2{ font-size:26px; }
       header{ padding:12px 14px; height:auto; }
       .detail-grid{ grid-template-columns:1fr; }
       table{ min-width:980px; }
-      .brand-logo{ max-width:220px; }
+      .brand-logo{ max-width:260px; }
     }
   </style>
 </head>
@@ -669,7 +641,7 @@
   <section id="loginView">
     <div class="login-wrap">
       <h1>Acesso ao sistema</h1>
-      <p>Entre com seu e-mail e senha para acessar sua unidade e suas permissões.</p>
+      <p>Entre com seu e-mail e senha para acessar.</p>
 
       <div class="form-group">
         <label for="loginEmail">E-mail <span class="req">*</span></label>
@@ -707,17 +679,19 @@
     </section>
   </main>
 
-  <!-- MODAL -->
+  <!-- MODAL DETALHE/EDIÇÃO -->
   <div class="modal" id="detailModal" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="modal-head">
         <div>
-          <h4 id="detailTitle">Detalhes do registro</h4>
-          <p id="detailSub">Visualize informações e fotos do veículo.</p>
+          <h4 id="detailTitle">Detalhes</h4>
+          <p id="detailSub">...</p>
         </div>
         <button class="btn btn-light" id="btnCloseModal" style="min-width:120px;">Fechar</button>
       </div>
+
       <div class="modal-body" id="detailBody"></div>
+
       <div class="modal-actions">
         <button class="btn btn-primary" id="btnEditRegistro">Editar</button>
         <button class="btn btn-success hidden" id="btnSaveRegistro">Salvar alterações</button>
@@ -729,19 +703,14 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import {
-      getAuth,
-      signInWithEmailAndPassword,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import {
       getFirestore,
       collection,
       doc,
       getDoc,
       getDocs,
+      setDoc,
       addDoc,
       updateDoc,
       query,
@@ -749,6 +718,13 @@
       limit,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    import {
+      getStorage,
+      ref as sRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
@@ -762,6 +738,7 @@
     const appFirebase = initializeApp(firebaseConfig);
     const auth = getAuth(appFirebase);
     const db = getFirestore(appFirebase);
+    const storage = getStorage(appFirebase);
 
     const el = {
       topbar: document.getElementById("topbar"),
@@ -821,41 +798,19 @@
       condutores: [],
       autorizadores: [],
       selectedMovimento: null,
-      editMode: false,
-      returnCtx: null,
+      editMode: false
     };
 
     const MOTIVOS_ENTRADA = [
-      "Retorno test-drive",
-      "Retorno de atividade externa",
-      "Retorno de transferência",
-      "Entrada para higienização",
-      "Entrada para manutenção",
-      "Entrada para peritagem / vistoria",
-      "Entrada de veículo 0km",
-      "Entrada de veículo seminovo",
-      "Chegada de transporte / cegonha",
-      "Devolução de cliente",
-      "Entrada para exposição",
-      "Entrada por recolhimento",
-      "Outro"
+      "Retorno test-drive","Retorno de atividade externa","Retorno de transferência","Entrada para higienização","Entrada para manutenção",
+      "Entrada para peritagem / vistoria","Entrada de veículo 0km","Entrada de veículo seminovo","Chegada de transporte / cegonha",
+      "Devolução de cliente","Entrada para exposição","Entrada por recolhimento","Outro"
     ];
 
     const MOTIVOS_SAIDA = [
-      "Saída test-drive",
-      "Transferência de loja",
-      "Atividade externa",
-      "Saída para manutenção",
-      "Saída para higienização",
-      "Saída para abastecimento",
-      "Saída para vistoria / laudo",
-      "Saída para emplacamento",
-      "Saída para entrega ao cliente",
-      "Saída para despachante",
-      "Saída para logística / transporte",
-      "Saída para pátio externo",
-      "Saída por recolhimento",
-      "Outro"
+      "Saída test-drive","Transferência de loja","Atividade externa","Saída para manutenção","Saída para higienização",
+      "Saída para abastecimento","Saída para vistoria / laudo","Saída para emplacamento","Saída para entrega ao cliente",
+      "Saída para despachante","Saída para logística / transporte","Saída para pátio externo","Saída por recolhimento","Outro"
     ];
 
     function clearNotice(target){
@@ -876,6 +831,24 @@
         .replace(/^(\d{3})(\d)/, "$1.$2")
         .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
         .replace(/\.(\d{3})(\d)/, ".$1-$2");
+    }
+
+    function isValidCPF(cpf){
+      const clean = onlyDigits(cpf);
+      if(clean.length !== 11) return false;
+      if(/^(\d)\1{10}$/.test(clean)) return false;
+
+      let sum=0;
+      for(let i=0;i<9;i++) sum += Number(clean[i])*(10-i);
+      let first=(sum*10)%11; if(first===10) first=0;
+      if(first !== Number(clean[9])) return false;
+
+      sum=0;
+      for(let i=0;i<10;i++) sum += Number(clean[i])*(11-i);
+      let second=(sum*10)%11; if(second===10) second=0;
+      if(second !== Number(clean[10])) return false;
+
+      return true;
     }
 
     function normalizePlate(value){ return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
@@ -899,9 +872,23 @@
         if(!value) return "-";
         if(value.seconds) return new Date(value.seconds * 1000).toLocaleString("pt-BR");
         return new Date(value).toLocaleString("pt-BR");
-      }catch(e){
-        return "-";
-      }
+      }catch(e){ return "-"; }
+    }
+
+    function dateValueToMillis(value){
+      if(!value) return null;
+      if(value.seconds) return value.seconds * 1000;
+      const t = new Date(value).getTime();
+      return isNaN(t) ? null : t;
+    }
+
+    function dateToRangeStart(dStr){
+      if(!dStr) return null;
+      return new Date(dStr + "T00:00:00").getTime();
+    }
+    function dateToRangeEnd(dStr){
+      if(!dStr) return null;
+      return new Date(dStr + "T23:59:59").getTime();
     }
 
     function getRoleLabel(role){
@@ -915,6 +902,14 @@
     function userIsStoreManager(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
     function userIsController(){ return state.userProfile?.role === Roles.CONTROLADOR; }
 
+    function canManageAutorizadores(){
+      return userIsGeneralManager() || userIsStoreManager();
+    }
+
+    function canManageLojas(){
+      return userIsGeneralManager();
+    }
+
     function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
 
     function getStoreName(lojaId){
@@ -922,15 +917,42 @@
       return state.lojasMap[lojaId]?.nome || lojaId;
     }
 
+    function getStoreLabel(lojaId){
+      const nome = state.lojasMap[lojaId]?.nome || lojaId;
+      return `${lojaId} - ${nome}`;
+    }
+
     function getStoreNameFromItem(item){
       const lojaId = item?.lojaId || "";
       if(lojaId && state.lojasMap[lojaId]?.nome) return state.lojasMap[lojaId].nome;
-      return item?.lojaNome || (lojaId || "-");
+      return lojaId || "-";
     }
 
     function buildMotivoOptions(list){
       const options = [`<option value="">Selecione o motivo</option>`];
       list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
+      return options.join("");
+    }
+
+    function buildCondutorOptions(){
+      const options = [`<option value="">Selecione o condutor</option>`];
+      state.condutores.forEach(item => {
+        const ativo = item.ativo !== false;
+        const label = ativo ? item.nome : `${item.nome} - inativo`;
+        const disabled = ativo ? "" : "disabled";
+        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
+      });
+      return options.join("");
+    }
+
+    function buildAutorizadorOptions(){
+      const options = [`<option value="">Selecione o autorizador</option>`];
+      state.autorizadores.forEach(item => {
+        const ativo = item.ativo !== false;
+        const label = ativo ? item.nome : `${item.nome} - inativo`;
+        const disabled = ativo ? "" : "disabled";
+        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
+      });
       return options.join("");
     }
 
@@ -968,11 +990,7 @@
     }
 
     function sortOperationalArrays(){
-      state.movimentos.sort((a,b) => {
-        const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-        const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
-        return tb - ta;
-      });
+      state.movimentos.sort((a,b) => (dateValueToMillis(b.data) || 0) - (dateValueToMillis(a.data) || 0));
       state.condutores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
       state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
     }
@@ -982,9 +1000,9 @@
 
       if(userIsGeneralManager()){
         const [movSnap, condSnap, autSnap] = await Promise.all([
-          getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))),
-          getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(4000))),
-          getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(4000)))
+          getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(2000))),
+          getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(6000))),
+          getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(6000)))
         ]);
 
         state.movimentos = [];
@@ -999,9 +1017,9 @@
       }
 
       const [movSnap, condSnap, autSnap] = await Promise.all([
-        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(1500))),
-        getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(3000))),
-        getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(3000)))
+        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(2000))),
+        getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(4000))),
+        getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(4000)))
       ]);
 
       state.movimentos = [];
@@ -1040,11 +1058,7 @@
       const patioMap = {};
       movimentos
         .slice()
-        .sort((a,b) => {
-          const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
-          const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
-          return ta - tb;
-        })
+        .sort((a,b) => (dateValueToMillis(a.data) || 0) - (dateValueToMillis(b.data) || 0))
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
@@ -1065,13 +1079,16 @@
       const cards = [
         { title: "Veículos no pátio", value: vehiclesInPatio, subtitle: userIsGeneralManager() ? "Somatório geral" : "Na unidade" },
         { title: "Movimentações", value: movimentos.length, subtitle: "Total de entradas e saídas" },
-        { title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" },
-        { title: "Condutores", value: state.condutores.length, subtitle: "Cadastros disponíveis" },
-        { title: "Autorizadores", value: state.autorizadores.length, subtitle: "Cadastros disponíveis" }
+        { title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo" },
+        { title: "Condutores", value: state.condutores.length, subtitle: "Cadastros" }
       ];
 
+      if(canManageAutorizadores()){
+        cards.push({ title: "Autorizadores", value: state.autorizadores.length, subtitle: "Cadastros" });
+      }
+
       if(userIsGeneralManager()){
-        cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades cadastradas" });
+        cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades" });
       }
 
       return cards;
@@ -1106,9 +1123,18 @@
         { id: "menu-entrada", label: "Entrada", action: renderEntrada },
         { id: "menu-saida", label: "Saída", action: renderSaida },
         { id: "menu-consulta", label: "Consulta", action: renderConsulta },
-        { id: "menu-condutores", label: "Condutores", action: renderCondutores },
-        { id: "menu-autorizadores", label: "Autorizadores", action: renderAutorizadores },
+        { id: "menu-condutores", label: "Condutores", action: renderCondutores }
       ];
+
+      // controlador NÃO vê autorizadores
+      if(canManageAutorizadores()){
+        items.push({ id: "menu-autorizadores", label: "Autorizadores", action: renderAutorizadores });
+      }
+
+      // gestão de lojas volta (somente gerente geral)
+      if(canManageLojas()){
+        items.push({ id: "menu-lojas", label: "Gestão de lojas", action: renderGestaoLojas });
+      }
 
       el.menuBar.innerHTML = "";
       items.forEach(item => {
@@ -1129,7 +1155,7 @@
         <tr>
           <td>${formatDate(item.data)}</td>
           <td>${item.tipo || "-"}</td>
-          <td>${getStoreNameFromItem(item)}</td>
+          <td>${getStoreLabel(item.lojaId || "-")}</td>
           <td>${item.placa || "-"}</td>
           <td>${item.veiculo || "-"}</td>
           <td>${item.condutor || "-"}</td>
@@ -1164,44 +1190,39 @@
       );
     }
 
-    /* FOTO (tablet) */
-    function readFileAsDataURL(file){
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(String(reader.result || ""));
-        reader.onerror = () => reject(reader.error || new Error("Falha ao ler arquivo"));
-        reader.readAsDataURL(file);
-      });
-    }
-
-    async function getImageDataFromInput(inputId){
+    // ============ FOTO (tablet / câmera direta) ============
+    function fileFromInput(inputId){
       const input = document.getElementById(inputId);
-      const file = input?.files?.[0];
-      if(!file) return "";
-      if(!file.type?.startsWith("image/")) return "";
-      return await readFileAsDataURL(file);
+      const file = input?.files?.[0] || null;
+      if(!file) return null;
+      if(!file.type?.startsWith("image/")) return null;
+      return file;
     }
 
-    function setPreview(previewId, dataUrl){
+    function setPreview(previewId, fileOrUrl){
       const preview = document.getElementById(previewId);
       if(!preview) return;
-      if(!dataUrl){
+
+      if(!fileOrUrl){
         preview.innerHTML = `<div class="photo-hint">Sem foto</div>`;
         return;
       }
-      preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
+
+      if(typeof fileOrUrl === "string"){
+        preview.innerHTML = `<img src="${fileOrUrl}" alt="Preview">`;
+        return;
+      }
+
+      const url = URL.createObjectURL(fileOrUrl);
+      preview.innerHTML = `<img src="${url}" alt="Preview">`;
     }
 
     function wirePhotoPreview(inputId, previewId){
       const input = document.getElementById(inputId);
       if(!input) return;
-      input.addEventListener("change", async () => {
-        try{
-          const dataUrl = await getImageDataFromInput(inputId);
-          setPreview(previewId, dataUrl);
-        }catch(e){
-          setPreview(previewId, "");
-        }
+      input.addEventListener("change", () => {
+        const f = fileFromInput(inputId);
+        setPreview(previewId, f);
       });
     }
 
@@ -1216,120 +1237,51 @@
       `;
     }
 
-    async function collectExtraPhotosData(prefix){
+    async function uploadPhotoToStorage(file, path){
+      const r = sRef(storage, path);
+      await uploadBytes(r, file, { contentType: file.type || "image/jpeg" });
+      return await getDownloadURL(r);
+    }
+
+    async function uploadFotosSet(docId, lojaId, prefix, currentUrls = null){
+      // currentUrls: {frente,mala,lateralEsq,lateralDir,extras:[]}
+      const basePath = `movimentos/${lojaId}/${docId}`;
+      const urls = {
+        frente: currentUrls?.frente || "",
+        mala: currentUrls?.mala || "",
+        lateralEsq: currentUrls?.lateralEsq || "",
+        lateralDir: currentUrls?.lateralDir || "",
+        extras: Array.isArray(currentUrls?.extras) ? [...currentUrls.extras] : []
+      };
+
+      const fFrente = fileFromInput(`${prefix}FotoFrente`);
+      const fMala = fileFromInput(`${prefix}FotoMala`);
+      const fEsq = fileFromInput(`${prefix}FotoLatEsq`);
+      const fDir = fileFromInput(`${prefix}FotoLatDir`);
+
+      // se vier arquivo novo, sobe e substitui
+      if(fFrente) urls.frente = await uploadPhotoToStorage(fFrente, `${basePath}/frente_${Date.now()}.jpg`);
+      if(fMala) urls.mala = await uploadPhotoToStorage(fMala, `${basePath}/mala_${Date.now()}.jpg`);
+      if(fEsq) urls.lateralEsq = await uploadPhotoToStorage(fEsq, `${basePath}/lateral_esq_${Date.now()}.jpg`);
+      if(fDir) urls.lateralDir = await uploadPhotoToStorage(fDir, `${basePath}/lateral_dir_${Date.now()}.jpg`);
+
+      // extras
       const extraInputs = Array.from(document.querySelectorAll(`input[id^='${prefix}fotoExtra_']`));
-      const data = [];
       for(const input of extraInputs){
         const file = input?.files?.[0];
-        if(!file) continue;
-        if(!file.type?.startsWith("image/")) continue;
-        try{
-          const url = await readFileAsDataURL(file);
-          if(url) data.push(url);
-        }catch(e){}
+        if(!file || !file.type?.startsWith("image/")) continue;
+        const u = await uploadPhotoToStorage(file, `${basePath}/extra_${Date.now()}_${Math.random().toString(16).slice(2)}.jpg`);
+        urls.extras.push(u);
       }
-      return data;
+
+      return urls;
     }
 
-    /* autocomplete condutor */
-    function getCondutoresForLoja(lojaId){
-      if(userIsGeneralManager()){
-        return state.condutores.filter(c => (c.lojaId || "") === (lojaId || ""));
-      }
-      return state.condutores.filter(c => (c.lojaId || "") === (currentUserStoreId() || ""));
+    function requiredFotosOk(urls){
+      return !!(urls?.frente && urls?.mala && urls?.lateralEsq && urls?.lateralDir);
     }
 
-    function setupAutocompleteCondutor({ lojaSelectId, inputId, listId, onPick, onOpenCadastro }){
-      const input = document.getElementById(inputId);
-      const list = document.getElementById(listId);
-      if(!input || !list) return;
-
-      let currentItems = [];
-
-      function closeList(){ list.style.display = "none"; list.innerHTML = ""; }
-      function openList(){ if(list.innerHTML.trim()) list.style.display = "block"; }
-
-      function renderItems(q){
-        const lojaId = userIsGeneralManager()
-          ? (document.getElementById(lojaSelectId)?.value || "")
-          : (currentUserStoreId() || "");
-
-        const items = getCondutoresForLoja(lojaId);
-        const queryTxt = String(q || "").trim().toLowerCase();
-
-        const matches = items
-          .map(x => ({
-            ...x,
-            _nome: String(x.nome || ""),
-            _ativo: x.ativo !== false
-          }))
-          .filter(x => !queryTxt || x._nome.toLowerCase().includes(queryTxt))
-          .slice(0, 12);
-
-        currentItems = matches;
-
-        const html = [
-          ...matches.map((x, idx) => {
-            const label = x._ativo ? x._nome : `${x._nome} - inativo`;
-            const cls = x._ativo ? "ac-item" : "ac-item ac-disabled";
-            return `<div class="${cls}" data-idx="${idx}">${label}</div>`;
-          }),
-          `<div class="ac-item ac-muted" data-action="cad">+ Cadastrar novo condutor</div>`
-        ].join("");
-
-        list.innerHTML = html;
-        openList();
-      }
-
-      input.addEventListener("input", () => renderItems(input.value));
-      input.addEventListener("focus", () => renderItems(input.value));
-
-      if(lojaSelectId){
-        const sel = document.getElementById(lojaSelectId);
-        if(sel){
-          sel.addEventListener("change", () => {
-            input.value = "";
-            closeList();
-          });
-        }
-      }
-
-      list.addEventListener("click", (e) => {
-        const target = e.target;
-        if(!(target instanceof HTMLElement)) return;
-
-        const action = target.getAttribute("data-action");
-        if(action === "cad"){
-          closeList();
-          onOpenCadastro?.();
-          return;
-        }
-
-        const idx = Number(target.getAttribute("data-idx") || "-1");
-        if(idx < 0 || idx >= currentItems.length) return;
-
-        const picked = currentItems[idx];
-        const ativo = picked.ativo !== false;
-
-        if(!ativo){
-          input.value = "";
-          closeList();
-          alert("Este condutor está INATIVO e não pode ser selecionado.");
-          return;
-        }
-
-        input.value = picked.nome || "";
-        closeList();
-        onPick?.(picked);
-      });
-
-      document.addEventListener("click", (e) => {
-        const t = e.target;
-        if(t === input || list.contains(t)) return;
-        closeList();
-      });
-    }
-
+    // ========= Entrada/Saída =========
     function toggleMotivoOutro(prefix){
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
@@ -1343,122 +1295,53 @@
       }
     }
 
-    function snapshotForm(prefix){
-      const data = {};
-      const ids = [
-        `${prefix}Loja`,
-        `${prefix}Placa`,
-        `${prefix}Veiculo`,
-        `${prefix}Motivo`,
-        `${prefix}MotivoOutro`,
-        `${prefix}CondutorTxt`,
-        `${prefix}Autorizador`,
-        `${prefix}Obs`
-      ];
-      ids.forEach(id => {
-        const elx = document.getElementById(id);
-        if(!elx) return;
-        data[id] = elx.value;
-      });
-      return data;
+    function addExtraPhotoInput(prefix){
+      const grid = document.getElementById(`${prefix}PhotoGridExtras`);
+      if(!grid) return;
+
+      const index = grid.querySelectorAll("[data-extra='1']").length + 1;
+      const inputId = `${prefix}fotoExtra_${index}`;
+      const previewId = `${prefix}previewExtra_${index}`;
+
+      const card = document.createElement("div");
+      card.className = "photo-card";
+      card.setAttribute("data-extra", "1");
+      card.innerHTML = `
+        <strong>Extra ${index}</strong>
+        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
+        <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+        <label class="btn-cam" for="${inputId}">Abrir câmera</label>
+      `;
+      grid.appendChild(card);
+      wirePhotoPreview(inputId, previewId);
     }
 
-    function restoreForm(data){
-      if(!data) return;
-      Object.keys(data).forEach(id => {
-        const elx = document.getElementById(id);
-        if(!elx) return;
-        elx.value = data[id];
-      });
-    }
-
-    function openCondutorCadastroFrom(prefix){
-      state.returnCtx = { view: prefix, data: snapshotForm(prefix) };
-      renderCondutores();
-      setTimeout(() => {
-        if(userIsGeneralManager()){
-          const lojaSel = document.getElementById("condLoja");
-          const ctxLoja = document.getElementById(`${prefix}Loja`)?.value || "";
-          if(lojaSel && ctxLoja) lojaSel.value = ctxLoja;
-        }
-      }, 0);
-    }
-
-    function backFromCadastroIfNeeded(newName){
-      if(!state.returnCtx) return;
-
-      const { view, data } = state.returnCtx;
-      state.returnCtx = null;
-
-      if(view === "entrada"){
-        renderEntrada();
-        setTimeout(() => {
-          restoreForm(data);
-          if(newName){
-            const inp = document.getElementById("entradaCondutorTxt");
-            if(inp) inp.value = newName;
-          }
-          toggleMotivoOutro("entrada");
-        }, 0);
-        return;
+    function lojaFieldHtml(prefix){
+      if(userIsGeneralManager()){
+        return `
+          <div class="form-group">
+            <label for="${prefix}Loja">Loja <span class="req">*</span></label>
+            <select class="select" id="${prefix}Loja">
+              ${state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`).join("")}
+            </select>
+          </div>
+        `;
       }
-
-      if(view === "saida"){
-        renderSaida();
-        setTimeout(() => {
-          restoreForm(data);
-          if(newName){
-            const inp = document.getElementById("saidaCondutorTxt");
-            if(inp) inp.value = newName;
-          }
-          toggleMotivoOutro("saida");
-        }, 0);
-        return;
-      }
-    }
-
-    function buildAutorizadorSelectForForm(prefix){
-      const options = [`<option value="">Selecione o autorizador</option>`];
-
-      const lojaId = userIsGeneralManager()
-        ? (document.getElementById(prefix + "Loja")?.value || state.lojas[0]?.id || "")
-        : (currentUserStoreId() || "");
-
-      const items = state.autorizadores.filter(a => (a.lojaId || "") === lojaId);
-
-      items.forEach(item => {
-        const ativo = item.ativo !== false;
-        const label = ativo ? item.nome : `${item.nome} - inativo`;
-        const disabled = ativo ? "" : "disabled";
-        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
-      });
-
-      return options.join("");
+      return `
+        <div class="form-group">
+          <label>Loja</label>
+          <input class="input" value="${getStoreLabel(currentUserStoreId())}" disabled>
+        </div>
+      `;
     }
 
     function renderEntrada(){
-      const lojaField = userIsGeneralManager()
-        ? `
-          <div class="form-group">
-            <label for="entradaLoja">Loja <span class="req">*</span></label>
-            <select class="select" id="entradaLoja">
-              ${state.lojas.map(l => `<option value="${l.id}">${l.id} - ${l.nome || l.id}</option>`).join("")}
-            </select>
-          </div>
-        `
-        : `
-          <div class="form-group">
-            <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-          </div>
-        `;
-
       renderPanel(
         "Entrada de veículo",
-        "Campos com * são obrigatórios. Observação é opcional.",
+        "Campos com * são obrigatórios. Observação é opcional. Fotos são obrigatórias.",
         `
           <div class="grid">
-            ${lojaField}
+            ${lojaFieldHtml("entrada")}
 
             <div class="form-group">
               <label for="entradaPlaca">Placa <span class="req">*</span></label>
@@ -1482,20 +1365,13 @@
             </div>
 
             <div class="form-group">
-              <label for="entradaCondutorTxt">Condutor <span class="req">*</span></label>
-              <div class="ac-wrap">
-                <input class="input" id="entradaCondutorTxt" autocomplete="off" placeholder="Digite o nome do condutor">
-                <div class="ac-list" id="entradaCondutorList"></div>
-              </div>
-              <div class="actions" style="margin-top:10px;">
-                <button class="btn btn-light" id="btnCadCondutorEntrada">Cadastrar condutor</button>
-              </div>
+              <label for="entradaCondutor">Condutor <span class="req">*</span></label>
+              <select class="select" id="entradaCondutor">${buildCondutorOptions()}</select>
             </div>
 
             <div class="form-group">
               <label for="entradaAutorizador">Autorizador <span class="req">*</span></label>
-              <select class="select" id="entradaAutorizador">${buildAutorizadorSelectForForm("entrada")}</select>
-              <div class="subtle">Autorizadores inativos aparecem, mas não podem ser selecionados.</div>
+              <select class="select" id="entradaAutorizador">${buildAutorizadorOptions()}</select>
             </div>
 
             <div class="form-group full">
@@ -1542,37 +1418,6 @@
       toggleMotivoOutro("entrada");
 
       document.getElementById("entradaBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("entrada"));
-
-      document.getElementById("btnCadCondutorEntrada").addEventListener("click", () => openCondutorCadastroFrom("entrada"));
-
-      setupAutocompleteCondutor({
-        lojaSelectId: userIsGeneralManager() ? "entradaLoja" : null,
-        inputId: "entradaCondutorTxt",
-        listId: "entradaCondutorList",
-        onPick: () => {},
-        onOpenCadastro: () => openCondutorCadastroFrom("entrada")
-      });
-    }
-
-    function addExtraPhotoInput(prefix){
-      const grid = document.getElementById(`${prefix}PhotoGridExtras`);
-      if(!grid) return;
-
-      const index = grid.querySelectorAll("[data-extra='1']").length + 1;
-      const inputId = `${prefix}fotoExtra_${index}`;
-      const previewId = `${prefix}previewExtra_${index}`;
-
-      const card = document.createElement("div");
-      card.className = "photo-card";
-      card.setAttribute("data-extra", "1");
-      card.innerHTML = `
-        <strong>Extra ${index}</strong>
-        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
-        <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
-        <label class="btn-cam" for="${inputId}">Abrir câmera</label>
-      `;
-      grid.appendChild(card);
-      wirePhotoPreview(inputId, previewId);
     }
 
     async function salvarEntrada(){
@@ -1587,7 +1432,7 @@
       const veiculo = (document.getElementById("entradaVeiculo")?.value || "").trim();
       const motivo = document.getElementById("entradaMotivo")?.value || "";
       const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
-      const condutor = (document.getElementById("entradaCondutorTxt")?.value || "").trim();
+      const condutor = document.getElementById("entradaCondutor")?.value || "";
       const autorizador = document.getElementById("entradaAutorizador")?.value || "";
       const observacao = (document.getElementById("entradaObs")?.value || "").trim();
 
@@ -1596,24 +1441,12 @@
       if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
       if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
       if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-      if(!condutor){ showNotice(notice, "Informe/Selecione o condutor."); return; }
+      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
-      const [frente, mala, latEsq, latDir] = await Promise.all([
-        getImageDataFromInput("entradaFotoFrente"),
-        getImageDataFromInput("entradaFotoMala"),
-        getImageDataFromInput("entradaFotoLatEsq"),
-        getImageDataFromInput("entradaFotoLatDir")
-      ]);
-
-      if(!frente || !mala || !latEsq || !latDir){
-        showNotice(notice, "As 4 fotos principais são obrigatórias.");
-        return;
-      }
-
+      // cria o doc primeiro (sem fotos), depois sobe fotos e atualiza URLs
       try{
-        const extras = await collectExtraPhotosData("entrada");
-        await addDoc(collection(db, Collections.MOVIMENTOS), {
+        const baseData = {
           tipo: "entrada",
           lojaId,
           placa,
@@ -1623,10 +1456,23 @@
           condutor,
           autorizador,
           observacao,
-          fotos: { frente, mala, lateralEsq: latEsq, lateralDir: latDir, extras: extras || [] },
+          fotos: { frente:"", mala:"", lateralEsq:"", lateralDir:"", extras:[] },
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
+        };
+
+        const docRef = await addDoc(collection(db, Collections.MOVIMENTOS), baseData);
+
+        // sobe fotos para storage e grava URLs
+        const urls = await uploadFotosSet(docRef.id, lojaId, "entrada", null);
+        if(!requiredFotosOk(urls)){
+          showNotice(notice, "As 4 fotos principais são obrigatórias.");
+          return;
+        }
+
+        await updateDoc(doc(db, Collections.MOVIMENTOS, docRef.id), {
+          fotos: urls
         });
 
         await refreshAfterWrite();
@@ -1634,32 +1480,17 @@
         renderEntrada();
       }catch(e){
         showNotice(notice, `Não foi possível salvar a entrada. (${e?.code || "erro"})`);
+        console.error(e);
       }
     }
 
     function renderSaida(){
-      const lojaField = userIsGeneralManager()
-        ? `
-          <div class="form-group">
-            <label for="saidaLoja">Loja <span class="req">*</span></label>
-            <select class="select" id="saidaLoja">
-              ${state.lojas.map(l => `<option value="${l.id}">${l.id} - ${l.nome || l.id}</option>`).join("")}
-            </select>
-          </div>
-        `
-        : `
-          <div class="form-group">
-            <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-          </div>
-        `;
-
       renderPanel(
         "Saída de veículo",
         "Campos com * são obrigatórios. Observação é opcional. Fotos são obrigatórias.",
         `
           <div class="grid">
-            ${lojaField}
+            ${lojaFieldHtml("saida")}
 
             <div class="form-group">
               <label for="saidaPlaca">Placa <span class="req">*</span></label>
@@ -1683,20 +1514,13 @@
             </div>
 
             <div class="form-group">
-              <label for="saidaCondutorTxt">Condutor <span class="req">*</span></label>
-              <div class="ac-wrap">
-                <input class="input" id="saidaCondutorTxt" autocomplete="off" placeholder="Digite o nome do condutor">
-                <div class="ac-list" id="saidaCondutorList"></div>
-              </div>
-              <div class="actions" style="margin-top:10px;">
-                <button class="btn btn-light" id="btnCadCondutorSaida">Cadastrar condutor</button>
-              </div>
+              <label for="saidaCondutor">Condutor <span class="req">*</span></label>
+              <select class="select" id="saidaCondutor">${buildCondutorOptions()}</select>
             </div>
 
             <div class="form-group">
               <label for="saidaAutorizador">Autorizador <span class="req">*</span></label>
-              <select class="select" id="saidaAutorizador">${buildAutorizadorSelectForForm("saida")}</select>
-              <div class="subtle">Autorizadores inativos aparecem, mas não podem ser selecionados.</div>
+              <select class="select" id="saidaAutorizador">${buildAutorizadorOptions()}</select>
             </div>
 
             <div class="form-group full">
@@ -1743,16 +1567,6 @@
       toggleMotivoOutro("saida");
 
       document.getElementById("saidaBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("saida"));
-
-      document.getElementById("btnCadCondutorSaida").addEventListener("click", () => openCondutorCadastroFrom("saida"));
-
-      setupAutocompleteCondutor({
-        lojaSelectId: userIsGeneralManager() ? "saidaLoja" : null,
-        inputId: "saidaCondutorTxt",
-        listId: "saidaCondutorList",
-        onPick: () => {},
-        onOpenCadastro: () => openCondutorCadastroFrom("saida")
-      });
     }
 
     async function salvarSaida(){
@@ -1766,8 +1580,8 @@
       const placa = formatPlate(document.getElementById("saidaPlaca")?.value || "");
       const veiculo = (document.getElementById("saidaVeiculo")?.value || "").trim();
       const motivo = document.getElementById("saidaMotivo")?.value || "";
-      const motivoOutro = document.getElementById("saidaMotivoOutro")?.value || "";
-      const condutor = (document.getElementById("saidaCondutorTxt")?.value || "").trim();
+      const motivoOutro = (document.getElementById("saidaMotivoOutro")?.value || "").trim();
+      const condutor = document.getElementById("saidaCondutor")?.value || "";
       const autorizador = document.getElementById("saidaAutorizador")?.value || "";
       const observacao = (document.getElementById("saidaObs")?.value || "").trim();
 
@@ -1776,24 +1590,11 @@
       if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
       if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
       if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-      if(!condutor){ showNotice(notice, "Informe/Selecione o condutor."); return; }
+      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
-      const [frente, mala, latEsq, latDir] = await Promise.all([
-        getImageDataFromInput("saidaFotoFrente"),
-        getImageDataFromInput("saidaFotoMala"),
-        getImageDataFromInput("saidaFotoLatEsq"),
-        getImageDataFromInput("saidaFotoLatDir")
-      ]);
-
-      if(!frente || !mala || !latEsq || !latDir){
-        showNotice(notice, "As 4 fotos principais são obrigatórias.");
-        return;
-      }
-
       try{
-        const extras = await collectExtraPhotosData("saida");
-        await addDoc(collection(db, Collections.MOVIMENTOS), {
+        const baseData = {
           tipo: "saida",
           lojaId,
           placa,
@@ -1803,21 +1604,32 @@
           condutor,
           autorizador,
           observacao,
-          fotos: { frente, mala, lateralEsq: latEsq, lateralDir: latDir, extras: extras || [] },
+          fotos: { frente:"", mala:"", lateralEsq:"", lateralDir:"", extras:[] },
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
-        });
+        };
+
+        const docRef = await addDoc(collection(db, Collections.MOVIMENTOS), baseData);
+
+        const urls = await uploadFotosSet(docRef.id, lojaId, "saida", null);
+        if(!requiredFotosOk(urls)){
+          showNotice(notice, "As 4 fotos principais são obrigatórias.");
+          return;
+        }
+
+        await updateDoc(doc(db, Collections.MOVIMENTOS, docRef.id), { fotos: urls });
 
         await refreshAfterWrite();
         showNotice(notice, "Saída registrada com sucesso.", "success");
         renderSaida();
       }catch(e){
         showNotice(notice, `Não foi possível salvar a saída. (${e?.code || "erro"})`);
+        console.error(e);
       }
     }
 
-    /* CONSULTA + MODAL (mantidos, sem mexer) */
+    // ========= Consulta =========
     function renderConsulta(){
       const storeFilterHTML = userIsGeneralManager()
         ? `
@@ -1825,20 +1637,20 @@
             <label for="filtroLojaConsulta">Loja</label>
             <select class="select" id="filtroLojaConsulta">
               <option value="__ALL__">Todas as lojas</option>
-              ${state.lojas.map(loja => `<option value="${loja.id}">${loja.id} - ${loja.nome || loja.id}</option>`).join("")}
+              ${state.lojas.map(loja => `<option value="${loja.id}">${getStoreLabel(loja.id)}</option>`).join("")}
             </select>
           </div>
         `
         : `
           <div class="form-group">
             <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+            <input class="input" value="${getStoreLabel(currentUserStoreId())}" disabled>
           </div>
         `;
 
       renderPanel(
         "Consulta",
-        "Toque em uma linha para abrir o detalhe individual (com fotos), exportar e editar.",
+        "Toque em uma linha para abrir o detalhe (com fotos), exportar e editar.",
         `
           <div class="grid">
             ${storeFilterHTML}
@@ -1906,23 +1718,7 @@
       attachInputMasks();
       document.getElementById("btnFiltrarConsulta").addEventListener("click", applyConsultaFilter);
       document.getElementById("btnLimparConsulta").addEventListener("click", renderConsulta);
-
       applyConsultaFilter();
-    }
-
-    function dateToRangeStart(dStr){
-      if(!dStr) return null;
-      return new Date(dStr + "T00:00:00").getTime();
-    }
-    function dateToRangeEnd(dStr){
-      if(!dStr) return null;
-      return new Date(dStr + "T23:59:59").getTime();
-    }
-    function dateValueToMillis(value){
-      if(!value) return null;
-      if(value.seconds) return value.seconds * 1000;
-      const t = new Date(value).getTime();
-      return isNaN(t) ? null : t;
     }
 
     function applyConsultaFilter(){
@@ -1944,6 +1740,7 @@
       const tFim = dateToRangeEnd(df);
 
       let items = [...state.movimentos];
+
       if(lojaId && lojaId !== "__ALL__") items = items.filter(i => i.lojaId === lojaId);
       if(placa) items = items.filter(i => normalizePlate(i.placa).includes(placa));
       if(tipo) items = items.filter(i => String(i.tipo || "").toLowerCase() === tipo);
@@ -1961,9 +1758,7 @@
       if(texto){
         items = items.filter(i => {
           const motivoFinal = i.motivo === "Outro" && i.motivoOutro ? `Outro: ${i.motivoOutro}` : (i.motivo || "");
-          const haystack = [
-            i.veiculo, motivoFinal, i.condutor, i.autorizador, i.observacao, i.criadoPorNome, getStoreNameFromItem(i)
-          ].join(" ").toLowerCase();
+          const haystack = [i.veiculo, motivoFinal, i.condutor, i.autorizador, i.observacao, i.criadoPorNome, getStoreLabel(i.lojaId)].join(" ").toLowerCase();
           return haystack.includes(texto);
         });
       }
@@ -1981,7 +1776,7 @@
           <tr class="row-clickable" data-id="${item.id}">
             <td>${formatDate(item.data)}</td>
             <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
-            <td>${getStoreNameFromItem(item)}</td>
+            <td>${getStoreLabel(item.lojaId || "-")}</td>
             <td>${item.placa || "-"}</td>
             <td>${item.veiculo || "-"}</td>
             <td>${motivoFinal}</td>
@@ -2005,14 +1800,13 @@
       });
     }
 
+    // ========= Modal detalhe/editar =========
     function openDetailModal(item){
       state.selectedMovimento = item;
       state.editMode = false;
       el.btnSaveRegistro.classList.add("hidden");
       el.btnEditRegistro.classList.remove("hidden");
-
       renderDetailView(item);
-
       el.detailModal.classList.add("show");
       el.detailModal.setAttribute("aria-hidden", "false");
     }
@@ -2029,14 +1823,14 @@
       if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` }); });
 
       el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
-      el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
+      el.detailSub.textContent = `Loja: ${getStoreLabel(item.lojaId)} • Data/hora: ${formatDate(item.data)}`;
 
       el.detailBody.innerHTML = `
         <div class="detail-grid">
           <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
           <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
 
-          <div class="detail-item"><small>Loja</small><div>${getStoreNameFromItem(item)}</div></div>
+          <div class="detail-item"><small>Loja</small><div>${getStoreLabel(item.lojaId)}</div></div>
           <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
 
           <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
@@ -2045,8 +1839,8 @@
           <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
           <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
 
-          <div class="detail-item"><small>Observação</small><div>${item.observacao || "-"}</div></div>
-          <div class="detail-item"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
+          <div class="detail-item" style="grid-column:1/-1;"><small>Observação</small><div>${item.observacao || "-"}</div></div>
+          <div class="detail-item" style="grid-column:1/-1;"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
         </div>
 
         <div class="section-title" style="margin-top:6px;">Fotos</div>
@@ -2064,13 +1858,12 @@
     }
 
     function renderDetailEdit(item){
-      // mantido igual (não mexi pra não alterar outras coisas)
-      el.detailTitle.textContent = `Editar registro — ${item.placa || ""}`;
-      el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
-
       const isEntrada = item.tipo === "entrada";
       const motivoList = isEntrada ? MOTIVOS_ENTRADA : MOTIVOS_SAIDA;
       const fotos = item?.fotos || {};
+
+      el.detailTitle.textContent = `Editar registro — ${item.placa || ""}`;
+      el.detailSub.textContent = `Loja: ${getStoreLabel(item.lojaId)} • Data/hora: ${formatDate(item.data)}`;
 
       el.detailBody.innerHTML = `
         <div class="grid">
@@ -2081,7 +1874,7 @@
 
           <div class="form-group">
             <label>Loja</label>
-            <input class="input" value="${getStoreNameFromItem(item)}" disabled>
+            <input class="input" value="${getStoreLabel(item.lojaId)}" disabled>
           </div>
 
           <div class="form-group">
@@ -2096,9 +1889,7 @@
 
           <div class="form-group">
             <label for="editMotivo">Motivo <span class="req">*</span></label>
-            <select class="select" id="editMotivo">
-              ${buildMotivoOptions(motivoList)}
-            </select>
+            <select class="select" id="editMotivo">${buildMotivoOptions(motivoList)}</select>
           </div>
 
           <div class="form-group hidden" id="editMotivoOutroWrap">
@@ -2108,12 +1899,12 @@
 
           <div class="form-group">
             <label for="editCondutor">Condutor <span class="req">*</span></label>
-            <input class="input" id="editCondutor" value="${item.condutor || ""}">
+            <select class="select" id="editCondutor">${buildCondutorOptions()}</select>
           </div>
 
           <div class="form-group">
             <label for="editAutorizador">Autorizador <span class="req">*</span></label>
-            <input class="input" id="editAutorizador" value="${item.autorizador || ""}">
+            <select class="select" id="editAutorizador">${buildAutorizadorOptions()}</select>
           </div>
 
           <div class="form-group full">
@@ -2123,7 +1914,7 @@
 
           <div class="form-group full">
             <label>Fotos (4 obrigatórias) <span class="req">*</span></label>
-            <div class="subtle">Se não tirar nova foto, será mantida a foto atual do registro.</div>
+            <div class="subtle">Se não tirar nova foto, será mantida a foto atual.</div>
 
             <div class="photo-grid">
               ${photoCaptureCard("Frente", "editFotoFrente", "editPreviewFrente")}
@@ -2132,7 +1923,7 @@
               ${photoCaptureCard("Lateral direita", "editFotoLatDir", "editPreviewLatDir")}
             </div>
 
-            <div class="subtle" style="margin-top:10px;">Fotos atuais (pré-visualização):</div>
+            <div class="subtle" style="margin-top:10px;">Fotos atuais:</div>
             <div class="thumbs" style="margin-top:10px;">
               ${fotos.frente ? `<div class="thumb"><img src="${fotos.frente}" alt="Frente"><div class="cap">Atual: Frente</div></div>` : ""}
               ${fotos.mala ? `<div class="thumb"><img src="${fotos.mala}" alt="Mala"><div class="cap">Atual: Mala</div></div>` : ""}
@@ -2150,8 +1941,12 @@
         <div id="editNotice" class="notice"></div>
       `;
 
+      // set selects
       document.getElementById("editMotivo").value = item.motivo || "";
+      document.getElementById("editCondutor").value = item.condutor || "";
+      document.getElementById("editAutorizador").value = item.autorizador || "";
 
+      // motivo outro
       const toggleEditOutro = () => {
         const motivo = document.getElementById("editMotivo")?.value || "";
         const wrap = document.getElementById("editMotivoOutroWrap");
@@ -2167,35 +1962,22 @@
       document.getElementById("editMotivo").addEventListener("change", toggleEditOutro);
       toggleEditOutro();
 
+      // masks & previews
       attachInputMasks();
       wirePhotoPreview("editFotoFrente", "editPreviewFrente");
       wirePhotoPreview("editFotoMala", "editPreviewMala");
       wirePhotoPreview("editFotoLatEsq", "editPreviewLatEsq");
       wirePhotoPreview("editFotoLatDir", "editPreviewLatDir");
 
-      document.getElementById("editBtnAddExtraFoto").addEventListener("click", () => {
-        const grid = document.getElementById("editPhotoGridExtras");
-        if(!grid) return;
-        const index = grid.querySelectorAll("[data-extra='1']").length + 1;
-        const inputId = `editFotoExtra_${index}`;
-        const previewId = `editPreviewExtra_${index}`;
-        const card = document.createElement("div");
-        card.className = "photo-card";
-        card.setAttribute("data-extra", "1");
-        card.innerHTML = `
-          <strong>Extra ${index}</strong>
-          <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
-          <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
-          <label class="btn-cam" for="${inputId}">Abrir câmera</label>
-        `;
-        grid.appendChild(card);
-        wirePhotoPreview(inputId, previewId);
-      });
+      document.getElementById("editBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("edit"));
     }
 
     async function saveEditedRegistro(){
       const item = state.selectedMovimento;
-      if(!item) return;
+      if(!item || !item.id){
+        alert("Registro inválido para edição.");
+        return;
+      }
 
       const notice = document.getElementById("editNotice");
       clearNotice(notice);
@@ -2204,49 +1986,26 @@
       const veiculo = (document.getElementById("editVeiculo")?.value || "").trim();
       const motivo = document.getElementById("editMotivo")?.value || "";
       const motivoOutro = (document.getElementById("editMotivoOutro")?.value || "").trim();
-      const condutor = (document.getElementById("editCondutor")?.value || "").trim();
-      const autorizador = (document.getElementById("editAutorizador")?.value || "").trim();
+      const condutor = document.getElementById("editCondutor")?.value || "";
+      const autorizador = document.getElementById("editAutorizador")?.value || "";
       const observacao = (document.getElementById("editObs")?.value || "").trim();
 
       if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
       if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
       if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
       if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-      if(!condutor){ showNotice(notice, "Informe o condutor."); return; }
-      if(!autorizador){ showNotice(notice, "Informe o autorizador."); return; }
-
-      const currentFotos = item.fotos || {};
-      const [newFrente, newMala, newLatEsq, newLatDir] = await Promise.all([
-        getImageDataFromInput("editFotoFrente"),
-        getImageDataFromInput("editFotoMala"),
-        getImageDataFromInput("editFotoLatEsq"),
-        getImageDataFromInput("editFotoLatDir")
-      ]);
-
-      const frente = newFrente || currentFotos.frente || "";
-      const mala = newMala || currentFotos.mala || "";
-      const lateralEsq = newLatEsq || currentFotos.lateralEsq || "";
-      const lateralDir = newLatDir || currentFotos.lateralDir || "";
-
-      if(!frente || !mala || !lateralEsq || !lateralDir){
-        showNotice(notice, "As 4 fotos principais são obrigatórias (pode manter as antigas ou tirar novas).");
-        return;
-      }
-
-      const extrasOld = Array.isArray(currentFotos.extras) ? currentFotos.extras : [];
-      const extrasNew = [];
-      const extraInputs = Array.from(document.querySelectorAll("input[id^='editFotoExtra_']"));
-      for(const input of extraInputs){
-        const file = input?.files?.[0];
-        if(!file) continue;
-        if(!file.type?.startsWith("image/")) continue;
-        try{
-          const url = await readFileAsDataURL(file);
-          if(url) extrasNew.push(url);
-        }catch(e){}
-      }
+      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
+      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
       try{
+        // sobe fotos novas (se houver) e mantém urls antigas
+        const lojaId = item.lojaId;
+        const urls = await uploadFotosSet(item.id, lojaId, "edit", item.fotos || null);
+        if(!requiredFotosOk(urls)){
+          showNotice(notice, "As 4 fotos principais são obrigatórias (pode manter as antigas ou tirar novas).");
+          return;
+        }
+
         await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
           placa,
           veiculo,
@@ -2255,13 +2014,15 @@
           condutor,
           autorizador,
           observacao,
-          fotos: { frente, mala, lateralEsq, lateralDir, extras: [...extrasOld, ...extrasNew] },
+          fotos: urls,
           atualizadoEm: new Date(),
           atualizadoPorUid: state.authUser.uid,
           atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
         });
 
         await refreshAfterWrite();
+
+        // atualiza seleção
         const refreshed = state.movimentos.find(m => m.id === item.id);
         if(refreshed) state.selectedMovimento = refreshed;
 
@@ -2272,6 +2033,7 @@
         el.btnEditRegistro.classList.remove("hidden");
         renderDetailView(state.selectedMovimento);
       }catch(e){
+        console.error(e);
         showNotice(notice, `Não foi possível salvar alterações. (${e?.code || "erro"})`);
       }
     }
@@ -2323,7 +2085,7 @@
 <body>
   <h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
   <p class="sub">
-    Unidade: ${getStoreNameFromItem(item)} •
+    Loja: ${getStoreLabel(item.lojaId)} •
     Data/Hora: ${formatDate(item.data)} •
     Exportado em: ${new Date().toLocaleString("pt-BR")}
   </p>
@@ -2333,7 +2095,7 @@
       <div><div class="k">Tipo</div><div class="v">${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
       <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
 
-      <div><div class="k">Loja</div><div class="v">${getStoreNameFromItem(item)}</div></div>
+      <div><div class="k">Loja</div><div class="v">${getStoreLabel(item.lojaId)}</div></div>
       <div><div class="k">Placa</div><div class="v">${item.placa || "-"}</div></div>
 
       <div><div class="k">Veículo</div><div class="v">${item.veiculo || "-"}</div></div>
@@ -2376,6 +2138,583 @@
       w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
+    // ========= Condutores (cadastro/consulta/inativar + Todas as lojas) =========
+    function buildLojaSelectWithAll(id){
+      const options = [];
+      if(userIsGeneralManager()){
+        options.push(`<option value="__ALL__">Todas as lojas</option>`);
+        state.lojas.forEach(l => options.push(`<option value="${l.id}">${getStoreLabel(l.id)}</option>`));
+      }else{
+        options.push(`<option value="${currentUserStoreId()}">${getStoreLabel(currentUserStoreId())}</option>`);
+      }
+      return `<select class="select" id="${id}">${options.join("")}</select>`;
+    }
+
+    function condutorDocId(lojaId, cpfDigits){
+      return `cond_${lojaId}_${cpfDigits}`;
+    }
+
+    async function findCondutorByCpf(lojaId, cpfDigits){
+      const q = query(
+        collection(db, Collections.CONDUTORES),
+        where("lojaId","==",lojaId),
+        where("cpf","==",cpfDigits),
+        limit(1)
+      );
+      const snap = await getDocs(q);
+      if(snap.empty) return null;
+      const d = snap.docs[0];
+      return { id: d.id, ...d.data() };
+    }
+
+    function renderCondutores(){
+      renderPanel(
+        "Condutores",
+        userIsGeneralManager()
+          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+          : "Cadastro e ativação/inativação de condutores da sua loja.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="condLoja">Loja <span class="req">*</span></label>
+              ${buildLojaSelectWithAll("condLoja")}
+              <div class="subtle">Se escolher “Todas as lojas”, o cadastro será replicado para cada loja.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="condCpf">CPF <span class="req">*</span></label>
+              <input class="input" id="condCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle" id="condCpfStatus"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="condNome">Nome <span class="req">*</span></label>
+              <input class="input" id="condNome" maxlength="80" placeholder="Nome completo">
+            </div>
+
+            <div class="form-group">
+              <label for="condCargo">Cargo <span class="req">*</span></label>
+              <input class="input" id="condCargo" maxlength="60" placeholder="Ex.: Motorista">
+            </div>
+
+            <div class="form-group">
+              <label for="condAtivo">Ativo</label>
+              <select class="select" id="condAtivo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarCondutor">Salvar condutor</button>
+            </div>
+          </div>
+
+          <div id="condNotice" class="notice"></div>
+
+          <div class="section-title">Lista</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Cargo</th>
+                  <th>Ativo</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="condListBody"></tbody>
+            </table>
+          </div>
+        `
+      );
+
+      attachInputMasks();
+      document.getElementById("btnSalvarCondutor").addEventListener("click", salvarCondutor);
+      document.getElementById("condCpf").addEventListener("blur", lookupCondutorByCpf);
+      document.getElementById("condLoja").addEventListener("change", () => {
+        document.getElementById("condCpfStatus").textContent = "";
+        document.getElementById("condNome").value = "";
+        document.getElementById("condCargo").value = "";
+        document.getElementById("condAtivo").value = "true";
+      });
+
+      renderCondutoresList();
+    }
+
+    function renderCondutoresList(){
+      const body = document.getElementById("condListBody");
+      if(!body) return;
+
+      let items = [...state.condutores];
+
+      if(!userIsGeneralManager()){
+        items = items.filter(i => i.lojaId === currentUserStoreId());
+      }
+
+      items.sort((a,b) => {
+        const la = `${a.lojaId || ""} ${a.nome || ""}`.toLowerCase();
+        const lb = `${b.lojaId || ""} ${b.nome || ""}`.toLowerCase();
+        return la.localeCompare(lb,"pt-BR");
+      });
+
+      body.innerHTML = items.map(i => `
+        <tr>
+          <td>${getStoreLabel(i.lojaId || "-")}</td>
+          <td>${i.nome || "-"}</td>
+          <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
+          <td>${i.cargo || "-"}</td>
+          <td>${i.ativo === false ? "Não" : "Sim"}</td>
+          <td>
+            <button class="btn btn-light" data-toggle-cond="${i.id}">
+              ${i.ativo === false ? "Ativar" : "Inativar"}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      Array.from(body.querySelectorAll("[data-toggle-cond]")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-cond");
+          const found = state.condutores.find(x => x.id === id);
+          if(!found) return;
+          try{
+            await updateDoc(doc(db, Collections.CONDUTORES, id), {
+              ativo: found.ativo === false ? true : false,
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+            await refreshAfterWrite();
+            renderCondutores();
+          }catch(e){
+            alert(`Falha ao atualizar: ${e?.code || "erro"}`);
+          }
+        });
+      });
+    }
+
+    async function lookupCondutorByCpf(){
+      const lojaId = document.getElementById("condLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("condCpf")?.value || "");
+      const status = document.getElementById("condCpfStatus");
+
+      status.textContent = "";
+
+      if(!cpfDigits || cpfDigits.length !== 11){
+        status.textContent = "Digite um CPF completo.";
+        return;
+      }
+      if(!isValidCPF(cpfDigits)){
+        status.textContent = "CPF inválido.";
+        return;
+      }
+
+      // se for todas as lojas, não faz lookup (porque teria múltiplos)
+      if(lojaId === "__ALL__"){
+        status.textContent = "Lookup desativado em “Todas as lojas”. Se precisar, selecione uma loja específica.";
+        return;
+      }
+
+      try{
+        const existing = await findCondutorByCpf(lojaId, cpfDigits);
+        if(existing){
+          status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
+          document.getElementById("condNome").value = existing.nome || "";
+          document.getElementById("condCargo").value = existing.cargo || "";
+          document.getElementById("condAtivo").value = (existing.ativo === false) ? "false" : "true";
+        }else{
+          status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
+          document.getElementById("condNome").value = "";
+          document.getElementById("condCargo").value = "";
+          document.getElementById("condAtivo").value = "true";
+        }
+      }catch(e){
+        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
+        console.error(e);
+      }
+    }
+
+    async function salvarCondutor(){
+      const notice = document.getElementById("condNotice");
+      clearNotice(notice);
+
+      const lojaSel = document.getElementById("condLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("condCpf")?.value || "");
+      const nome = (document.getElementById("condNome")?.value || "").trim();
+      const cargo = (document.getElementById("condCargo")?.value || "").trim();
+      const ativo = (document.getElementById("condAtivo")?.value || "true") === "true";
+
+      if(!lojaSel){ showNotice(notice, "Selecione a loja."); return; }
+      if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){ showNotice(notice, "Informe um CPF válido."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome."); return; }
+      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
+
+      try{
+        const lojasAlvo = (lojaSel === "__ALL__")
+          ? state.lojas.map(l => l.id)
+          : [lojaSel];
+
+        for(const lojaId of lojasAlvo){
+          const id = condutorDocId(lojaId, cpfDigits);
+          await setDoc(doc(db, Collections.CONDUTORES, id), {
+            lojaId,
+            cpf: cpfDigits,
+            nome,
+            cargo,
+            ativo,
+            atualizadoEm: new Date(),
+            atualizadoPorUid: state.authUser.uid,
+            atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+          }, { merge: true });
+        }
+
+        await refreshAfterWrite();
+        showNotice(notice, "Condutor salvo com sucesso.", "success");
+        renderCondutores();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Falha ao salvar. (${e?.code || "erro"})`);
+      }
+    }
+
+    // ========= Autorizadores (somente gerente_loja/gerente_geral) =========
+    function autorizadorDocId(lojaId, cpfDigits){
+      return `aut_${lojaId}_${cpfDigits}`;
+    }
+
+    async function findAutorizadorByCpf(lojaId, cpfDigits){
+      const q = query(
+        collection(db, Collections.AUTORIZADORES),
+        where("lojaId","==",lojaId),
+        where("cpf","==",cpfDigits),
+        limit(1)
+      );
+      const snap = await getDocs(q);
+      if(snap.empty) return null;
+      const d = snap.docs[0];
+      return { id: d.id, ...d.data() };
+    }
+
+    function renderAutorizadores(){
+      if(!canManageAutorizadores()){
+        renderPanel("Acesso restrito", "Controlador não acessa Autorizadores.", `<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      renderPanel(
+        "Autorizadores",
+        userIsGeneralManager()
+          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+          : "Cadastro e ativação/inativação de autorizadores da sua loja.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="autLoja">Loja <span class="req">*</span></label>
+              ${buildLojaSelectWithAll("autLoja")}
+              <div class="subtle">Se escolher “Todas as lojas”, o cadastro será replicado para cada loja.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="autCpf">CPF <span class="req">*</span></label>
+              <input class="input" id="autCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle" id="autCpfStatus"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="autNome">Nome <span class="req">*</span></label>
+              <input class="input" id="autNome" maxlength="80" placeholder="Nome completo">
+            </div>
+
+            <div class="form-group">
+              <label for="autCargo">Cargo <span class="req">*</span></label>
+              <input class="input" id="autCargo" maxlength="60" placeholder="Ex.: Gerente">
+            </div>
+
+            <div class="form-group">
+              <label for="autAtivo">Ativo</label>
+              <select class="select" id="autAtivo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarAutorizador">Salvar autorizador</button>
+            </div>
+          </div>
+
+          <div id="autNotice" class="notice"></div>
+
+          <div class="section-title">Lista</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Cargo</th>
+                  <th>Ativo</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="autListBody"></tbody>
+            </table>
+          </div>
+        `
+      );
+
+      attachInputMasks();
+      document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
+      document.getElementById("autCpf").addEventListener("blur", lookupAutorizadorByCpf);
+      document.getElementById("autLoja").addEventListener("change", () => {
+        document.getElementById("autCpfStatus").textContent = "";
+        document.getElementById("autNome").value = "";
+        document.getElementById("autCargo").value = "";
+        document.getElementById("autAtivo").value = "true";
+      });
+
+      renderAutorizadoresList();
+    }
+
+    function renderAutorizadoresList(){
+      const body = document.getElementById("autListBody");
+      if(!body) return;
+
+      let items = [...state.autorizadores];
+
+      if(!userIsGeneralManager()){
+        items = items.filter(i => i.lojaId === currentUserStoreId());
+      }
+
+      items.sort((a,b) => {
+        const la = `${a.lojaId || ""} ${a.nome || ""}`.toLowerCase();
+        const lb = `${b.lojaId || ""} ${b.nome || ""}`.toLowerCase();
+        return la.localeCompare(lb,"pt-BR");
+      });
+
+      body.innerHTML = items.map(i => `
+        <tr>
+          <td>${getStoreLabel(i.lojaId || "-")}</td>
+          <td>${i.nome || "-"}</td>
+          <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
+          <td>${i.cargo || "-"}</td>
+          <td>${i.ativo === false ? "Não" : "Sim"}</td>
+          <td>
+            <button class="btn btn-light" data-toggle-aut="${i.id}">
+              ${i.ativo === false ? "Ativar" : "Inativar"}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      Array.from(body.querySelectorAll("[data-toggle-aut]")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-aut");
+          const found = state.autorizadores.find(x => x.id === id);
+          if(!found) return;
+          try{
+            await updateDoc(doc(db, Collections.AUTORIZADORES, id), {
+              ativo: found.ativo === false ? true : false,
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+            await refreshAfterWrite();
+            renderAutorizadores();
+          }catch(e){
+            alert(`Falha ao atualizar: ${e?.code || "erro"}`);
+          }
+        });
+      });
+    }
+
+    async function lookupAutorizadorByCpf(){
+      const lojaId = document.getElementById("autLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("autCpf")?.value || "");
+      const status = document.getElementById("autCpfStatus");
+
+      status.textContent = "";
+
+      if(!cpfDigits || cpfDigits.length !== 11){
+        status.textContent = "Digite um CPF completo.";
+        return;
+      }
+      if(!isValidCPF(cpfDigits)){
+        status.textContent = "CPF inválido.";
+        return;
+      }
+
+      if(lojaId === "__ALL__"){
+        status.textContent = "Lookup desativado em “Todas as lojas”. Se precisar, selecione uma loja específica.";
+        return;
+      }
+
+      try{
+        const existing = await findAutorizadorByCpf(lojaId, cpfDigits);
+        if(existing){
+          status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
+          document.getElementById("autNome").value = existing.nome || "";
+          document.getElementById("autCargo").value = existing.cargo || "";
+          document.getElementById("autAtivo").value = (existing.ativo === false) ? "false" : "true";
+        }else{
+          status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
+          document.getElementById("autNome").value = "";
+          document.getElementById("autCargo").value = "";
+          document.getElementById("autAtivo").value = "true";
+        }
+      }catch(e){
+        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
+        console.error(e);
+      }
+    }
+
+    async function salvarAutorizador(){
+      const notice = document.getElementById("autNotice");
+      clearNotice(notice);
+
+      const lojaSel = document.getElementById("autLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("autCpf")?.value || "");
+      const nome = (document.getElementById("autNome")?.value || "").trim();
+      const cargo = (document.getElementById("autCargo")?.value || "").trim();
+      const ativo = (document.getElementById("autAtivo")?.value || "true") === "true";
+
+      if(!lojaSel){ showNotice(notice, "Selecione a loja."); return; }
+      if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){ showNotice(notice, "Informe um CPF válido."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome."); return; }
+      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
+
+      try{
+        const lojasAlvo = (lojaSel === "__ALL__")
+          ? state.lojas.map(l => l.id)
+          : [lojaSel];
+
+        for(const lojaId of lojasAlvo){
+          const id = autorizadorDocId(lojaId, cpfDigits);
+          await setDoc(doc(db, Collections.AUTORIZADORES, id), {
+            lojaId,
+            cpf: cpfDigits,
+            nome,
+            cargo,
+            ativo,
+            atualizadoEm: new Date(),
+            atualizadoPorUid: state.authUser.uid,
+            atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+          }, { merge: true });
+        }
+
+        await refreshAfterWrite();
+        showNotice(notice, "Autorizador salvo com sucesso.", "success");
+        renderAutorizadores();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Falha ao salvar. (${e?.code || "erro"})`);
+      }
+    }
+
+    // ========= Gestão de lojas (somente gerente geral) =========
+    function renderGestaoLojas(){
+      if(!canManageLojas()){
+        renderPanel("Acesso restrito", "Somente gerente geral.", `<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      const rows = state.lojas.map(l => `
+        <tr>
+          <td>${l.id}</td>
+          <td>${l.nome || "-"}</td>
+          <td>${l.ativo === false ? "Não" : "Sim"}</td>
+        </tr>
+      `).join("");
+
+      renderPanel(
+        "Gestão de lojas",
+        "Crie ou atualize lojas. O ID é o documento (ex.: 0001) e o nome é o visível.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="lojaIdNovo">ID da loja <span class="req">*</span></label>
+              <input class="input" id="lojaIdNovo" maxlength="40" placeholder="Ex.: 0001">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaNomeNovo">Nome da loja <span class="req">*</span></label>
+              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: Vigorito - Matriz">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaAtivaNovo">Ativa</label>
+              <select class="select" id="lojaAtivaNovo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarLoja">Salvar loja</button>
+            </div>
+          </div>
+
+          <div id="lojasNotice" class="notice"></div>
+
+          <div class="section-title">Lojas cadastradas</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Ativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `
+      );
+
+      document.getElementById("btnSalvarLoja").addEventListener("click", salvarLojaAdmin);
+    }
+
+    async function salvarLojaAdmin(){
+      const notice = document.getElementById("lojasNotice");
+      clearNotice(notice);
+
+      const lojaId = (document.getElementById("lojaIdNovo")?.value || "").trim();
+      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
+      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
+
+      if(!lojaId){ showNotice(notice, "Informe o ID da loja."); return; }
+      if(!/^[a-zA-Z0-9_-]+$/.test(lojaId)){ showNotice(notice, "ID inválido. Use apenas letras, números, _ ou -."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome da loja."); return; }
+
+      try{
+        await setDoc(doc(db, Collections.LOJAS, lojaId), {
+          nome,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser?.uid || "",
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        }, { merge: true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Loja salva com sucesso.", "success");
+        renderGestaoLojas();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Não foi possível salvar a loja. (${e?.code || "erro"})`);
+      }
+    }
+
+    // ========= refresh / auth =========
     async function refreshAfterWrite(){
       await loadLojas();
       await loadOperationalCollections();
@@ -2469,7 +2808,6 @@
       state.autorizadores = [];
       state.selectedMovimento = null;
       state.editMode = false;
-      state.returnCtx = null;
 
       el.topbar.style.display = "none";
       el.footerbar.style.display = "none";
@@ -2489,660 +2827,7 @@
       closeDetailModal();
     }
 
-    /* =========================
-       ✅ AQUI É A ÚNICA PARTE ALTERADA HOJE:
-       Condutores e Autorizadores com "Todas as lojas"
-       ========================= */
-
-    function lojaOptionsHTML({ includeAll = false } = {}){
-      if(!state.lojas.length) return `<option value="">(Sem lojas)</option>`;
-      const allOpt = includeAll ? `<option value="__ALL__">Todas as lojas</option>` : "";
-      const normal = state.lojas.map(l => `<option value="${l.id}">${l.id} - ${l.nome || l.id}</option>`).join("");
-      return allOpt + normal;
-    }
-
-    function findCondutorByCpf(lojaId, cpfDigits){
-      return state.condutores.find(c => (c.lojaId || "") === lojaId && String(c.cpf || "") === cpfDigits) || null;
-    }
-
-    function findAutorizadorByCpf(lojaId, cpfDigits){
-      return state.autorizadores.find(a => (a.lojaId || "") === lojaId && String(a.cpf || "") === cpfDigits) || null;
-    }
-
-    function renderCondutores(){
-      const lojaField = userIsGeneralManager()
-        ? `
-          <div class="form-group">
-            <label for="condLoja">Loja <span class="req">*</span></label>
-            <select class="select" id="condLoja">${lojaOptionsHTML({ includeAll: true })}</select>
-            <div class="subtle">Se escolher “Todas as lojas”, ao salvar ele grava/atualiza em todas.</div>
-          </div>
-        `
-        : `
-          <div class="form-group">
-            <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-            <input type="hidden" id="condLoja" value="${currentUserStoreId() || ""}">
-          </div>
-        `;
-
-      renderPanel(
-        "Condutores",
-        "Cadastre/edite/inative condutores. Se veio do formulário, ao salvar você volta automaticamente.",
-        `
-          <div class="grid">
-            ${lojaField}
-
-            <div class="form-group">
-              <label for="condCPF">CPF <span class="req">*</span></label>
-              <input class="input" id="condCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
-              <div class="subtle">Ao digitar o CPF, o sistema tenta localizar o cadastro na loja selecionada.</div>
-            </div>
-
-            <div class="form-group">
-              <label for="condNome">Nome <span class="req">*</span></label>
-              <input class="input" id="condNome" maxlength="80" placeholder="Nome do condutor">
-            </div>
-
-            <div class="form-group">
-              <label for="condCargo">Cargo</label>
-              <input class="input" id="condCargo" maxlength="60" placeholder="Opcional">
-            </div>
-
-            <div class="form-group">
-              <label for="condAtivo">Ativo</label>
-              <select class="select" id="condAtivo">
-                <option value="true">Sim</option>
-                <option value="false">Não (inativo)</option>
-              </select>
-            </div>
-
-            <div class="form-group full">
-              <div class="actions">
-                <button class="btn btn-success" id="btnSalvarCond">Salvar</button>
-                <button class="btn btn-light" id="btnLimparCond">Limpar</button>
-              </div>
-              <div id="condNotice" class="notice"></div>
-            </div>
-          </div>
-
-          <div class="section-title">Lista (loja selecionada)</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>CPF</th>
-                  <th>Cargo</th>
-                  <th>Ativo</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="condListBody"></tbody>
-            </table>
-          </div>
-
-          <div class="empty" id="condEmpty"></div>
-        `
-      );
-
-      attachInputMasks();
-
-      const lojaSel = document.getElementById("condLoja");
-      const cpfInp = document.getElementById("condCPF");
-      const btnSalvar = document.getElementById("btnSalvarCond");
-      const btnLimpar = document.getElementById("btnLimparCond");
-
-      let editingId = null;
-
-      function currentLojaId(){
-        if(userIsGeneralManager()) return lojaSel?.value || "";
-        return currentUserStoreId() || "";
-      }
-
-      function renderList(){
-        const body = document.getElementById("condListBody");
-        const empty = document.getElementById("condEmpty");
-        if(!body || !empty) return;
-
-        const lojaId = currentLojaId();
-
-        if(lojaId === "__ALL__"){
-          body.innerHTML = "";
-          empty.textContent = "Selecione uma loja específica para listar (em “Todas as lojas” o salvamento é em massa).";
-          return;
-        }
-
-        const items = state.condutores.filter(c => (c.lojaId || "") === lojaId);
-
-        body.innerHTML = items.map(c => {
-          const ativo = c.ativo !== false;
-          return `
-            <tr>
-              <td>${c.nome || "-"}</td>
-              <td>${formatCPF(c.cpf || "")}</td>
-              <td>${c.cargo || "-"}</td>
-              <td>${ativo ? "Sim" : "Não"}</td>
-              <td>
-                <button class="btn btn-light" data-act="edit" data-id="${c.id}" style="min-height:40px;padding:10px 12px;">Editar</button>
-                <button class="btn ${ativo ? "btn-danger" : "btn-success"}" data-act="toggle" data-id="${c.id}" style="min-height:40px;padding:10px 12px;">
-                  ${ativo ? "Inativar" : "Ativar"}
-                </button>
-              </td>
-            </tr>
-          `;
-        }).join("");
-
-        empty.textContent = items.length ? "" : "Nenhum condutor cadastrado nesta loja.";
-
-        Array.from(body.querySelectorAll("button[data-act]")).forEach(b => {
-          b.addEventListener("click", async () => {
-            const act = b.getAttribute("data-act");
-            const id = b.getAttribute("data-id");
-            const found = state.condutores.find(x => x.id === id);
-            if(!found) return;
-
-            if(act === "edit"){
-              editingId = found.id;
-              cpfInp.value = formatCPF(found.cpf || "");
-              document.getElementById("condNome").value = found.nome || "";
-              document.getElementById("condCargo").value = found.cargo || "";
-              document.getElementById("condAtivo").value = (found.ativo !== false) ? "true" : "false";
-              return;
-            }
-
-            if(act === "toggle"){
-              try{
-                await updateDoc(doc(db, Collections.CONDUTORES, found.id), {
-                  ativo: !(found.ativo !== false),
-                  atualizadoEm: new Date(),
-                  atualizadoPorUid: state.authUser.uid,
-                  atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-                });
-                await refreshAfterWrite();
-                renderCondutores();
-              }catch(e){
-                alert(`Falha ao atualizar: ${e?.code || ""}`);
-              }
-            }
-          });
-        });
-      }
-
-      async function tryLookupByCPF(){
-        const lojaId = currentLojaId();
-        if(lojaId === "__ALL__") return;
-
-        const cpf = onlyDigits(cpfInp.value);
-        if(!lojaId || cpf.length !== 11) return;
-
-        const mem = findCondutorByCpf(lojaId, cpf);
-        if(mem){
-          editingId = mem.id;
-          document.getElementById("condNome").value = mem.nome || "";
-          document.getElementById("condCargo").value = mem.cargo || "";
-          document.getElementById("condAtivo").value = (mem.ativo !== false) ? "true" : "false";
-          return;
-        }
-
-        // fallback leve (se houver índice e você quiser)
-        try{
-          const qs = await getDocs(query(
-            collection(db, Collections.CONDUTORES),
-            where("lojaId","==",lojaId),
-            where("cpf","==",cpf),
-            limit(1)
-          ));
-          if(!qs.empty){
-            const d = qs.docs[0];
-            const data = d.data();
-            editingId = d.id;
-            document.getElementById("condNome").value = data.nome || "";
-            document.getElementById("condCargo").value = data.cargo || "";
-            document.getElementById("condAtivo").value = (data.ativo !== false) ? "true" : "false";
-          }
-        }catch(e){
-          console.warn("lookup cpf falhou:", e?.code, e?.message);
-        }
-      }
-
-      function clearForm(){
-        editingId = null;
-        cpfInp.value = "";
-        document.getElementById("condNome").value = "";
-        document.getElementById("condCargo").value = "";
-        document.getElementById("condAtivo").value = "true";
-        clearNotice(document.getElementById("condNotice"));
-      }
-
-      async function salvar(){
-        const notice = document.getElementById("condNotice");
-        clearNotice(notice);
-
-        const lojaIdSel = currentLojaId();
-        const cpf = onlyDigits(cpfInp.value);
-        const nome = (document.getElementById("condNome").value || "").trim();
-        const cargo = (document.getElementById("condCargo").value || "").trim();
-        const ativo = (document.getElementById("condAtivo").value || "true") === "true";
-
-        if(!lojaIdSel){ showNotice(notice, "Selecione a loja."); return; }
-        if(cpf.length !== 11){ showNotice(notice, "Informe um CPF válido."); return; }
-        if(!nome){ showNotice(notice, "Informe o nome."); return; }
-
-        // ✅ regra: se escolheu “todas as lojas”, é cadastro em massa (não em modo edição)
-        if(lojaIdSel === "__ALL__" && editingId){
-          showNotice(notice, "Para salvar em TODAS as lojas, clique em Limpar e cadastre como novo.", "warn");
-          return;
-        }
-
-        btnSalvar.disabled = true;
-
-        try{
-          if(lojaIdSel === "__ALL__"){
-            let okCount = 0;
-
-            for(const loja of state.lojas){
-              const lojaId = loja.id;
-              const existing = findCondutorByCpf(lojaId, cpf);
-
-              if(existing){
-                await updateDoc(doc(db, Collections.CONDUTORES, existing.id), {
-                  lojaId,
-                  cpf,
-                  nome,
-                  cargo,
-                  ativo,
-                  atualizadoEm: new Date(),
-                  atualizadoPorUid: state.authUser.uid,
-                  atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-                });
-              }else{
-                await addDoc(collection(db, Collections.CONDUTORES), {
-                  lojaId,
-                  cpf,
-                  nome,
-                  cargo,
-                  ativo,
-                  criadoEm: new Date(),
-                  criadoPorUid: state.authUser.uid,
-                  criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-                });
-              }
-
-              okCount++;
-            }
-
-            await refreshAfterWrite();
-            showNotice(notice, `Condutor salvo em ${okCount} loja(s).`, "success");
-            backFromCadastroIfNeeded(nome);
-            return;
-          }
-
-          // loja única (normal)
-          if(editingId){
-            await updateDoc(doc(db, Collections.CONDUTORES, editingId), {
-              lojaId: lojaIdSel,
-              cpf,
-              nome,
-              cargo,
-              ativo,
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            });
-          }else{
-            const existing = findCondutorByCpf(lojaIdSel, cpf);
-            if(existing){
-              await updateDoc(doc(db, Collections.CONDUTORES, existing.id), {
-                lojaId: lojaIdSel,
-                cpf,
-                nome,
-                cargo,
-                ativo,
-                atualizadoEm: new Date(),
-                atualizadoPorUid: state.authUser.uid,
-                atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-              });
-              editingId = existing.id;
-            }else{
-              await addDoc(collection(db, Collections.CONDUTORES), {
-                lojaId: lojaIdSel,
-                cpf,
-                nome,
-                cargo,
-                ativo,
-                criadoEm: new Date(),
-                criadoPorUid: state.authUser.uid,
-                criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-              });
-            }
-          }
-
-          await refreshAfterWrite();
-          showNotice(notice, "Condutor salvo com sucesso.", "success");
-          backFromCadastroIfNeeded(nome);
-
-        }catch(e){
-          showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-        }finally{
-          btnSalvar.disabled = false;
-        }
-      }
-
-      if(lojaSel){
-        lojaSel.addEventListener("change", () => {
-          clearForm();
-          renderList();
-        });
-      }
-
-      cpfInp.addEventListener("input", () => {
-        const cpf = onlyDigits(cpfInp.value);
-        if(cpf.length === 11){
-          tryLookupByCPF();
-        }
-      });
-
-      btnSalvar.addEventListener("click", salvar);
-      btnLimpar.addEventListener("click", () => { clearForm(); renderList(); });
-
-      renderList();
-    }
-
-    function renderAutorizadores(){
-      const lojaField = userIsGeneralManager()
-        ? `
-          <div class="form-group">
-            <label for="autLoja">Loja <span class="req">*</span></label>
-            <select class="select" id="autLoja">${lojaOptionsHTML({ includeAll: true })}</select>
-            <div class="subtle">Se escolher “Todas as lojas”, ao salvar ele grava/atualiza em todas.</div>
-          </div>
-        `
-        : `
-          <div class="form-group">
-            <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-            <input type="hidden" id="autLoja" value="${currentUserStoreId() || ""}">
-          </div>
-        `;
-
-      renderPanel(
-        "Autorizadores",
-        "Cadastre/edite/inative autorizadores.",
-        `
-          <div class="grid">
-            ${lojaField}
-
-            <div class="form-group">
-              <label for="autCPF">CPF <span class="req">*</span></label>
-              <input class="input" id="autCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
-            </div>
-
-            <div class="form-group">
-              <label for="autNome">Nome <span class="req">*</span></label>
-              <input class="input" id="autNome" maxlength="80" placeholder="Nome do autorizador">
-            </div>
-
-            <div class="form-group">
-              <label for="autCargo">Cargo</label>
-              <input class="input" id="autCargo" maxlength="60" placeholder="Opcional">
-            </div>
-
-            <div class="form-group">
-              <label for="autAtivo">Ativo</label>
-              <select class="select" id="autAtivo">
-                <option value="true">Sim</option>
-                <option value="false">Não (inativo)</option>
-              </select>
-            </div>
-
-            <div class="form-group full">
-              <div class="actions">
-                <button class="btn btn-success" id="btnSalvarAut">Salvar</button>
-                <button class="btn btn-light" id="btnLimparAut">Limpar</button>
-              </div>
-              <div id="autNotice" class="notice"></div>
-            </div>
-          </div>
-
-          <div class="section-title">Lista (loja selecionada)</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>CPF</th>
-                  <th>Cargo</th>
-                  <th>Ativo</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="autListBody"></tbody>
-            </table>
-          </div>
-
-          <div class="empty" id="autEmpty"></div>
-        `
-      );
-
-      attachInputMasks();
-
-      const lojaSel = document.getElementById("autLoja");
-      const cpfInp = document.getElementById("autCPF");
-      const btnSalvar = document.getElementById("btnSalvarAut");
-      const btnLimpar = document.getElementById("btnLimparAut");
-
-      let editingId = null;
-
-      function currentLojaId(){
-        if(userIsGeneralManager()) return lojaSel?.value || "";
-        return currentUserStoreId() || "";
-      }
-
-      function renderList(){
-        const body = document.getElementById("autListBody");
-        const empty = document.getElementById("autEmpty");
-        if(!body || !empty) return;
-
-        const lojaId = currentLojaId();
-
-        if(lojaId === "__ALL__"){
-          body.innerHTML = "";
-          empty.textContent = "Selecione uma loja específica para listar (em “Todas as lojas” o salvamento é em massa).";
-          return;
-        }
-
-        const items = state.autorizadores.filter(a => (a.lojaId || "") === lojaId);
-
-        body.innerHTML = items.map(a => {
-          const ativo = a.ativo !== false;
-          return `
-            <tr>
-              <td>${a.nome || "-"}</td>
-              <td>${formatCPF(a.cpf || "")}</td>
-              <td>${a.cargo || "-"}</td>
-              <td>${ativo ? "Sim" : "Não"}</td>
-              <td>
-                <button class="btn btn-light" data-act="edit" data-id="${a.id}" style="min-height:40px;padding:10px 12px;">Editar</button>
-                <button class="btn ${ativo ? "btn-danger" : "btn-success"}" data-act="toggle" data-id="${a.id}" style="min-height:40px;padding:10px 12px;">
-                  ${ativo ? "Inativar" : "Ativar"}
-                </button>
-              </td>
-            </tr>
-          `;
-        }).join("");
-
-        empty.textContent = items.length ? "" : "Nenhum autorizador cadastrado nesta loja.";
-
-        Array.from(body.querySelectorAll("button[data-act]")).forEach(b => {
-          b.addEventListener("click", async () => {
-            const act = b.getAttribute("data-act");
-            const id = b.getAttribute("data-id");
-            const found = state.autorizadores.find(x => x.id === id);
-            if(!found) return;
-
-            if(act === "edit"){
-              editingId = found.id;
-              cpfInp.value = formatCPF(found.cpf || "");
-              document.getElementById("autNome").value = found.nome || "";
-              document.getElementById("autCargo").value = found.cargo || "";
-              document.getElementById("autAtivo").value = (found.ativo !== false) ? "true" : "false";
-              return;
-            }
-
-            if(act === "toggle"){
-              try{
-                await updateDoc(doc(db, Collections.AUTORIZADORES, found.id), {
-                  ativo: !(found.ativo !== false),
-                  atualizadoEm: new Date(),
-                  atualizadoPorUid: state.authUser.uid,
-                  atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-                });
-                await refreshAfterWrite();
-                renderAutorizadores();
-              }catch(e){
-                alert(`Falha ao atualizar: ${e?.code || ""}`);
-              }
-            }
-          });
-        });
-      }
-
-      function clearForm(){
-        editingId = null;
-        cpfInp.value = "";
-        document.getElementById("autNome").value = "";
-        document.getElementById("autCargo").value = "";
-        document.getElementById("autAtivo").value = "true";
-        clearNotice(document.getElementById("autNotice"));
-      }
-
-      async function salvar(){
-        const notice = document.getElementById("autNotice");
-        clearNotice(notice);
-
-        const lojaIdSel = currentLojaId();
-        const cpf = onlyDigits(cpfInp.value);
-        const nome = (document.getElementById("autNome").value || "").trim();
-        const cargo = (document.getElementById("autCargo").value || "").trim();
-        const ativo = (document.getElementById("autAtivo").value || "true") === "true";
-
-        if(!lojaIdSel){ showNotice(notice, "Selecione a loja."); return; }
-        if(cpf.length !== 11){ showNotice(notice, "Informe um CPF válido."); return; }
-        if(!nome){ showNotice(notice, "Informe o nome."); return; }
-
-        if(lojaIdSel === "__ALL__" && editingId){
-          showNotice(notice, "Para salvar em TODAS as lojas, clique em Limpar e cadastre como novo.", "warn");
-          return;
-        }
-
-        btnSalvar.disabled = true;
-
-        try{
-          if(lojaIdSel === "__ALL__"){
-            let okCount = 0;
-
-            for(const loja of state.lojas){
-              const lojaId = loja.id;
-              const existing = findAutorizadorByCpf(lojaId, cpf);
-
-              if(existing){
-                await updateDoc(doc(db, Collections.AUTORIZADORES, existing.id), {
-                  lojaId,
-                  cpf,
-                  nome,
-                  cargo,
-                  ativo,
-                  atualizadoEm: new Date(),
-                  atualizadoPorUid: state.authUser.uid,
-                  atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-                });
-              }else{
-                await addDoc(collection(db, Collections.AUTORIZADORES), {
-                  lojaId,
-                  cpf,
-                  nome,
-                  cargo,
-                  ativo,
-                  criadoEm: new Date(),
-                  criadoPorUid: state.authUser.uid,
-                  criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-                });
-              }
-
-              okCount++;
-            }
-
-            await refreshAfterWrite();
-            showNotice(notice, `Autorizador salvo em ${okCount} loja(s).`, "success");
-            renderAutorizadores();
-            return;
-          }
-
-          if(editingId){
-            await updateDoc(doc(db, Collections.AUTORIZADORES, editingId), {
-              lojaId: lojaIdSel,
-              cpf,
-              nome,
-              cargo,
-              ativo,
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            });
-          }else{
-            const existing = findAutorizadorByCpf(lojaIdSel, cpf);
-            if(existing){
-              await updateDoc(doc(db, Collections.AUTORIZADORES, existing.id), {
-                lojaId: lojaIdSel,
-                cpf,
-                nome,
-                cargo,
-                ativo,
-                atualizadoEm: new Date(),
-                atualizadoPorUid: state.authUser.uid,
-                atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-              });
-              editingId = existing.id;
-            }else{
-              await addDoc(collection(db, Collections.AUTORIZADORES), {
-                lojaId: lojaIdSel,
-                cpf,
-                nome,
-                cargo,
-                ativo,
-                criadoEm: new Date(),
-                criadoPorUid: state.authUser.uid,
-                criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-              });
-            }
-          }
-
-          await refreshAfterWrite();
-          showNotice(notice, "Autorizador salvo com sucesso.", "success");
-          renderAutorizadores();
-
-        }catch(e){
-          showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-        }finally{
-          btnSalvar.disabled = false;
-        }
-      }
-
-      if(lojaSel){
-        lojaSel.addEventListener("change", () => {
-          clearForm();
-          renderList();
-        });
-      }
-
-      btnSalvar.addEventListener("click", salvar);
-      btnLimpar.addEventListener("click", () => { clearForm(); renderList(); });
-
-      renderList();
-    }
-
-    // Eventos base
+    // ========= Eventos =========
     el.btnLogin.addEventListener("click", login);
     el.btnLogout.addEventListener("click", logout);
 

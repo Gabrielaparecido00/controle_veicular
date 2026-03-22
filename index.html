@@ -349,6 +349,7 @@
     .badge-green{ background:#dcfce7; color:#166534; }
     .badge-red{ background:#fee2e2; color:#991b1b; }
     .badge-blue{ background:#dbeafe; color:#1d4ed8; }
+    .badge-amber{ background:#ffedd5; color:#9a3412; }
 
     .photo-grid{
       display:grid;
@@ -642,6 +643,10 @@
       <div class="modal-actions">
         <button class="btn btn-primary" id="btnEditRegistro">Editar</button>
         <button class="btn btn-success hidden" id="btnSaveRegistro">Salvar alterações</button>
+
+        <!-- ✅ NOVO: Marcar alerta como resolvido (somente gerência e só quando houver alerta pendente) -->
+        <button class="btn btn-success hidden" id="btnResolveAlert">Marcar alerta como resolvido</button>
+
         <button class="btn btn-light" id="btnExportRegistro">Exportar registro</button>
         <button class="btn btn-light" id="btnCloseModal2">Fechar</button>
       </div>
@@ -712,6 +717,9 @@
       btnExportRegistro: document.getElementById("btnExportRegistro"),
       btnEditRegistro: document.getElementById("btnEditRegistro"),
       btnSaveRegistro: document.getElementById("btnSaveRegistro"),
+
+      // ✅ NOVO
+      btnResolveAlert: document.getElementById("btnResolveAlert"),
     };
 
     const Collections = {
@@ -938,7 +946,6 @@
     function renderShellInfo(){
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
-      const lojaNome = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
 
       el.headerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
       el.footerUserText.textContent = nome;
@@ -972,11 +979,94 @@
       return Object.keys(patioMap).length;
     }
 
+    // ✅ NOVO: checar se placa está no pátio antes de salvar SAÍDA (para alerta)
+    function isPlateCurrentlyInPatioForStore(lojaId, placa){
+      const plate = normalizePlate(placa);
+      if(!lojaId || !plate) return false;
+
+      const items = state.movimentos
+        .filter(m => m.lojaId === lojaId && normalizePlate(m.placa) === plate)
+        .slice()
+        .sort((a,b) => (dateValueToMillis(a.data)||0) - (dateValueToMillis(b.data)||0));
+
+      let inside = false;
+      for(const m of items){
+        if(m.tipo === "entrada") inside = true;
+        if(m.tipo === "saida") inside = false;
+      }
+      return inside;
+    }
+
+    // ✅ NOVO: helpers do alerta e do botão "Marcar como resolvido"
+    function userCanResolveAlert(){
+      return userIsGeneralManager() || userIsStoreManager();
+    }
+    function itemIsOpenAlert(item){
+      return !!item
+        && item.alerta === true
+        && item.alertaTipo === "saida_fora_padrao"
+        && item.alertaResolvido !== true;
+    }
+    function syncResolveAlertButton(){
+      if(!el.btnResolveAlert) return;
+      const show = userCanResolveAlert() && itemIsOpenAlert(state.selectedMovimento);
+      if(show) el.btnResolveAlert.classList.remove("hidden");
+      else el.btnResolveAlert.classList.add("hidden");
+    }
+    async function resolveSelectedAlert(){
+      const item = state.selectedMovimento;
+      if(!item) return;
+
+      if(!userCanResolveAlert()){
+        alert("Apenas gerentes podem marcar alerta como resolvido.");
+        return;
+      }
+      if(!itemIsOpenAlert(item)){
+        alert("Este registro não possui alerta pendente.");
+        return;
+      }
+
+      const ok = confirm("Marcar este ALERTA como resolvido?");
+      if(!ok) return;
+
+      try{
+        await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
+          alertaResolvido: true,
+          alertaResolvidoEm: new Date(),
+          alertaResolvidoPorUid: state.authUser.uid,
+          alertaResolvidoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        });
+
+        await refreshAfterWrite();
+
+        const refreshed = state.movimentos.find(m => m.id === item.id);
+        if(refreshed) state.selectedMovimento = refreshed;
+
+        renderDetailView(state.selectedMovimento);
+        syncResolveAlertButton();
+        alert("Alerta marcado como resolvido.");
+      }catch(e){
+        console.error(e);
+        alert(`Falha ao marcar como resolvido. (${e?.code || "erro"})`);
+      }
+    }
+
     function buildDashboardMetrics(){
       const movimentos = [...state.movimentos];
       const vehiclesInPatio = computePatioCount(movimentos);
       const entradas = movimentos.filter(m=>m.tipo==="entrada").length;
       const saidas = movimentos.filter(m=>m.tipo==="saida").length;
+
+      // ✅ NOVO: contador de alertas pendentes (apenas gerência vê)
+      let alertasPend = 0;
+      if(userCanResolveAlert()){
+        if(userIsGeneralManager()){
+          alertasPend = movimentos.filter(m => m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true).length;
+        }else{
+          const lojaId = currentUserStoreId();
+          alertasPend = movimentos.filter(m => m.lojaId===lojaId && m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true).length;
+        }
+      }
 
       const cards = [
         { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:userIsGeneralManager()?"Somatório geral":"Na unidade" },
@@ -984,12 +1074,17 @@
         { title:"Entradas / Saídas", value:`${entradas} / ${saidas}`, subtitle:"Resumo" },
         { title:"Condutores", value:state.condutores.length, subtitle:"Cadastros" }
       ];
+
       if(canManageAutorizadores()){
         cards.push({ title:"Autorizadores", value:state.autorizadores.length, subtitle:"Cadastros" });
       }
       if(userIsGeneralManager()){
         cards.push({ title:"Lojas", value:state.lojas.length, subtitle:"Unidades" });
       }
+      if(userCanResolveAlert()){
+        cards.push({ title:"Alertas pendentes", value:alertasPend, subtitle:"Saída fora do padrão" });
+      }
+
       return cards;
     }
 
@@ -1046,22 +1141,75 @@
       const movimentos = [...state.movimentos];
       const lastFive = movimentos.slice(0,5);
 
-      const rows = lastFive.map(item=>`
-        <tr>
-          <td>${formatDate(item.data)}</td>
-          <td>${item.tipo||"-"}</td>
-          <td>${getStoreLabel(item.lojaId||"-")}</td>
-          <td>${item.placa||"-"}</td>
-          <td>${item.veiculo||"-"}</td>
-          <td>${item.condutor||"-"}</td>
-          <td>${item.autorizador||"-"}</td>
-        </tr>
-      `).join("");
+      const rows = lastFive.map(item=>{
+        const alertaBadge = (item.alerta===true && item.alertaTipo==="saida_fora_padrao" && item.alertaResolvido!==true)
+          ? `<span class="badge badge-amber">ALERTA</span>`
+          : "";
+        return `
+          <tr>
+            <td>${formatDate(item.data)}</td>
+            <td>${item.tipo||"-"} ${alertaBadge}</td>
+            <td>${getStoreLabel(item.lojaId||"-")}</td>
+            <td>${item.placa||"-"}</td>
+            <td>${item.veiculo||"-"}</td>
+            <td>${item.condutor||"-"}</td>
+            <td>${item.autorizador||"-"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      // ✅ NOVO: bloco de alertas pendentes para gerente loja e geral
+      let alertasHTML = "";
+      if(userCanResolveAlert()){
+        const lojaId = currentUserStoreId();
+        let alertas = movimentos.filter(m => m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true);
+        if(!userIsGeneralManager()) alertas = alertas.filter(m => m.lojaId===lojaId);
+
+        alertas.sort((a,b)=> (dateValueToMillis(b.data)||0) - (dateValueToMillis(a.data)||0));
+        const top = alertas.slice(0, 10);
+
+        const arows = top.map(a => `
+          <tr class="row-clickable" data-alert-id="${a.id}">
+            <td>${formatDate(a.data)}</td>
+            <td><span class="badge badge-amber">Saída fora do padrão</span></td>
+            <td>${getStoreLabel(a.lojaId||"-")}</td>
+            <td>${a.placa||"-"}</td>
+            <td>${a.veiculo||"-"}</td>
+            <td>${a.condutor||"-"}</td>
+            <td>${a.autorizador||"-"}</td>
+          </tr>
+        `).join("");
+
+        alertasHTML = `
+          <div class="section-title">Alertas pendentes (saída fora do padrão)</div>
+          <div class="subtle">Toque em um alerta para abrir o registro e marcar como resolvido.</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Alerta</th>
+                  <th>Loja</th>
+                  <th>Placa</th>
+                  <th>Veículo</th>
+                  <th>Condutor</th>
+                  <th>Autorizador</th>
+                </tr>
+              </thead>
+              <tbody id="dashAlertsBody">
+                ${arows || `<tr><td colspan="7">Nenhum alerta pendente.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `;
+      }
 
       renderPanel(
         userIsGeneralManager() ? "Dashboard geral" : "Dashboard",
         userIsGeneralManager() ? "Visão consolidada de todas as unidades." : "Visão resumida da sua unidade.",
         `
+          ${alertasHTML}
+
           <div class="section-title">Últimas movimentações</div>
           <div class="table-wrap">
             <table>
@@ -1083,15 +1231,26 @@
           </div>
         `
       );
+
+      // clique nos alertas
+      const dashAlertsBody = document.getElementById("dashAlertsBody");
+      if(dashAlertsBody){
+        Array.from(dashAlertsBody.querySelectorAll("tr[data-alert-id]")).forEach(tr=>{
+          tr.addEventListener("click", ()=>{
+            const id = tr.getAttribute("data-alert-id");
+            const found = state.movimentos.find(m=>m.id===id);
+            if(found) openDetailModal(found);
+          });
+        });
+      }
     }
 
     // ========= FOTO (Firestore-only) =========
     // Compressão para não estourar 1MB no Firestore.
-    // Ajuste fino:
     const PHOTO_MAX_W = 900;
     const PHOTO_MAX_H = 900;
-    const PHOTO_QUALITY = 0.55; // 0.45~0.65 (quanto menor, mais leve)
-    const PHOTO_MAX_BYTES = 160 * 1024; // ~160KB por foto (4 fotos ~640KB + campos)
+    const PHOTO_QUALITY = 0.55;
+    const PHOTO_MAX_BYTES = 160 * 1024;
 
     function fileFromInput(inputId){
       const input = document.getElementById(inputId);
@@ -1137,18 +1296,15 @@
     }
 
     function estimateBase64Bytes(dataUrl){
-      // data:image/jpeg;base64,XXXX
       const base64 = String(dataUrl||"").split(",")[1] || "";
       return Math.floor(base64.length * 3 / 4);
     }
 
     async function compressImageToDataURL(file){
-      // cria bitmap
       const img = await createImageBitmap(file);
       let w = img.width;
       let h = img.height;
 
-      // resize mantendo proporção
       const ratio = Math.min(PHOTO_MAX_W / w, PHOTO_MAX_H / h, 1);
       const nw = Math.max(1, Math.round(w * ratio));
       const nh = Math.max(1, Math.round(h * ratio));
@@ -1160,7 +1316,6 @@
       const ctx = canvas.getContext("2d", { alpha:false });
       ctx.drawImage(img, 0, 0, nw, nh);
 
-      // tenta com qualidade alvo; se ainda ficar grande, reduz qualidade automaticamente
       let q = PHOTO_QUALITY;
       let out = canvas.toDataURL("image/jpeg", q);
       while(estimateBase64Bytes(out) > PHOTO_MAX_BYTES && q > 0.25){
@@ -1169,8 +1324,6 @@
       }
 
       if(estimateBase64Bytes(out) > PHOTO_MAX_BYTES){
-        // ainda grande (foto muito detalhada). devolve mesmo assim, mas vai falhar no doc grande.
-        // Melhor avisar.
         console.warn("Foto ainda grande após compressão:", estimateBase64Bytes(out));
       }
       return out;
@@ -1210,9 +1363,8 @@
     }
 
     function docSizeGuardOrThrow(fotos){
-      // folga para outros campos; se passar muito, vai estourar 1MB
       const bytesFotos = totalFotosBytes(fotos);
-      const LIMIT = 900 * 1024; // guardrail (não é o limite real, é margem)
+      const LIMIT = 900 * 1024;
       if(bytesFotos > LIMIT){
         throw new Error("Fotos muito pesadas para salvar no Firestore. Tire as fotos mais próximas / com menos detalhe ou diminua extras.");
       }
@@ -1392,7 +1544,6 @@
         ]);
 
         const extras = await collectExtraPhotosData("entrada");
-
         const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
 
         if(!fotosRequiredOk(fotos)){
@@ -1430,7 +1581,7 @@
     function renderSaida(){
       renderPanel(
         "Saída de veículo",
-        "Campos com * são obrigatórios. Observação é opcional. Fotos são obrigatórias.",
+        "Campos com * são obrigatórios. Observação é opcional. Fotos são obrigatórias. Saída fora do padrão gera ALERTA para gerência.",
         `
           <div class="grid">
             ${lojaFieldHtml("saida")}
@@ -1556,6 +1707,10 @@
 
         docSizeGuardOrThrow(fotos);
 
+        // ✅ ALERTA: saída sem "entrada" registrada (fora do padrão)
+        const inPatioNow = isPlateCurrentlyInPatioForStore(lojaId, placa);
+        const isAlert = !inPatioNow;
+
         await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "saida",
           lojaId,
@@ -1567,13 +1722,25 @@
           autorizador,
           observacao,
           fotos,
+
+          // ✅ campos de alerta
+          alerta: isAlert,
+          alertaTipo: isAlert ? "saida_fora_padrao" : "",
+          alertaMensagem: isAlert ? "Saída registrada sem entrada anterior (fora do padrão)." : "",
+          alertaResolvido: false,
+
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
         });
 
         await refreshAfterWrite();
-        showNotice(notice, "Saída registrada com sucesso.", "success");
+
+        if(isAlert){
+          showNotice(notice, "Saída registrada com ALERTA (fora do padrão). Gerência será notificada no painel.", "warn");
+        }else{
+          showNotice(notice, "Saída registrada com sucesso.", "success");
+        }
         renderSaida();
       }catch(e){
         console.error(e);
@@ -1724,10 +1891,14 @@
         const totalFotos = baseCount + extrasCount;
         const motivoFinal = item.motivo==="Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo||"-");
 
+        const alertaBadge = (item.alerta===true && item.alertaTipo==="saida_fora_padrao" && item.alertaResolvido!==true)
+          ? `<span class="badge badge-amber">ALERTA</span>`
+          : "";
+
         return `
           <tr class="row-clickable" data-id="${item.id}">
             <td>${formatDate(item.data)}</td>
-            <td>${item.tipo==="entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
+            <td>${item.tipo==="entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`} ${alertaBadge}</td>
             <td>${getStoreLabel(item.lojaId||"-")}</td>
             <td>${item.placa||"-"}</td>
             <td>${item.veiculo||"-"}</td>
@@ -1759,6 +1930,10 @@
       el.btnSaveRegistro.classList.add("hidden");
       el.btnEditRegistro.classList.remove("hidden");
       renderDetailView(item);
+
+      // ✅ NOVO: botão "resolver alerta"
+      syncResolveAlertButton();
+
       el.detailModal.classList.add("show");
       el.detailModal.setAttribute("aria-hidden","false");
     }
@@ -1774,11 +1949,23 @@
       if(fotos.lateralDir) thumbs.push({ url:fotos.lateralDir, cap:"Lateral direita" });
       if(Array.isArray(fotos.extras)) fotos.extras.forEach((u,idx)=>{ if(u) thumbs.push({ url:u, cap:`Extra ${idx+1}` }); });
 
+      const alertaTop = (item.alerta===true && item.alertaTipo==="saida_fora_padrao")
+        ? `
+          <div class="notice show warn" style="margin-top:0;">
+            <strong>ALERTA:</strong> Saída fora do padrão<br/>
+            <div style="margin-top:6px;">${item.alertaMensagem || "Saída registrada sem entrada anterior."}</div>
+            <div style="margin-top:6px;"><b>Status:</b> ${item.alertaResolvido===true ? "Resolvido" : "Pendente"}</div>
+          </div>
+        `
+        : "";
+
       el.detailTitle.textContent = `Registro: ${item.tipo==="entrada"?"Entrada":"Saída"} — ${item.placa||""}`;
       el.detailSub.textContent = `Loja: ${getStoreLabel(item.lojaId)} • Data/hora: ${formatDate(item.data)}`;
 
       el.detailBody.innerHTML = `
-        <div class="detail-grid">
+        ${alertaTop}
+
+        <div class="detail-grid" style="margin-top:${alertaTop ? "12px" : "0"};">
           <div class="detail-item"><small>Tipo</small><div>${item.tipo==="entrada"?"Entrada":"Saída"}</div></div>
           <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
 
@@ -1807,6 +1994,9 @@
           </div>
         ` : `<div class="empty">Este registro não possui fotos.</div>`}
       `;
+
+      // ✅ mantém coerente o botão
+      syncResolveAlertButton();
     }
 
     function renderDetailEdit(item){
@@ -1918,6 +2108,9 @@
       wirePhotoPreview("editFotoLatDir", "editPreviewLatDir");
 
       document.getElementById("editBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("edit"));
+
+      // ✅ botão resolver alerta não aparece em modo edição (fica discreto)
+      syncResolveAlertButton();
     }
 
     async function saveEditedRegistro(){
@@ -1946,7 +2139,6 @@
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
       try{
-        // se não tirou nova foto, mantém as atuais
         const cur = item.fotos || {};
         const [newFrente, newMala, newEsq, newDir] = await Promise.all([
           getCompressedDataURLFromInput("editFotoFrente"),
@@ -2759,6 +2951,11 @@
     });
 
     el.btnSaveRegistro.addEventListener("click", saveEditedRegistro);
+
+    // ✅ NOVO: resolver alerta
+    if(el.btnResolveAlert){
+      el.btnResolveAlert.addEventListener("click", resolveSelectedAlert);
+    }
 
     onAuthStateChanged(auth, async (user) => {
       if(!user){

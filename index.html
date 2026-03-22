@@ -263,6 +263,37 @@
 
     .menu .btn{ border-radius:16px; padding:14px 16px; }
 
+    .menu-wrap{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-bottom:18px;
+    }
+
+    .menu-main,
+    .menu-sub{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+
+    .menu-title{
+      font-size:13px;
+      font-weight:900;
+      color:#475569;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      margin-bottom:2px;
+    }
+
+    .submenu-card{
+      background:#fff;
+      border:1px solid #e5edf5;
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow);
+    }
+
     .card{
       background:var(--card);
       border-radius:var(--radius);
@@ -1047,6 +1078,7 @@
     };
 
     const Roles = {
+      MASTER: "master",
       CONTROLADOR: "controlador",
       GERENTE_LOJA: "gerente_loja",
       GERENTE_GERAL: "gerente_geral"
@@ -1072,6 +1104,10 @@
       parametros: {
         motivosEntrada: [],
         motivosSaida: []
+      },
+
+      ui: {
+        masterOpsOpen: false
       },
 
       lock: { busy:false, busyKey:"" }
@@ -1236,21 +1272,26 @@
     }
 
     function getRoleLabel(role){
+      if(role===Roles.MASTER) return "Usuário master";
       if(role===Roles.CONTROLADOR) return "Controlador de acesso";
       if(role===Roles.GERENTE_LOJA) return "Gerente de loja";
       if(role===Roles.GERENTE_GERAL) return "Gerente geral";
       return "Perfil não definido";
     }
 
+    function userIsMaster(){ return state.userProfile?.role===Roles.MASTER; }
     function userIsGeneralManager(){ return state.userProfile?.role===Roles.GERENTE_GERAL; }
     function userIsStoreManager(){ return state.userProfile?.role===Roles.GERENTE_LOJA; }
     function userIsController(){ return state.userProfile?.role===Roles.CONTROLADOR; }
 
-    function canManageAutorizadores(){ return userIsGeneralManager() || userIsStoreManager(); }
-    function canManageLojas(){ return userIsGeneralManager(); }
-    function canManageUsers(){ return userIsGeneralManager() || userIsStoreManager(); }
+    function canManageAutorizadores(){ return userIsMaster() || userIsGeneralManager() || userIsStoreManager(); }
+    function canManageLojas(){ return userIsMaster() || userIsGeneralManager(); }
+    function canManageUsers(){ return userIsMaster() || userIsGeneralManager() || userIsStoreManager(); }
+    function canManageParametros(){ return userIsMaster() || userIsGeneralManager(); }
+    function canAccessFaturamento(){ return userIsMaster(); }
 
-    function userHasAllStoresAccess(){ return userIsGeneralManager(); }
+    function userHasAllStoresAccess(){ return userIsMaster() || userIsGeneralManager(); }
+
     function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
 
     function getStoreLabel(lojaId){
@@ -1325,7 +1366,7 @@
       const data = userSnap.data();
       if(data.ativo === false) throw new Error("Usuário desativado");
       if(!data.role) throw new Error("Usuário sem role");
-      if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada");
+      if(data.role !== Roles.GERENTE_GERAL && data.role !== Roles.MASTER && !data.lojaId) throw new Error("Usuário sem loja vinculada");
       if(!data.cpf || !isValidCPF(data.cpf)) throw new Error("Usuário sem CPF válido");
       state.userProfile = { id: userSnap.id, ...data };
     }
@@ -1339,7 +1380,7 @@
     async function loadOperationalCollections(){
       const lojaId = currentUserStoreId();
 
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         const [movSnap, condSnap, autSnap] = await Promise.all([
           getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data","desc"), limit(2000))),
           getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome","asc"), limit(6000))),
@@ -1377,12 +1418,21 @@
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
 
-      el.headerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
+      if(userIsMaster()){
+        el.headerStoreText.textContent = "Ambiente corporativo";
+        el.footerStoreText.textContent = "Corporativo";
+      }else{
+        el.headerStoreText.textContent = userHasAllStoresAccess() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
+        el.footerStoreText.textContent = userHasAllStoresAccess() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
+      }
+
       el.footerUserText.textContent = nome;
       el.footerRoleText.textContent = roleLabel;
-      el.footerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
 
-      if(userIsGeneralManager()){
+      if(userIsMaster()){
+        el.heroTitle.textContent = "Painel master";
+        el.heroSubtitle.textContent = "Visão corporativa, usuários, faturamento e supervisão geral do sistema.";
+      }else if(userIsGeneralManager()){
         el.heroTitle.textContent = "Dashboard geral";
         el.heroSubtitle.textContent = "Acompanhe movimentações e cadastros de todas as lojas.";
       }else if(userIsStoreManager()){
@@ -1402,7 +1452,7 @@
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
-          const key = userIsGeneralManager() ? `${item.lojaId||""}__${plate}` : plate;
+          const key = userHasAllStoresAccess() ? `${item.lojaId||""}__${plate}` : plate;
           if(item.tipo==="entrada") patioMap[key]=true;
           if(item.tipo==="saida") delete patioMap[key];
         });
@@ -1426,7 +1476,7 @@
       return inside;
     }
 
-    function userCanResolveAlert(){ return userIsGeneralManager() || userIsStoreManager(); }
+    function userCanResolveAlert(){ return userIsMaster() || userIsGeneralManager() || userIsStoreManager(); }
     function itemIsOpenAlert(item){
       return !!item
         && item.alerta === true
@@ -1444,7 +1494,7 @@
       if(!item) return;
 
       if(!userCanResolveAlert()){
-        toast("Apenas gerentes podem marcar alerta como resolvido.", "warn");
+        toast("Apenas gerentes ou master podem marcar alerta como resolvido.", "warn");
         return;
       }
       if(!itemIsOpenAlert(item)){
@@ -1482,7 +1532,7 @@
       }
     }
 
-    function canAcknowledgeDamage(){ return userIsGeneralManager() || userIsStoreManager(); }
+    function canAcknowledgeDamage(){ return userIsMaster() || userIsGeneralManager() || userIsStoreManager(); }
     function itemHasDamageAlert(item){
       return !!item && item.danoAlerta === true && item.danoCiente !== true;
     }
@@ -1497,7 +1547,7 @@
       if(!item) return;
 
       if(!canAcknowledgeDamage()){
-        toast("Apenas gerentes podem dar ciência do dano.", "warn");
+        toast("Apenas gerentes ou master podem dar ciência do dano.", "warn");
         return;
       }
       if(!itemHasDamageAlert(item)){
@@ -1542,7 +1592,7 @@
 
       let alertasPend = 0;
       if(userCanResolveAlert()){
-        if(userIsGeneralManager()){
+        if(userHasAllStoresAccess()){
           alertasPend = movimentos.filter(m => m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true).length;
         }else{
           const lojaId = currentUserStoreId();
@@ -1552,7 +1602,7 @@
 
       let danosPend = 0;
       if(canAcknowledgeDamage()){
-        if(userIsGeneralManager()){
+        if(userHasAllStoresAccess()){
           danosPend = movimentos.filter(m => m.danoAlerta===true && m.danoCiente!==true).length;
         }else{
           const lojaId = currentUserStoreId();
@@ -1561,7 +1611,7 @@
       }
 
       const cards = [
-        { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:userIsGeneralManager()?"Somatório geral":"Na unidade" },
+        { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:userHasAllStoresAccess()?"Somatório geral":"Na unidade" },
         { title:"Movimentações", value:movimentos.length, subtitle:"Total entradas e saídas" },
         { title:"Entradas / Saídas", value:`${entradas} / ${saidas}`, subtitle:"Resumo" },
         { title:"Condutores", value:state.condutores.length, subtitle:"Cadastros" }
@@ -1570,7 +1620,7 @@
       if(canManageAutorizadores()){
         cards.push({ title:"Autorizadores", value:state.autorizadores.length, subtitle:"Cadastros" });
       }
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         cards.push({ title:"Lojas", value:state.lojas.length, subtitle:"Unidades" });
       }
       if(userCanResolveAlert()){
@@ -1578,6 +1628,9 @@
       }
       if(canAcknowledgeDamage()){
         cards.push({ title:"Danos pendentes", value:danosPend, subtitle:"Aguardando ciência" });
+      }
+      if(canAccessFaturamento()){
+        cards.push({ title:"Faturamento", value:"Suspenso", subtitle:"Módulo em implantação" });
       }
 
       return cards;
@@ -1606,7 +1659,70 @@
       `;
     }
 
+    function renderMasterMenu(){
+      el.menuBar.className = "menu-wrap";
+      el.menuBar.innerHTML = `
+        <div>
+          <div class="menu-title">Principal</div>
+          <div class="menu-main" id="masterMainMenu"></div>
+        </div>
+        <div class="submenu-card ${state.ui.masterOpsOpen ? "" : "hidden"}" id="masterOpsWrap">
+          <div class="menu-title">Operação</div>
+          <div class="menu-sub" id="masterOpsMenu"></div>
+        </div>
+      `;
+
+      const mainItems = [
+        { id:"menu-dashboard", label:"Dashboard", action:renderDashboardHome },
+        { id:"menu-faturamento", label:"Faturamento", action:renderFaturamento },
+        { id:"menu-consulta", label:"Consulta", action:renderConsulta },
+        { id:"menu-usuarios", label:"Usuários", action:renderUsuarios },
+        { id:"menu-master-operacao", label: state.ui.masterOpsOpen ? "Ocultar operação" : "Operação", action:toggleMasterOpsMenu }
+      ];
+
+      const opsItems = [
+        { id:"menu-entrada", label:"Entrada", action:renderEntrada },
+        { id:"menu-saida", label:"Saída", action:renderSaida },
+        { id:"menu-condutores", label:"Condutores", action:renderCondutores },
+        { id:"menu-autorizadores", label:"Autorizadores", action:renderAutorizadores },
+        { id:"menu-lojas", label:"Gestão de lojas", action:renderGestaoLojas },
+        { id:"menu-parametros", label:"Parâmetros", action:renderParametros }
+      ];
+
+      const mainWrap = document.getElementById("masterMainMenu");
+      const opsWrap = document.getElementById("masterOpsMenu");
+
+      mainItems.forEach(item=>{
+        const btn = document.createElement("button");
+        btn.className = "btn btn-primary";
+        btn.id = item.id;
+        btn.textContent = item.label;
+        btn.addEventListener("click", item.action);
+        mainWrap.appendChild(btn);
+      });
+
+      opsItems.forEach(item=>{
+        const btn = document.createElement("button");
+        btn.className = "btn btn-light";
+        btn.id = item.id;
+        btn.textContent = item.label;
+        btn.addEventListener("click", item.action);
+        opsWrap.appendChild(btn);
+      });
+    }
+
+    function toggleMasterOpsMenu(){
+      state.ui.masterOpsOpen = !state.ui.masterOpsOpen;
+      renderMasterMenu();
+    }
+
     function buildMenu(){
+      if(userIsMaster()){
+        renderMasterMenu();
+        return;
+      }
+
+      el.menuBar.className = "menu";
       const items = [
         { id:"menu-dashboard", label:userIsGeneralManager()?"Dashboard geral":"Dashboard", action:renderDashboardHome },
         { id:"menu-entrada", label:"Entrada", action:renderEntrada },
@@ -1622,7 +1738,7 @@
       if(canManageUsers()){
         items.push({ id:"menu-usuarios", label:"Usuários", action:renderUsuarios });
       }
-      if(userIsGeneralManager()){
+      if(canManageParametros()){
         items.push({ id:"menu-parametros", label:"Parâmetros", action:renderParametros });
       }
 
@@ -1666,7 +1782,7 @@
           (m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true)
           || (m.danoAlerta===true && m.danoCiente!==true)
         );
-        if(!userIsGeneralManager()) alertas = alertas.filter(m => m.lojaId===lojaId);
+        if(!userHasAllStoresAccess()) alertas = alertas.filter(m => m.lojaId===lojaId);
 
         alertas.sort((a,b)=> (dateValueToMillis(b.data)||0) - (dateValueToMillis(a.data)||0));
         const top = alertas.slice(0, 12);
@@ -1714,8 +1830,12 @@
       }
 
       renderPanel(
-        userIsGeneralManager() ? "Dashboard geral" : "Dashboard",
-        userIsGeneralManager() ? "Visão consolidada de todas as unidades." : "Visão resumida da sua unidade.",
+        userIsMaster() ? "Dashboard master" : (userIsGeneralManager() ? "Dashboard geral" : "Dashboard"),
+        userIsMaster()
+          ? "Visão corporativa consolidada do sistema."
+          : userIsGeneralManager()
+            ? "Visão consolidada de todas as unidades."
+            : "Visão resumida da sua unidade.",
         `
           ${alertasHTML}
 
@@ -1751,6 +1871,79 @@
           });
         });
       }
+    }
+
+    function renderFaturamento(){
+      if(!canAccessFaturamento()){
+        renderPanel("Acesso restrito", "Somente usuário master acessa faturamento.", `<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      renderPanel(
+        "Faturamento",
+        "Módulo reservado ao controle corporativo do custo do sistema. Atualmente está suspenso, mas já estruturado para evolução.",
+        `
+          <div class="notice show warn">
+            <strong>Status do módulo:</strong> Suspenso / em implantação.
+            <div style="margin-top:8px;">Esta aba foi criada para centralizar o faturamento do sistema, custos por unidade, plano contratado, vencimentos e histórico financeiro.</div>
+          </div>
+
+          <div class="dashboard" style="margin-top:18px;">
+            <article class="stat">
+              <small>Plano atual</small>
+              <strong>—</strong>
+              <span>Definir posteriormente</span>
+            </article>
+
+            <article class="stat">
+              <small>Custo mensal</small>
+              <strong>—</strong>
+              <span>Definir posteriormente</span>
+            </article>
+
+            <article class="stat">
+              <small>Próximo vencimento</small>
+              <strong>—</strong>
+              <span>Definir posteriormente</span>
+            </article>
+
+            <article class="stat">
+              <small>Status financeiro</small>
+              <strong>Suspenso</strong>
+              <span>Módulo em construção</span>
+            </article>
+          </div>
+
+          <div class="section-title">Estrutura prevista</div>
+          <div class="grid">
+            <div class="detail-item">
+              <small>Controle de boletos</small>
+              <div>Publicação e acompanhamento de boletos por competência.</div>
+            </div>
+
+            <div class="detail-item">
+              <small>Histórico financeiro</small>
+              <div>Registro de faturas pagas, pendentes, vencidas e comprovantes.</div>
+            </div>
+
+            <div class="detail-item">
+              <small>Custeio por loja</small>
+              <div>Possibilidade futura de rateio por unidade / grupo econômico.</div>
+            </div>
+
+            <div class="detail-item">
+              <small>Transparência</small>
+              <div>Resumo executivo do custo total do sistema e evolução mensal.</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-light" disabled>Gerenciar boletos</button>
+            <button class="btn btn-light" disabled>Adicionar cobrança</button>
+            <button class="btn btn-light" disabled>Exportar histórico</button>
+          </div>
+        `
+      );
     }
 
     const PHOTO_MAX_W = 900;
@@ -1940,7 +2133,7 @@
     }
 
     function lojaFieldHtml(prefix){
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         return `
           <div class="form-group">
             <label for="${prefix}Loja">Loja <span class="req">*</span></label>
@@ -2107,7 +2300,7 @@
         return;
       }
 
-      const lojaId = userIsGeneralManager()
+      const lojaId = userHasAllStoresAccess()
         ? (document.getElementById("entradaLoja")?.value || "")
         : currentUserStoreId();
 
@@ -2293,7 +2486,7 @@
         return;
       }
 
-      const lojaId = userIsGeneralManager()
+      const lojaId = userHasAllStoresAccess()
         ? (document.getElementById("saidaLoja")?.value || "")
         : currentUserStoreId();
 
@@ -2386,7 +2579,7 @@
     }
 
     function renderConsulta(){
-      const storeFilterHTML = userIsGeneralManager()
+      const storeFilterHTML = userHasAllStoresAccess()
         ? `
           <div class="form-group">
             <label for="filtroLojaConsulta">Loja</label>
@@ -2482,7 +2675,7 @@
       const empty = document.getElementById("consultaEmpty");
       if(!body || !empty) return;
 
-      const lojaId = userIsGeneralManager()
+      const lojaId = userHasAllStoresAccess()
         ? (document.getElementById("filtroLojaConsulta")?.value || "__ALL__")
         : currentUserStoreId();
 
@@ -2963,7 +3156,7 @@
 
     function buildLojaSelectWithAll(id){
       const options = [];
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         options.push(`<option value="__ALL__">Todas as lojas</option>`);
         state.lojas.forEach(l => options.push(`<option value="${l.id}">${getStoreLabel(l.id)}</option>`));
       }else{
@@ -2991,8 +3184,8 @@
     function renderCondutores(){
       renderPanel(
         "Condutores",
-        userIsGeneralManager()
-          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+        userHasAllStoresAccess()
+          ? "Master / gerente geral podem cadastrar para uma loja ou para TODAS as lojas."
           : "Cadastro e ativação/inativação de condutores da sua loja.",
         `
           <div class="grid">
@@ -3071,7 +3264,7 @@
       if(!body) return;
 
       let items = [...state.condutores];
-      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
+      if(!userHasAllStoresAccess()) items = items.filter(i => i.lojaId === currentUserStoreId());
 
       items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
 
@@ -3198,8 +3391,8 @@
 
       renderPanel(
         "Autorizadores",
-        userIsGeneralManager()
-          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+        userHasAllStoresAccess()
+          ? "Master / gerente geral podem cadastrar para uma loja ou para TODAS as lojas."
           : "Cadastro e ativação/inativação de autorizadores da sua loja.",
         `
           <div class="grid">
@@ -3354,7 +3547,7 @@
       if(!body) return;
 
       let items = [...state.autorizadores];
-      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
+      if(!userHasAllStoresAccess()) items = items.filter(i => i.lojaId === currentUserStoreId());
 
       items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
 
@@ -3401,7 +3594,7 @@
 
     function renderGestaoLojas(){
       if(!canManageLojas()){
-        renderPanel("Acesso restrito","Somente gerente geral.",`<div class="empty">Acesso negado.</div>`);
+        renderPanel("Acesso restrito","Somente gerente geral ou master.",`<div class="empty">Acesso negado.</div>`);
         return;
       }
 
@@ -3559,11 +3752,18 @@
     }
 
     function roleOptionsForCurrentManager(){
+      if(userIsMaster()){
+        return [
+          { v:Roles.CONTROLADOR, label:"controlador" },
+          { v:Roles.GERENTE_LOJA, label:"gerente_loja" },
+          { v:Roles.GERENTE_GERAL, label:"gerente_geral" }
+        ];
+      }
       if(userIsGeneralManager()){
         return [
           { v:Roles.CONTROLADOR, label:"controlador" },
           { v:Roles.GERENTE_LOJA, label:"gerente_loja" },
-          { v:Roles.GERENTE_GERAL, label:"gerente_geral" },
+          { v:Roles.GERENTE_GERAL, label:"gerente_geral" }
         ];
       }
       return [{ v:Roles.CONTROLADOR, label:"controlador" }];
@@ -3573,7 +3773,7 @@
       if(role === Roles.GERENTE_GERAL){
         return `<option value="">(sem loja - gerente geral)</option>`;
       }
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         return state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`).join("");
       }
       const lojaId = currentUserStoreId();
@@ -3586,6 +3786,13 @@
     }
 
     function buildUserEditRoleOptions(){
+      if(userIsMaster()){
+        return [
+          { v:Roles.CONTROLADOR, label:"controlador" },
+          { v:Roles.GERENTE_LOJA, label:"gerente_loja" },
+          { v:Roles.GERENTE_GERAL, label:"gerente_geral" }
+        ];
+      }
       if(userIsGeneralManager()){
         return [
           { v:Roles.CONTROLADOR, label:"controlador" },
@@ -3613,7 +3820,7 @@
         return;
       }
 
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         el.ueLoja.innerHTML = state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`).join("");
         el.ueLoja.disabled = false;
         if(selectedLojaId) el.ueLoja.value = selectedLojaId;
@@ -3636,7 +3843,9 @@
       el.ueCargo.value = userData.cargo || "";
       el.ueAtivo.value = userData.ativo === false ? "false" : "true";
 
-      const initialRole = userIsStoreManager() ? Roles.CONTROLADOR : (userData.role || Roles.CONTROLADOR);
+      let initialRole = userData.role || Roles.CONTROLADOR;
+      if(userIsStoreManager()) initialRole = Roles.CONTROLADOR;
+
       fillUserEditRoleOptions(initialRole);
       fillUserEditLojaOptions(userData.lojaId || "");
 
@@ -3660,6 +3869,15 @@
       const userData = state.editingUser;
       if(!userData || !userData.id){
         showNotice(el.ueNotice, "Usuário inválido.", "error");
+        return;
+      }
+
+      if(userIsGeneralManager() && userData.role === Roles.MASTER){
+        showNotice(el.ueNotice, "Gerente geral não pode editar usuário master.", "error");
+        return;
+      }
+      if(userIsStoreManager() && (userData.role === Roles.MASTER || userData.role === Roles.GERENTE_GERAL)){
+        showNotice(el.ueNotice, "Gerente de loja não pode editar este perfil.", "error");
         return;
       }
 
@@ -3729,7 +3947,7 @@
 
     async function renderUsuarios(){
       if(!canManageUsers()){
-        renderPanel("Acesso restrito","Somente gerentes.",`<div class="empty">Acesso negado.</div>`);
+        renderPanel("Acesso restrito","Somente gerentes ou master.",`<div class="empty">Acesso negado.</div>`);
         return;
       }
 
@@ -3743,6 +3961,8 @@
         if(userIsStoreManager()){
           const lojaId = currentUserStoreId();
           users = users.filter(u => u.role === Roles.GERENTE_GERAL || u.lojaId === lojaId);
+        }else if(userIsGeneralManager()){
+          users = users.filter(u => u.role !== Roles.MASTER);
         }
       }catch(e){
         console.error(e);
@@ -3763,18 +3983,24 @@
               <select class="select" id="invRole">
                 ${roleOps.map(r=>`<option value="${r.v}">${r.label}</option>`).join("")}
               </select>
-              <div class="subtle">Gerente de loja só pode criar CONTROLADOR.</div>
+              <div class="subtle">${
+                userIsMaster()
+                  ? "Master pode criar gerente geral e perfis abaixo."
+                  : userIsGeneralManager()
+                    ? "Gerente geral pode criar gerente geral, gerente de loja e controlador."
+                    : "Gerente de loja só pode criar CONTROLADOR."
+              }</div>
             </div>
 
             <div class="form-group">
               <label for="invLoja">Loja <span class="req">*</span></label>
               <select class="select" id="invLoja"></select>
-              <div class="subtle">Para gerente geral: selecione a loja. Para gerente_geral: fica sem loja.</div>
+              <div class="subtle">Para gerente geral: fica sem loja. Demais perfis exigem loja.</div>
             </div>
 
             <div class="form-group full">
               <label for="invCargo">Cargo (no cadastro) <span class="req">*</span></label>
-              <input class="input" id="invCargo" maxlength="60" placeholder="Ex.: Controlador / Gerente de loja">
+              <input class="input" id="invCargo" maxlength="60" placeholder="Ex.: Controlador / Gerente de loja / Gerente geral">
             </div>
 
             <div class="form-group">
@@ -3901,7 +4127,13 @@
         body.innerHTML = list.map(u=>{
           const role = u.role || "-";
           const ativo = u.ativo===false ? `<span class="badge badge-red">Inativo</span>` : `<span class="badge badge-green">Ativo</span>`;
-          const loja = u.role===Roles.GERENTE_GERAL ? "Todas" : (u.lojaId ? getStoreLabel(u.lojaId) : "-");
+          const loja = (u.role===Roles.GERENTE_GERAL || u.role===Roles.MASTER) ? "Corporativo" : (u.lojaId ? getStoreLabel(u.lojaId) : "-");
+
+          const canDeleteThis =
+            userIsMaster()
+            && u.role !== Roles.MASTER
+            && u.id !== state.userProfile?.id;
+
           return `
             <tr>
               <td>${u.email || "-"}</td>
@@ -3914,6 +4146,7 @@
               <td>
                 <button class="btn btn-light" data-edit-user="${u.id}">Editar</button>
                 <button class="btn btn-light" data-toggle-user="${u.id}">${u.ativo===false ? "Ativar" : "Inativar"}</button>
+                ${canDeleteThis ? `<button class="btn btn-danger" data-delete-user="${u.id}">Excluir</button>` : ``}
               </td>
             </tr>
           `;
@@ -3925,8 +4158,12 @@
             const u = list.find(x=>x.id===uid);
             if(!u) return;
 
-            if(userIsStoreManager() && u.role === Roles.GERENTE_GERAL){
-              toast("Gerente de loja não pode alterar gerente geral.", "warn", 2800);
+            if(userIsGeneralManager() && u.role === Roles.MASTER){
+              toast("Gerente geral não pode alterar usuário master.", "warn", 2800);
+              return;
+            }
+            if(userIsStoreManager() && (u.role === Roles.GERENTE_GERAL || u.role === Roles.MASTER)){
+              toast("Gerente de loja não pode alterar este perfil.", "warn", 2800);
               return;
             }
             if(userIsStoreManager() && u.lojaId !== currentUserStoreId()){
@@ -3961,8 +4198,12 @@
             const u = list.find(x=>x.id===uid);
             if(!u) return;
 
-            if(userIsStoreManager() && u.role === Roles.GERENTE_GERAL){
-              toast("Gerente de loja não pode editar gerente geral.", "warn", 2800);
+            if(userIsGeneralManager() && u.role === Roles.MASTER){
+              toast("Gerente geral não pode editar usuário master.", "warn", 2800);
+              return;
+            }
+            if(userIsStoreManager() && (u.role === Roles.GERENTE_GERAL || u.role === Roles.MASTER)){
+              toast("Gerente de loja não pode editar este perfil.", "warn", 2800);
               return;
             }
             if(userIsStoreManager() && u.lojaId !== currentUserStoreId()){
@@ -3971,6 +4212,42 @@
             }
 
             openUserEditModal(u);
+          });
+        });
+
+        document.querySelectorAll("[data-delete-user]").forEach(btn=>{
+          btn.addEventListener("click", async ()=>{
+            const uid = btn.getAttribute("data-delete-user");
+            const u = list.find(x=>x.id===uid);
+            if(!u) return;
+            if(!userIsMaster()){
+              toast("Somente master pode excluir usuários.", "warn", 2400);
+              return;
+            }
+            if(u.role === Roles.MASTER){
+              toast("Usuário master não pode ser excluído por esta tela.", "warn", 2800);
+              return;
+            }
+            if(u.id === state.userProfile?.id){
+              toast("Você não pode excluir o próprio usuário.", "warn", 2400);
+              return;
+            }
+
+            const ok = confirm(`Excluir o usuário ${u.nome || u.email}?`);
+            if(!ok) return;
+
+            try{
+              if(!lockUI("delete_user", "Excluindo…", "Removendo usuário da base.")) return;
+              await deleteDoc(doc(db, Collections.USUARIOS, uid));
+              await refreshAfterWrite();
+              toast("Usuário excluído da base.", "success", 2200);
+              renderUsuarios();
+            }catch(e){
+              console.error(e);
+              toast(`Falha ao excluir. (${e?.code || e?.message || "erro"})`, "error", 3600);
+            }finally{
+              unlockUI();
+            }
           });
         });
       }
@@ -4008,8 +4285,8 @@
     }
 
     function renderParametros(){
-      if(!userIsGeneralManager()){
-        renderPanel("Acesso restrito", "Somente gerente geral pode alterar parâmetros.", `<div class="empty">Acesso negado.</div>`);
+      if(!canManageParametros()){
+        renderPanel("Acesso restrito", "Somente gerente geral ou master podem alterar parâmetros.", `<div class="empty">Acesso negado.</div>`);
         return;
       }
 
@@ -4092,7 +4369,7 @@
 
     function exportUsersXls(users){
       const rows = users.map(u=>{
-        const loja = u.role===Roles.GERENTE_GERAL ? "Todas" : (u.lojaId || "");
+        const loja = (u.role===Roles.GERENTE_GERAL || u.role===Roles.MASTER) ? "Corporativo" : (u.lojaId || "");
         const ativo = u.ativo===false ? "Inativo" : "Ativo";
         return `
           <tr>
@@ -4432,6 +4709,7 @@
         motivosEntrada: [],
         motivosSaida: []
       };
+      state.ui.masterOpsOpen = false;
 
       el.topbar.style.display = "none";
       el.footerbar.style.display = "none";
@@ -4440,6 +4718,7 @@
 
       el.dashboardCards.innerHTML = "";
       el.menuBar.innerHTML = "";
+      el.menuBar.className = "menu";
       el.mainPanel.innerHTML = `
         <div class="card-header">
           <div>

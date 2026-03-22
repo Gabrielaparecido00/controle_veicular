@@ -24,83 +24,210 @@
       --header:#0f172a;
       --shadow:0 16px 40px rgba(15,23,42,.08);
       --radius:16px;
-      --touch:54px;
+
+      --touch:54px;  /* tablet */
       --fs:16px;
     }
+
     *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
-    body{ font-family:'Inter',sans-serif; background:var(--bg); color:var(--text); font-size:var(--fs); overscroll-behavior:none; }
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      font-size:var(--fs);
+      overscroll-behavior: none;
+    }
     button,input,select,textarea{ font:inherit; }
     .hidden{ display:none !important; }
 
+    /* TOPBAR (apenas logo + texto) */
     header{
-      height:76px; background:var(--header); color:#fff;
-      display:none; align-items:center; justify-content:space-between;
-      padding:0 22px; box-shadow:0 8px 24px rgba(0,0,0,.18);
-      position:sticky; top:0; z-index:100;
+      height:76px;
+      background:var(--header);
+      color:#fff;
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 22px;
+      box-shadow:0 8px 24px rgba(0,0,0,.18);
+      position:sticky;
+      top:0;
+      z-index:100;
     }
     .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
-    /* ✅ logo “puro” */
-    .brand-logo{ height:46px; width:auto; max-width:320px; object-fit:contain; border:none; background:transparent; padding:0; display:block; }
+    /* ✅ só o logo, sem borda/fundo/padding */
+    .brand-logo{
+      height:46px;
+      width:auto;
+      max-width:320px;
+      object-fit:contain;
+      display:block;
+      border:none;
+      border-radius:0;
+      background:transparent;
+      padding:0;
+      box-shadow:none;
+    }
     .brand-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
-    .brand-text strong{ font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1; }
+    .brand-text strong{
+      font-size:18px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      line-height:1.1;
+    }
     .brand-text span{ font-size:13px; color:#cbd5e1; }
 
+    /* FOOTER fixo (perfil/nome/unidade/sair) */
     .footerbar{
-      position:fixed; left:0; right:0; bottom:0; z-index:120;
-      background:rgba(15,23,42,.98); color:#fff;
+      position:fixed;
+      left:0; right:0; bottom:0;
+      z-index:120;
+      background:rgba(15,23,42,.98);
+      color:#fff;
       padding:12px 16px calc(12px + env(safe-area-inset-bottom));
       box-shadow:0 -10px 28px rgba(0,0,0,.25);
       display:none;
     }
     .footerbar .wrap{
-      max-width:1420px; margin:0 auto;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px; flex-wrap:wrap;
+      max-width:1420px;
+      margin:0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
     }
     .chips{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .chip{ background:rgba(255,255,255,.10); color:#fff; padding:10px 14px; border-radius:999px; font-size:13px; font-weight:800; line-height:1; white-space:nowrap; }
-    .btn-topbar{ border:none; background:#1e293b; color:#fff; padding:12px 16px; border-radius:14px; cursor:pointer; font-weight:900; min-height:var(--touch); min-width:120px; }
+    .chip{
+      background:rgba(255,255,255,.10);
+      color:#fff;
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .btn-topbar{
+      border:none;
+      background:#1e293b;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:900;
+      min-height:var(--touch);
+      min-width:120px;
+    }
     .btn-topbar:active{ transform:scale(.99); }
 
-    #loginView{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-    .login-wrap{ width:100%; max-width:460px; background:var(--card); border-radius:22px; padding:34px; box-shadow:var(--shadow); border:1px solid #edf2f7; }
+    /* LOGIN */
+    #loginView{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+    }
+    .login-wrap{
+      width:100%;
+      max-width:460px;
+      background:var(--card);
+      border-radius:22px;
+      padding:34px;
+      box-shadow:var(--shadow);
+      border:1px solid #edf2f7;
+    }
     .login-wrap h1{ font-size:30px; margin-bottom:8px; }
     .login-wrap p{ font-size:15px; color:var(--muted); margin-bottom:22px; line-height:1.55; }
 
     .form-group{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
-    .form-group label{ font-size:14px; font-weight:900; color:#334155; display:flex; align-items:center; gap:6px; }
-    .req::after{ content:"*"; color:#ef4444; font-weight:900; margin-left:2px; }
+    .label-row{ display:flex; align-items:center; gap:8px; }
+    .label-row label{ font-size:14px; font-weight:900; color:#334155; }
+    .req{ color:var(--danger); font-weight:900; font-size:14px; margin-left:2px; }
 
-    .input, .select, .textarea{
-      width:100%; padding:14px 16px; border:1px solid var(--line);
-      border-radius:14px; background:#fff; color:var(--text);
-      outline:none; transition:.18s; min-height:var(--touch); font-size:16px;
+    .input,.select,.textarea{
+      width:100%;
+      padding:14px 16px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      transition:.18s;
+      min-height:var(--touch);
+      font-size:16px;
     }
-    .textarea{ resize:vertical; min-height:110px; }
-    .input:focus,.select:focus,.textarea:focus{ border-color:#93c5fd; box-shadow:0 0 0 4px rgba(37,99,235,.10); }
+    .textarea{ resize:vertical; min-height:120px; }
+    .input:focus,.select:focus,.textarea:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 4px rgba(37,99,235,.10);
+    }
 
-    .btn{ border:none; border-radius:14px; padding:14px 16px; font-weight:900; cursor:pointer; transition:.18s; min-height:var(--touch); font-size:16px; }
+    .btn{
+      border:none;
+      border-radius:14px;
+      padding:14px 16px;
+      font-weight:900;
+      cursor:pointer;
+      transition:.18s;
+      min-height:var(--touch);
+      font-size:16px;
+    }
     .btn:disabled{ opacity:.55; cursor:not-allowed; }
+
     .btn-primary{ background:var(--primary); color:#fff; }
     .btn-primary:hover{ background:var(--primary-dark); }
     .btn-success{ background:var(--success); color:#fff; }
+    .btn-success:hover{ filter:brightness(.97); }
     .btn-danger{ background:var(--danger); color:#fff; }
+    .btn-danger:hover{ filter:brightness(.97); }
     .btn-light{ background:#e2e8f0; color:#0f172a; }
+    .btn-light:hover{ background:#cfd8e3; }
+
     .btn-block{ width:100%; }
 
-    .notice{ display:none; margin-top:14px; padding:12px 14px; border-radius:14px; font-size:15px; line-height:1.45; word-break:break-word; }
+    .notice{
+      display:none;
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.45;
+      word-break:break-word;
+    }
     .notice.show{ display:block; }
     .notice.error{ background:#fee2e2; color:#991b1b; }
     .notice.success{ background:#dcfce7; color:#166534; }
     .notice.info{ background:#dbeafe; color:#1e40af; }
+    .notice.warn{ background:#ffedd5; color:#9a3412; }
 
-    #appView{ display:none; max-width:1420px; margin:0 auto; padding:24px; padding-bottom:150px; }
+    /* APP */
+    #appView{
+      display:none;
+      max-width:1420px;
+      margin:0 auto;
+      padding:24px;
+      padding-bottom:150px; /* rodapé fixo */
+    }
     .hero{ margin-bottom:18px; display:flex; justify-content:space-between; gap:14px; align-items:flex-start; flex-wrap:wrap; }
     .hero h2{ font-size:30px; margin-bottom:8px; }
     .hero p{ color:var(--muted); font-size:15px; line-height:1.55; }
 
-    .dashboard{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin-bottom:18px; }
-    .stat{ background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); border:1px solid #edf2f7; }
+    .dashboard{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:14px;
+      margin-bottom:18px;
+    }
+    .stat{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:18px;
+      box-shadow:var(--shadow);
+      border:1px solid #edf2f7;
+    }
     .stat small{ display:block; color:var(--muted); margin-bottom:10px; font-size:14px; font-weight:700; }
     .stat strong{ display:block; font-size:34px; line-height:1; margin-bottom:8px; font-weight:900; }
     .stat span{ color:#475569; font-size:14px; }
@@ -108,76 +235,227 @@
     .menu{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
     .menu .btn{ border-radius:16px; padding:14px 16px; }
 
-    .card{ background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:24px; border:1px solid #edf2f7; }
-    .card-header{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:18px; flex-wrap:wrap; }
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+      border:1px solid #edf2f7;
+    }
+    .card-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      margin-bottom:18px;
+      flex-wrap:wrap;
+    }
     .card-header h3{ font-size:26px; margin-bottom:6px; }
     .card-header p{ color:var(--muted); font-size:15px; line-height:1.5; }
 
     .grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-    .full{ grid-column:1/-1; }
+    .full{ grid-column:1 / -1; }
+
     .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
 
-    .table-wrap{ overflow:auto; border:1px solid #e5edf5; border-radius:16px; background:#fff; margin-top:18px; -webkit-overflow-scrolling:touch; }
+    .table-wrap{
+      overflow:auto;
+      border:1px solid #e5edf5;
+      border-radius:16px;
+      background:#fff;
+      margin-top:18px;
+      -webkit-overflow-scrolling: touch;
+    }
     table{ width:100%; border-collapse:collapse; min-width:1100px; }
-    th,td{ padding:14px 16px; border-bottom:1px solid #eef2f7; text-align:left; vertical-align:top; font-size:15px; }
-    th{ background:#f8fafc; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:#475569; font-weight:900; position:sticky; top:0; z-index:1; }
+    th,td{
+      padding:14px 16px;
+      border-bottom:1px solid #eef2f7;
+      text-align:left;
+      vertical-align:top;
+      font-size:15px;
+    }
+    th{
+      background:#f8fafc;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      color:#475569;
+      font-weight:900;
+      position:sticky;
+      top:0;
+      z-index:1;
+    }
     tr.row-clickable{ cursor:pointer; }
     tr.row-clickable:active{ background:#f8fafc; }
+
     .empty{ margin-top:14px; color:var(--muted); font-size:15px; }
     .section-title{ margin:20px 0 10px; font-size:17px; font-weight:900; color:#1e293b; }
 
-    .badge{ display:inline-flex; align-items:center; padding:7px 11px; border-radius:999px; font-size:12px; font-weight:900; line-height:1; white-space:nowrap; }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      padding:7px 11px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
+      line-height:1;
+      white-space:nowrap;
+    }
     .badge-green{ background:#dcfce7; color:#166534; }
     .badge-red{ background:#fee2e2; color:#991b1b; }
-    .badge-gray{ background:#e2e8f0; color:#334155; }
-
-    /* Camera (tablet) */
-    .photo-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(260px,1fr)); gap:12px; margin-top:8px; }
-    .photo-card{ border:1px solid #e5edf5; border-radius:16px; padding:12px; background:#fff; }
-    .photo-card strong{ display:block; font-size:14px; margin-bottom:10px; color:#0f172a; font-weight:900; }
-    .photo-preview{
-      width:100%; height:180px; border-radius:14px;
-      background:#f1f5f9; border:1px dashed #cbd5e1;
-      display:flex; align-items:center; justify-content:center;
-      overflow:hidden; margin-bottom:10px;
-    }
-    .photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .photo-hint{ font-size:13px; color:#64748b; text-align:center; padding:10px; line-height:1.35; }
-    .camera-btn{
-      width:100%; display:flex; align-items:center; justify-content:center;
-      border:1px solid var(--line); background:#fff; color:#0f172a;
-      border-radius:14px; min-height:var(--touch);
-      cursor:pointer; font-weight:900;
-    }
-    .camera-btn:active{ transform:scale(.99); }
-    .file-input{ position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
+    .badge-gray{ background:#f1f5f9; color:#334155; }
 
     .subtle{ font-size:13px; color:#64748b; line-height:1.4; margin-top:6px; }
 
-    /* Modal */
-    .modal{ position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:200; display:none; padding:18px; align-items:center; justify-content:center; }
+    /* Fotos (tablet camera) */
+    .photo-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+      gap:12px;
+      margin-top:8px;
+    }
+    .photo-card{
+      border:1px solid #e5edf5;
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+    }
+    .photo-card strong{
+      display:block;
+      font-size:14px;
+      margin-bottom:10px;
+      color:#0f172a;
+      font-weight:900;
+    }
+    .photo-preview{
+      width:100%;
+      height:170px;
+      border-radius:14px;
+      background:#f1f5f9;
+      border:1px dashed #cbd5e1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      overflow:hidden;
+      margin-bottom:10px;
+      position:relative;
+    }
+    .photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .photo-hint{ font-size:13px; color:#64748b; text-align:center; padding:10px; line-height:1.35; }
+    .file-input{ display:none; } /* ✅ escondido: não aparece “selecionar arquivo” */
+
+    .btn-camera{
+      width:100%;
+      min-height:var(--touch);
+      border-radius:14px;
+      border:1px solid #e5edf5;
+      background:#0f172a;
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .btn-camera:active{ transform:scale(.99); }
+
+    /* MODAL (consulta individual + fotos + exportar) */
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.55);
+      z-index:200;
+      display:none;
+      padding:18px;
+      align-items:center;
+      justify-content:center;
+    }
     .modal.show{ display:flex; }
-    .modal-card{ width:100%; max-width:980px; background:#fff; border-radius:20px; box-shadow:0 24px 60px rgba(0,0,0,.22); overflow:hidden; border:1px solid #e5edf5; max-height:calc(100vh - 32px); display:flex; flex-direction:column; }
-    .modal-head{ padding:18px 18px 12px; border-bottom:1px solid #edf2f7; display:flex; gap:10px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; background:#fff; }
+    .modal-card{
+      width:100%;
+      max-width:980px;
+      background:#fff;
+      border-radius:20px;
+      box-shadow:0 24px 60px rgba(0,0,0,.22);
+      overflow:hidden;
+      border:1px solid #e5edf5;
+      max-height:calc(100vh - 32px);
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-head{
+      padding:18px 18px 12px 18px;
+      border-bottom:1px solid #edf2f7;
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      justify-content:space-between;
+      flex-wrap:wrap;
+      background:#fff;
+    }
     .modal-head h4{ font-size:18px; font-weight:900; margin-bottom:4px; }
     .modal-head p{ color:#64748b; font-size:14px; line-height:1.4; }
-    .modal-body{ padding:16px 18px 18px; overflow:auto; -webkit-overflow-scrolling:touch; }
-    .detail-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:14px; }
-    .detail-item{ background:#f8fafc; border:1px solid #e5edf5; border-radius:14px; padding:12px 14px; }
-    .detail-item small{ display:block; color:#64748b; font-weight:800; font-size:12px; margin-bottom:6px; text-transform:uppercase; letter-spacing:.05em; }
-    .detail-item div{ font-weight:800; color:#0f172a; font-size:15px; line-height:1.35; word-break:break-word; }
-    .thumbs{ display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:10px; margin-top:10px; }
-    .thumb{ border:1px solid #e5edf5; border-radius:14px; overflow:hidden; background:#fff; }
-    .thumb img{ width:100%; height:170px; object-fit:cover; display:block; }
-    .thumb .cap{ padding:10px 12px; font-size:13px; color:#334155; font-weight:900; border-top:1px solid #eef2f7; }
-    .modal-actions{ display:flex; gap:10px; flex-wrap:wrap; padding:14px 18px 18px; border-top:1px solid #edf2f7; background:#fff; }
+    .modal-body{ padding:16px 18px 18px 18px; overflow:auto; -webkit-overflow-scrolling: touch; }
+
+    .detail-grid{
+      display:grid;
+      grid-template-columns:repeat(2, minmax(0,1fr));
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .detail-item{
+      background:#f8fafc;
+      border:1px solid #e5edf5;
+      border-radius:14px;
+      padding:12px 14px;
+    }
+    .detail-item small{
+      display:block;
+      color:#64748b;
+      font-weight:800;
+      font-size:12px;
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+    .detail-item div{
+      font-weight:800;
+      color:#0f172a;
+      font-size:15px;
+      line-height:1.35;
+      word-break:break-word;
+    }
+    .thumbs{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .thumb{
+      border:1px solid #e5edf5;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .thumb img{ width:100%; height:160px; object-fit:cover; display:block; }
+    .thumb .cap{
+      padding:10px 12px;
+      font-size:13px;
+      color:#334155;
+      font-weight:900;
+      border-top:1px solid #eef2f7;
+    }
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      padding:14px 18px 18px 18px;
+      border-top:1px solid #edf2f7;
+      background:#fff;
+    }
 
     @media (max-width:900px){
       .grid{ grid-template-columns:1fr; }
-      .hero h2{ font-size:26px; }
-      header{ padding:12px 14px; height:auto; }
       .detail-grid{ grid-template-columns:1fr; }
       table{ min-width:980px; }
+      header{ padding:12px 14px; height:auto; }
       .brand-logo{ max-width:260px; }
     }
   </style>
@@ -185,1886 +463,2341 @@
 
 <body>
 
-<header id="topbar">
-  <div class="brand">
-    <img class="brand-logo" src="vigorito.png" alt="Vigorito">
-    <div class="brand-text">
-      <strong>Controle Veicular</strong>
-      <span id="headerStoreText">Carregando unidade...</span>
+  <header id="topbar">
+    <div class="brand">
+      <img class="brand-logo" src="vigorito.png" alt="Vigorito">
+      <div class="brand-text">
+        <strong>Controle Veicular</strong>
+        <span id="headerStoreText">Carregando unidade...</span>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<footer class="footerbar" id="footerbar">
-  <div class="wrap">
-    <div class="chips">
-      <div class="chip" id="footerRoleText">Perfil</div>
-      <div class="chip" id="footerUserText">Usuário</div>
-      <div class="chip" id="footerStoreText">Unidade</div>
+  <footer class="footerbar" id="footerbar">
+    <div class="wrap">
+      <div class="chips">
+        <div class="chip" id="footerRoleText">Perfil</div>
+        <div class="chip" id="footerUserText">Usuário</div>
+        <div class="chip" id="footerStoreText">Unidade</div>
+      </div>
+      <button class="btn-topbar" id="btnLogout">Sair</button>
     </div>
-    <button class="btn-topbar" id="btnLogout">Sair</button>
-  </div>
-</footer>
+  </footer>
 
-<section id="loginView">
-  <div class="login-wrap">
-    <h1>Acesso ao sistema</h1>
-    <p>Entre com seu e-mail e senha para acessar sua unidade e suas permissões.</p>
+  <section id="loginView">
+    <div class="login-wrap">
+      <h1>Acesso ao sistema</h1>
+      <p>Entre com seu e-mail e senha para acessar sua unidade e suas permissões.</p>
 
-    <div class="form-group">
-      <label class="req" for="loginEmail">E-mail</label>
-      <input class="input" id="loginEmail" type="email" placeholder="seuemail@empresa.com">
-    </div>
+      <div class="form-group">
+        <div class="label-row"><label for="loginEmail">E-mail</label><span class="req">*</span></div>
+        <input class="input" id="loginEmail" type="email" placeholder="seuemail@empresa.com">
+      </div>
 
-    <div class="form-group">
-      <label class="req" for="loginSenha">Senha</label>
-      <input class="input" id="loginSenha" type="password" placeholder="Digite sua senha">
-    </div>
+      <div class="form-group">
+        <div class="label-row"><label for="loginSenha">Senha</label><span class="req">*</span></div>
+        <input class="input" id="loginSenha" type="password" placeholder="Digite sua senha">
+      </div>
 
-    <button class="btn btn-primary btn-block" id="btnLogin">Entrar</button>
-    <div id="loginNotice" class="notice"></div>
-  </div>
-</section>
+      <button class="btn btn-primary btn-block" id="btnLogin">Entrar</button>
 
-<main id="appView">
-  <section class="hero">
-    <div>
-      <h2 id="heroTitle">Painel</h2>
-      <p id="heroSubtitle">Carregando informações...</p>
+      <div id="loginNotice" class="notice"></div>
     </div>
   </section>
 
-  <section class="dashboard" id="dashboardCards"></section>
-  <nav class="menu" id="menuBar"></nav>
-
-  <section class="card" id="mainPanel">
-    <div class="card-header">
+  <main id="appView">
+    <section class="hero">
       <div>
-        <h3>Bem-vindo</h3>
-        <p>Selecione uma função no menu acima.</p>
+        <h2 id="heroTitle">Painel</h2>
+        <p id="heroSubtitle">Carregando informações...</p>
       </div>
-    </div>
-  </section>
-</main>
+    </section>
 
-<!-- Modal detalhes + export individual (com fotos) -->
-<div class="modal" id="detailModal" aria-hidden="true">
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
-    <div class="modal-head">
-      <div>
-        <h4 id="detailTitle">Detalhes do registro</h4>
-        <p id="detailSub">Visualize informações e fotos do veículo.</p>
-      </div>
-      <button class="btn btn-light" id="btnCloseModal" style="min-width:120px;" type="button">Fechar</button>
-    </div>
-    <div class="modal-body" id="detailBody"></div>
-    <div class="modal-actions">
-      <button class="btn btn-primary" id="btnExportRegistro" type="button">Exportar registro</button>
-      <button class="btn btn-light" id="btnCloseModal2" type="button">Fechar</button>
-    </div>
-  </div>
-</div>
+    <section class="dashboard" id="dashboardCards"></section>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import {
-    getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc,
-    query, where, limit, orderBy
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <nav class="menu" id="menuBar"></nav>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
-    authDomain: "controle-ponto-26d34.firebaseapp.com",
-    projectId: "controle-ponto-26d34",
-    storageBucket: "controle-ponto-26d34.appspot.com",
-    messagingSenderId: "730360923157",
-    appId: "1:730360923157:web:cdd6ea1eeed6fd717d3a1c"
-  };
-
-  const appFirebase = initializeApp(firebaseConfig);
-  const auth = getAuth(appFirebase);
-  const db = getFirestore(appFirebase);
-
-  const el = {
-    topbar: document.getElementById("topbar"),
-    footerbar: document.getElementById("footerbar"),
-    loginView: document.getElementById("loginView"),
-    appView: document.getElementById("appView"),
-
-    loginEmail: document.getElementById("loginEmail"),
-    loginSenha: document.getElementById("loginSenha"),
-    btnLogin: document.getElementById("btnLogin"),
-    btnLogout: document.getElementById("btnLogout"),
-    loginNotice: document.getElementById("loginNotice"),
-
-    headerStoreText: document.getElementById("headerStoreText"),
-
-    footerRoleText: document.getElementById("footerRoleText"),
-    footerUserText: document.getElementById("footerUserText"),
-    footerStoreText: document.getElementById("footerStoreText"),
-
-    heroTitle: document.getElementById("heroTitle"),
-    heroSubtitle: document.getElementById("heroSubtitle"),
-
-    dashboardCards: document.getElementById("dashboardCards"),
-    menuBar: document.getElementById("menuBar"),
-    mainPanel: document.getElementById("mainPanel"),
-
-    detailModal: document.getElementById("detailModal"),
-    detailBody: document.getElementById("detailBody"),
-    detailTitle: document.getElementById("detailTitle"),
-    detailSub: document.getElementById("detailSub"),
-    btnCloseModal: document.getElementById("btnCloseModal"),
-    btnCloseModal2: document.getElementById("btnCloseModal2"),
-    btnExportRegistro: document.getElementById("btnExportRegistro")
-  };
-
-  const Collections = {
-    LOJAS: "lojas",
-    USUARIOS: "usuarios",
-    MOVIMENTOS: "movimentos",
-    CONDUTORES: "condutores",
-    AUTORIZADORES: "autorizadores"
-  };
-
-  const Roles = {
-    CONTROLADOR: "controlador",
-    GERENTE_LOJA: "gerente_loja",
-    GERENTE_GERAL: "gerente_geral"
-  };
-
-  const MOTIVOS_ENTRADA = [
-    "Retorno test-drive","Retorno de atividade externa","Retorno de transferência",
-    "Entrada para higienização","Entrada para manutenção","Entrada para peritagem / vistoria",
-    "Entrada de veículo 0km","Entrada de veículo seminovo","Chegada de transporte / cegonha",
-    "Devolução de cliente","Entrada para exposição","Entrada por recolhimento","Outro"
-  ];
-
-  const MOTIVOS_SAIDA = [
-    "Saída test-drive","Transferência de loja","Atividade externa",
-    "Saída para manutenção","Saída para higienização","Saída para abastecimento",
-    "Saída para vistoria / laudo","Saída para emplacamento","Saída para entrega ao cliente",
-    "Saída para despachante","Saída para logística / transporte","Saída para pátio externo",
-    "Saída por recolhimento","Outro"
-  ];
-
-  const state = {
-    authUser: null,
-    userProfile: null,
-    lojas: [],
-    lojasMap: {},
-    movimentos: [],
-    condutores: [],
-    autorizadores: [],
-    selectedMovimento: null,
-
-    condutorEditing: null,
-    autorizadorEditing: null
-  };
-
-  function debugLog(...args){ console.log(...args); }
-  function debugError(...args){ console.error(...args); }
-
-  function clearNotice(target){ target.className = "notice"; target.textContent = ""; }
-  function showNotice(target, message, type = "error"){ target.className = `notice show ${type}`; target.textContent = message; }
-
-  function onlyDigits(value){ return String(value || "").replace(/\D/g, ""); }
-
-  function formatCPF(value){
-    const digits = onlyDigits(value).slice(0, 11);
-    return digits
-      .replace(/^(\d{3})(\d)/, "$1.$2")
-      .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-      .replace(/\.(\d{3})(\d)/, ".$1-$2");
-  }
-
-  function isValidCPF(cpf){
-    const clean = onlyDigits(cpf);
-    if (clean.length !== 11) return false;
-    if (/^(\d)\1{10}$/.test(clean)) return false;
-
-    let sum = 0;
-    for (let i = 0; i < 9; i++) sum += Number(clean[i]) * (10 - i);
-    let first = (sum * 10) % 11;
-    if (first === 10) first = 0;
-    if (first !== Number(clean[9])) return false;
-
-    sum = 0;
-    for (let i = 0; i < 10; i++) sum += Number(clean[i]) * (11 - i);
-    let second = (sum * 10) % 11;
-    if (second === 10) second = 0;
-    if (second !== Number(clean[10])) return false;
-
-    return true;
-  }
-
-  function normalizePlate(value){ return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
-  function isValidPlate(plate){
-    const clean = normalizePlate(plate);
-    return /^[A-Z]{3}[0-9]{4}$/.test(clean) || /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(clean);
-  }
-  function formatPlate(value){
-    const clean = normalizePlate(value).slice(0, 7);
-    if(!clean) return "";
-    if(clean.length <= 3) return clean;
-    return clean.slice(0, 3) + "-" + clean.slice(3);
-  }
-
-  function formatDate(value){
-    try{
-      if(!value) return "-";
-      if(value.seconds) return new Date(value.seconds * 1000).toLocaleString("pt-BR");
-      return new Date(value).toLocaleString("pt-BR");
-    }catch(e){ return "-"; }
-  }
-
-  function ymdToDateStart(ymd){ if(!ymd) return null; const d = new Date(ymd + "T00:00:00"); return isNaN(d.getTime()) ? null : d; }
-  function ymdToDateEnd(ymd){ if(!ymd) return null; const d = new Date(ymd + "T23:59:59.999"); return isNaN(d.getTime()) ? null : d; }
-
-  function getRoleLabel(role){
-    if(role === Roles.CONTROLADOR) return "Controlador de acesso";
-    if(role === Roles.GERENTE_LOJA) return "Gerente de loja";
-    if(role === Roles.GERENTE_GERAL) return "Gerente geral";
-    return `Perfil: ${role || "não definido"}`;
-  }
-
-  function userIsGeneralManager(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
-  function userIsStoreManager(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
-  function userIsController(){ return state.userProfile?.role === Roles.CONTROLADOR; }
-
-  function userCanCreateAutorizador(){ return userIsStoreManager() || userIsGeneralManager(); }
-  function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
-
-  function getStoreName(lojaId){
-    if(!lojaId) return "Todas as lojas";
-    return state.lojasMap[lojaId]?.nome || lojaId;
-  }
-
-  function getStoreNameFromItem(item){
-    const lojaId = item?.lojaId || "";
-    if(lojaId && state.lojasMap[lojaId]?.nome) return state.lojasMap[lojaId].nome;
-    return item?.lojaNome || (lojaId || "-");
-  }
-
-  function buildStoreOptions({ includeBlank = true, blankLabel="Selecione a loja", includeAll=false } = {}){
-    const options = [];
-    if(includeAll) options.push(`<option value="">Todas as lojas</option>`);
-    else if(includeBlank) options.push(`<option value="">${blankLabel}</option>`);
-    state.lojas.forEach(loja => options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`));
-    return options.join("");
-  }
-
-  function buildMotivoOptions(list){
-    const options = [`<option value="">Selecione o motivo</option>`];
-    list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
-    return options.join("");
-  }
-
-  function buildCondutorOptions(){
-    const options = [`<option value="">Selecione o condutor</option>`];
-    state.condutores.forEach(c => {
-      const ativo = (c.ativo !== false);
-      const label = ativo ? (c.nome || "-") : `${c.nome || "-"} - inativo`;
-      options.push(`<option value="${ativo ? (c.nome || "") : ""}" ${ativo ? "" : "disabled"}>${label}</option>`);
-    });
-    return options.join("");
-  }
-
-  function buildAutorizadorOptions(){
-    const options = [`<option value="">Selecione o autorizador</option>`];
-    state.autorizadores.forEach(a => {
-      const ativo = (a.ativo !== false);
-      const label = ativo ? (a.nome || "-") : `${a.nome || "-"} - inativo`;
-      options.push(`<option value="${ativo ? (a.nome || "") : ""}" ${ativo ? "" : "disabled"}>${label}</option>`);
-    });
-    return options.join("");
-  }
-
-  function attachInputMasks(){
-    document.querySelectorAll("[data-mask='cpf']").forEach(input => {
-      input.addEventListener("input", () => { input.value = formatCPF(input.value); });
-    });
-    document.querySelectorAll("[data-mask='plate']").forEach(input => {
-      input.addEventListener("input", () => { input.value = formatPlate(input.value); });
-    });
-  }
-
-  async function loadLojas(){
-    const lojasSnap = await getDocs(collection(db, Collections.LOJAS));
-    state.lojas = [];
-    state.lojasMap = {};
-    lojasSnap.forEach(docSnap => {
-      const data = docSnap.data();
-      const item = { id: docSnap.id, ...data };
-      state.lojas.push(item);
-      state.lojasMap[item.id] = item;
-    });
-    state.lojas.sort((a,b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
-  }
-
-  async function loadUserProfile(uid){
-    const userRef = doc(db, Collections.USUARIOS, uid);
-    const userSnap = await getDoc(userRef);
-
-    if(!userSnap.exists()) throw new Error("Usuário não encontrado em usuarios/{uid}.");
-    const data = userSnap.data();
-    if(data.ativo === false) throw new Error("Usuário desativado.");
-    if(!data.role) throw new Error("Usuário sem role.");
-    if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada (lojaId).");
-
-    state.userProfile = { id: userSnap.id, ...data };
-    console.log("Perfil:", { role: data.role, lojaId: data.lojaId });
-  }
-
-  function getTimestampSeconds(item){
-    if(item?.data?.seconds) return item.data.seconds;
-    const t = new Date(item?.data || 0).getTime();
-    return isNaN(t) ? 0 : Math.floor(t/1000);
-  }
-
-  function sortOperationalArrays(){
-    state.movimentos.sort((a,b) => getTimestampSeconds(b) - getTimestampSeconds(a));
-    state.condutores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
-    state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
-  }
-
-  async function fetchLabel(label, q){
-    const snap = await getDocs(q);
-    const arr = [];
-    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
-    console.log("OK:", label, "docs:", snap.size);
-    return arr;
-  }
-
-  async function loadOperationalCollections(){
-    const lojaId = currentUserStoreId();
-
-    if(userIsGeneralManager()){
-      state.movimentos = await fetchLabel("movimentos", query(collection(db, Collections.MOVIMENTOS), orderBy("data","desc"), limit(2000)));
-      state.condutores = await fetchLabel("condutores", query(collection(db, Collections.CONDUTORES), orderBy("nome","asc"), limit(5000)));
-      state.autorizadores = await fetchLabel("autorizadores", query(collection(db, Collections.AUTORIZADORES), orderBy("nome","asc"), limit(5000)));
-    }else{
-      state.movimentos = await fetchLabel("movimentos", query(collection(db, Collections.MOVIMENTOS), where("lojaId","==",lojaId), limit(2000)));
-      state.condutores = await fetchLabel("condutores", query(collection(db, Collections.CONDUTORES), where("lojaId","==",lojaId), limit(3000)));
-      state.autorizadores = await fetchLabel("autorizadores", query(collection(db, Collections.AUTORIZADORES), where("lojaId","==",lojaId), limit(3000)));
-    }
-
-    state.condutores = state.condutores.map(c => ({...c, ativo: (c.ativo !== false)}));
-    state.autorizadores = state.autorizadores.map(a => ({...a, ativo: (a.ativo !== false)}));
-
-    sortOperationalArrays();
-  }
-
-  function renderShellInfo(){
-    const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
-    const roleLabel = getRoleLabel(state.userProfile?.role);
-    const lojaNome = userIsGeneralManager() ? "Todas as lojas" : getStoreName(state.userProfile?.lojaId);
-
-    el.headerStoreText.textContent = lojaNome;
-    el.footerUserText.textContent = nome;
-    el.footerRoleText.textContent = roleLabel;
-    el.footerStoreText.textContent = lojaNome;
-
-    if(userIsGeneralManager()){
-      el.heroTitle.textContent = "Dashboard geral";
-      el.heroSubtitle.textContent = "Acompanhe e gerencie a operação de todas as unidades.";
-    }else if(userIsStoreManager()){
-      el.heroTitle.textContent = "Dashboard da loja";
-      el.heroSubtitle.textContent = "Acompanhe e gerencie a operação da sua unidade.";
-    }else{
-      el.heroTitle.textContent = "Painel operacional";
-      el.heroSubtitle.textContent = "Registre entradas e saídas e faça consultas.";
-    }
-  }
-
-  function computePatioCount(movimentos){
-    const patioMap = {};
-    movimentos.slice().sort((a,b)=>getTimestampSeconds(a)-getTimestampSeconds(b)).forEach(item=>{
-      const plate = normalizePlate(item.placa);
-      if(!plate) return;
-      const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
-      if(item.tipo === "entrada") patioMap[key] = true;
-      if(item.tipo === "saida") delete patioMap[key];
-    });
-    return Object.keys(patioMap).length;
-  }
-
-  function buildDashboardMetrics(){
-    const mov = [...state.movimentos];
-    const cond = [...state.condutores];
-    const aut = [...state.autorizadores];
-    const patio = computePatioCount(mov);
-    const entradas = mov.filter(m=>m.tipo==="entrada").length;
-    const saidas = mov.filter(m=>m.tipo==="saida").length;
-
-    const cards = [
-      { title:"Veículos no pátio", value:patio, subtitle:userIsGeneralManager() ? "Somatório de todas as lojas" : "Veículos dentro da unidade" },
-      { title:"Movimentações", value:mov.length, subtitle:"Total de entradas e saídas" },
-      { title:"Condutores", value:cond.length, subtitle:"Cadastros disponíveis" },
-      { title:"Autorizadores", value:aut.length, subtitle:"Cadastros disponíveis" }
-    ];
-
-    if(!userIsGeneralManager()){
-      cards.push({ title:"Entradas / Saídas", value:`${entradas} / ${saidas}`, subtitle:"Resumo operacional" });
-    }else{
-      cards.push({ title:"Lojas", value:state.lojas.length, subtitle:"Unidades cadastradas" });
-    }
-
-    return cards;
-  }
-
-  function renderDashboard(){
-    const cards = buildDashboardMetrics();
-    el.dashboardCards.innerHTML = cards.map(c=>`
-      <article class="stat">
-        <small>${c.title}</small>
-        <strong>${c.value}</strong>
-        <span>${c.subtitle}</span>
-      </article>
-    `).join("");
-  }
-
-  function renderPanel(title, subtitle, bodyHTML){
-    el.mainPanel.innerHTML = `
-      <div class="card-header">
-        <div>
-          <h3>${title}</h3>
-          <p>${subtitle}</p>
-        </div>
-      </div>
-      ${bodyHTML}
-    `;
-  }
-
-  function buildMenu(){
-    const items = [];
-    items.push({ label: userIsGeneralManager() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome });
-    items.push({ label: "Entrada", action: renderEntrada });
-    items.push({ label: "Saída", action: renderSaida });
-    items.push({ label: "Consulta", action: renderConsulta });
-    items.push({ label: "Condutor", action: renderCondutor });
-    if(userCanCreateAutorizador()) items.push({ label: "Autorizador", action: renderAutorizador });
-    if(userIsGeneralManager()) items.push({ label: "Extrato", action: renderExtrato });
-
-    el.menuBar.innerHTML = "";
-    items.forEach(it=>{
-      const b = document.createElement("button");
-      b.className = "btn btn-primary";
-      b.textContent = it.label;
-      b.addEventListener("click", it.action);
-      el.menuBar.appendChild(b);
-    });
-  }
-
-  function renderDashboardHome(){
-    const last = [...state.movimentos].slice(0,6);
-    const rows = last.map(item=>`
-      <tr class="row-clickable" data-id="${item.id}">
-        <td>${formatDate(item.data)}</td>
-        <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
-        <td>${getStoreNameFromItem(item)}</td>
-        <td>${item.placa || "-"}</td>
-        <td>${item.veiculo || "-"}</td>
-        <td>${item.condutor || "-"}</td>
-        <td>${item.autorizador || "-"}</td>
-      </tr>
-    `).join("");
-
-    renderPanel(
-      userIsGeneralManager() ? "Dashboard geral" : "Dashboard",
-      "Toque em uma linha para abrir detalhes e exportar.",
-      `
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Data/Hora</th><th>Tipo</th><th>Loja</th><th>Placa</th><th>Veículo</th><th>Condutor</th><th>Autorizador</th>
-              </tr>
-            </thead>
-            <tbody id="dashLastBody">
-              ${rows || `<tr><td colspan="7">Nenhum registro encontrado.</td></tr>`}
-            </tbody>
-          </table>
-        </div>
-      `
-    );
-
-    setTimeout(()=>{
-      document.querySelectorAll("#dashLastBody tr[data-id]").forEach(tr=>{
-        tr.addEventListener("click", ()=>{
-          const id = tr.getAttribute("data-id");
-          const found = state.movimentos.find(m=>m.id===id);
-          if(found) openDetailModal(found);
-        });
-      });
-    },0);
-  }
-
-  /* ===== Camera tablet ===== */
-  function readFileAsDataURL(file){
-    return new Promise((resolve,reject)=>{
-      const r = new FileReader();
-      r.onload = ()=>resolve(String(r.result||""));
-      r.onerror = ()=>reject(r.error || new Error("Falha ao ler arquivo"));
-      r.readAsDataURL(file);
-    });
-  }
-
-  async function getImageDataFromInput(inputId){
-    const input = document.getElementById(inputId);
-    const file = input?.files?.[0];
-    if(!file) return "";
-    if(!file.type?.startsWith("image/")) return "";
-    return await readFileAsDataURL(file);
-  }
-
-  function setPreview(previewId, dataUrl){
-    const preview = document.getElementById(previewId);
-    if(!preview) return;
-    preview.innerHTML = dataUrl ? `<img src="${dataUrl}" alt="Foto">` : `<div class="photo-hint">Sem foto</div>`;
-  }
-
-  function wireCamera(inputId, previewId, btnId){
-    const input = document.getElementById(inputId);
-    const btn = document.getElementById(btnId);
-    if(btn && input) btn.addEventListener("click", ()=>input.click());
-    if(input){
-      input.addEventListener("change", async ()=>{
-        try{ setPreview(previewId, await getImageDataFromInput(inputId)); }
-        catch(e){ setPreview(previewId,""); }
-      });
-    }
-  }
-
-  function validateRequiredPhoto(inputId, label){
-    const input = document.getElementById(inputId);
-    const file = input?.files?.[0];
-    if(!file) return `${label} é obrigatória.`;
-    if(!file.type?.startsWith("image/")) return `${label} deve ser uma imagem.`;
-    return "";
-  }
-
-  async function collectExtraPhotosData(){
-    const extraInputs = Array.from(document.querySelectorAll("input[id^='fotoExtra_']"));
-    const data = [];
-    for(const input of extraInputs){
-      const file = input?.files?.[0];
-      if(!file || !file.type?.startsWith("image/")) continue;
-      try{
-        const url = await readFileAsDataURL(file);
-        if(url) data.push(url);
-      }catch(e){}
-    }
-    return data;
-  }
-
-  function addExtraPhotoInput(){
-    const grid = document.getElementById("entradaPhotoGrid");
-    if(!grid) return;
-    const index = grid.querySelectorAll("[data-extra='1']").length + 1;
-    const inputId = `fotoExtra_${index}`;
-    const previewId = `previewExtra_${index}`;
-    const btnId = `btnExtra_${index}`;
-
-    const card = document.createElement("div");
-    card.className = "photo-card";
-    card.setAttribute("data-extra","1");
-    card.innerHTML = `
-      <strong>Extra ${index}</strong>
-      <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
-      <button class="camera-btn" type="button" id="${btnId}">Abrir câmera</button>
-      <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
-    `;
-    grid.appendChild(card);
-    wireCamera(inputId, previewId, btnId);
-  }
-
-  function toggleMotivoOutro(prefix){
-    const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
-    const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
-    if(!wrap) return;
-    if(motivo === "Outro") wrap.classList.remove("hidden");
-    else{
-      wrap.classList.add("hidden");
-      const i = document.getElementById(`${prefix}MotivoOutro`);
-      if(i) i.value = "";
-    }
-  }
-
-  /* ===== Entrada (obs sempre aparece, não obrigatória) ===== */
-  function renderEntrada(){
-    renderPanel("Entrada", "Preencha os campos. Observação é opcional.", `
-      <div class="grid">
-        ${userIsGeneralManager() ? `
-          <div class="form-group">
-            <label class="req" for="entradaLoja">Loja</label>
-            <select class="select" id="entradaLoja">${buildStoreOptions({includeBlank:true, blankLabel:"Selecione a loja"})}</select>
-          </div>
-        ` : `
-          <div class="form-group">
-            <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-          </div>
-        `}
-
-        <div class="form-group">
-          <label class="req" for="entradaPlaca">Placa</label>
-          <input class="input" id="entradaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="entradaVeiculo">Veículo</label>
-          <input class="input" id="entradaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="entradaMotivo">Motivo</label>
-          <select class="select" id="entradaMotivo">${buildMotivoOptions(MOTIVOS_ENTRADA)}</select>
-        </div>
-
-        <div class="form-group hidden" id="entradaMotivoOutroWrap">
-          <label class="req" for="entradaMotivoOutro">Descreva o motivo</label>
-          <input class="input" id="entradaMotivoOutro" maxlength="60" placeholder="Motivo curto">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="entradaCondutor">Condutor</label>
-          <select class="select" id="entradaCondutor">${buildCondutorOptions()}</select>
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="entradaAutorizador">Autorizador</label>
-          <select class="select" id="entradaAutorizador">${buildAutorizadorOptions()}</select>
-        </div>
-
-        <div class="form-group full">
-          <label for="entradaObs">Observação (opcional)</label>
-          <textarea class="textarea" id="entradaObs" maxlength="300" placeholder="Observações..."></textarea>
-        </div>
-
-        <div class="form-group full">
-          <label class="req">Fotos do veículo (4 obrigatórias)</label>
-          <div class="photo-grid" id="entradaPhotoGrid">
-            <div class="photo-card">
-              <strong>Frente</strong>
-              <div class="photo-preview" id="previewFrente"><div class="photo-hint">Sem foto</div></div>
-              <button class="camera-btn" type="button" id="btnFrente">Abrir câmera</button>
-              <input class="file-input" id="fotoFrente" type="file" accept="image/*" capture="environment">
-            </div>
-            <div class="photo-card">
-              <strong>Mala</strong>
-              <div class="photo-preview" id="previewMala"><div class="photo-hint">Sem foto</div></div>
-              <button class="camera-btn" type="button" id="btnMala">Abrir câmera</button>
-              <input class="file-input" id="fotoMala" type="file" accept="image/*" capture="environment">
-            </div>
-            <div class="photo-card">
-              <strong>Lateral esquerda</strong>
-              <div class="photo-preview" id="previewLatEsq"><div class="photo-hint">Sem foto</div></div>
-              <button class="camera-btn" type="button" id="btnLatEsq">Abrir câmera</button>
-              <input class="file-input" id="fotoLatEsq" type="file" accept="image/*" capture="environment">
-            </div>
-            <div class="photo-card">
-              <strong>Lateral direita</strong>
-              <div class="photo-preview" id="previewLatDir"><div class="photo-hint">Sem foto</div></div>
-              <button class="camera-btn" type="button" id="btnLatDir">Abrir câmera</button>
-              <input class="file-input" id="fotoLatDir" type="file" accept="image/*" capture="environment">
-            </div>
-          </div>
-
-          <div class="actions" style="margin-top:12px;">
-            <button class="btn btn-light" id="btnAddExtraFoto" type="button">Fotografar mais partes</button>
-          </div>
-          <div class="subtle">Fotos extras são opcionais.</div>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-success" id="btnSalvarEntrada" type="button">Salvar entrada</button>
-        <button class="btn btn-light" id="btnLimparEntrada" type="button">Limpar</button>
-      </div>
-
-      <div id="entradaNotice" class="notice"></div>
-    `);
-
-    attachInputMasks();
-    wireCamera("fotoFrente","previewFrente","btnFrente");
-    wireCamera("fotoMala","previewMala","btnMala");
-    wireCamera("fotoLatEsq","previewLatEsq","btnLatEsq");
-    wireCamera("fotoLatDir","previewLatDir","btnLatDir");
-
-    document.getElementById("btnAddExtraFoto").addEventListener("click", addExtraPhotoInput);
-
-    document.getElementById("entradaMotivo").addEventListener("change", ()=>toggleMotivoOutro("entrada"));
-    toggleMotivoOutro("entrada");
-
-    document.getElementById("btnSalvarEntrada").addEventListener("click", salvarEntrada);
-    document.getElementById("btnLimparEntrada").addEventListener("click", renderEntrada);
-  }
-
-  async function salvarEntrada(){
-    const notice = document.getElementById("entradaNotice");
-    clearNotice(notice);
-
-    const lojaId = userIsGeneralManager()
-      ? (document.getElementById("entradaLoja")?.value || "")
-      : currentUserStoreId();
-
-    const placa = formatPlate(document.getElementById("entradaPlaca")?.value || "");
-    const veiculo = (document.getElementById("entradaVeiculo")?.value || "").trim();
-    const motivo = document.getElementById("entradaMotivo")?.value || "";
-    const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
-    const condutor = document.getElementById("entradaCondutor")?.value || "";
-    const autorizador = document.getElementById("entradaAutorizador")?.value || "";
-    const observacao = (document.getElementById("entradaObs")?.value || "").trim();
-
-    if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-    if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
-    if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
-    if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
-    if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-    if(!condutor){ showNotice(notice, "Selecione o condutor (inativos não podem)."); return; }
-    if(!autorizador){ showNotice(notice, "Selecione o autorizador (inativos não podem)."); return; }
-
-    const e1 = validateRequiredPhoto("fotoFrente","Foto da frente");
-    const e2 = validateRequiredPhoto("fotoMala","Foto da mala");
-    const e3 = validateRequiredPhoto("fotoLatEsq","Foto lateral esquerda");
-    const e4 = validateRequiredPhoto("fotoLatDir","Foto lateral direita");
-    const errs = [e1,e2,e3,e4].filter(Boolean);
-    if(errs.length){ showNotice(notice, errs[0]); return; }
-
-    try{
-      const [fotoFrente,fotoMala,fotoLateralEsq,fotoLateralDir] = await Promise.all([
-        getImageDataFromInput("fotoFrente"),
-        getImageDataFromInput("fotoMala"),
-        getImageDataFromInput("fotoLatEsq"),
-        getImageDataFromInput("fotoLatDir")
-      ]);
-      const extras = await collectExtraPhotosData();
-
-      await addDoc(collection(db, Collections.MOVIMENTOS), {
-        tipo:"entrada",
-        lojaId,
-        placa,
-        veiculo,
-        motivo,
-        motivoOutro: motivo === "Outro" ? motivoOutro : "",
-        condutor,
-        autorizador,
-        observacao: observacao || "",
-        fotos:{
-          frente: fotoFrente || "",
-          mala: fotoMala || "",
-          lateralEsq: fotoLateralEsq || "",
-          lateralDir: fotoLateralDir || "",
-          extras: extras || []
-        },
-        criadoPorUid: state.authUser.uid,
-        criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
-        data: new Date()
-      });
-
-      await refreshAfterWrite();
-      showNotice(notice, "Entrada registrada com sucesso.", "success");
-      renderEntrada();
-    }catch(e){
-      showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-    }
-  }
-
-  /* ===== Saída (obs sempre aparece, não obrigatória) ===== */
-  function renderSaida(){
-    renderPanel("Saída", "Preencha os campos. Observação é opcional.", `
-      <div class="grid">
-        ${userIsGeneralManager() ? `
-          <div class="form-group">
-            <label class="req" for="saidaLoja">Loja</label>
-            <select class="select" id="saidaLoja">${buildStoreOptions({includeBlank:true, blankLabel:"Selecione a loja"})}</select>
-          </div>
-        ` : `
-          <div class="form-group">
-            <label>Loja</label>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-          </div>
-        `}
-
-        <div class="form-group">
-          <label class="req" for="saidaPlaca">Placa</label>
-          <input class="input" id="saidaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="saidaVeiculo">Veículo</label>
-          <input class="input" id="saidaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="saidaMotivo">Motivo</label>
-          <select class="select" id="saidaMotivo">${buildMotivoOptions(MOTIVOS_SAIDA)}</select>
-        </div>
-
-        <div class="form-group hidden" id="saidaMotivoOutroWrap">
-          <label class="req" for="saidaMotivoOutro">Descreva o motivo</label>
-          <input class="input" id="saidaMotivoOutro" maxlength="60" placeholder="Motivo curto">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="saidaCondutor">Condutor</label>
-          <select class="select" id="saidaCondutor">${buildCondutorOptions()}</select>
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="saidaAutorizador">Autorizador</label>
-          <select class="select" id="saidaAutorizador">${buildAutorizadorOptions()}</select>
-        </div>
-
-        <div class="form-group full">
-          <label for="saidaObs">Observação (opcional)</label>
-          <textarea class="textarea" id="saidaObs" maxlength="300" placeholder="Observações..."></textarea>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-danger" id="btnSalvarSaida" type="button">Salvar saída</button>
-        <button class="btn btn-light" id="btnLimparSaida" type="button">Limpar</button>
-      </div>
-
-      <div id="saidaNotice" class="notice"></div>
-    `);
-
-    attachInputMasks();
-    document.getElementById("saidaMotivo").addEventListener("change", ()=>toggleMotivoOutro("saida"));
-    toggleMotivoOutro("saida");
-
-    document.getElementById("btnSalvarSaida").addEventListener("click", salvarSaida);
-    document.getElementById("btnLimparSaida").addEventListener("click", renderSaida);
-  }
-
-  async function salvarSaida(){
-    const notice = document.getElementById("saidaNotice");
-    clearNotice(notice);
-
-    const lojaId = userIsGeneralManager()
-      ? (document.getElementById("saidaLoja")?.value || "")
-      : currentUserStoreId();
-
-    const placa = formatPlate(document.getElementById("saidaPlaca")?.value || "");
-    const veiculo = (document.getElementById("saidaVeiculo")?.value || "").trim();
-    const motivo = document.getElementById("saidaMotivo")?.value || "";
-    const motivoOutro = (document.getElementById("saidaMotivoOutro")?.value || "").trim();
-    const condutor = document.getElementById("saidaCondutor")?.value || "";
-    const autorizador = document.getElementById("saidaAutorizador")?.value || "";
-    const observacao = (document.getElementById("saidaObs")?.value || "").trim();
-
-    if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-    if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
-    if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
-    if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
-    if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-    if(!condutor){ showNotice(notice, "Selecione o condutor (inativos não podem)."); return; }
-    if(!autorizador){ showNotice(notice, "Selecione o autorizador (inativos não podem)."); return; }
-
-    try{
-      await addDoc(collection(db, Collections.MOVIMENTOS), {
-        tipo:"saida",
-        lojaId,
-        placa,
-        veiculo,
-        motivo,
-        motivoOutro: motivo === "Outro" ? motivoOutro : "",
-        condutor,
-        autorizador,
-        observacao: observacao || "",
-        fotos:{}, // fotos ficam só no individual quando existir
-        criadoPorUid: state.authUser.uid,
-        criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
-        data: new Date()
-      });
-
-      await refreshAfterWrite();
-      showNotice(notice, "Saída registrada com sucesso.", "success");
-      renderSaida();
-    }catch(e){
-      showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-    }
-  }
-
-  /* ===== Consulta + filtro por data ===== */
-  function renderConsulta(){
-    const storeFilterHTML = userIsGeneralManager()
-      ? `
-        <div class="form-group">
-          <label for="filtroLojaConsulta">Loja</label>
-          <select class="select" id="filtroLojaConsulta">${buildStoreOptions({includeAll:true})}</select>
-        </div>
-      `
-      : `
-        <div class="form-group">
-          <label>Loja</label>
-          <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-        </div>
-      `;
-
-    renderPanel("Consulta", "Toque no registro para ver 1 por 1 e exportar (fotos só aqui).", `
-      <div class="grid">
-        ${storeFilterHTML}
-
-        <div class="form-group">
-          <label for="filtroDataIni">Data inicial</label>
-          <input class="input" id="filtroDataIni" type="date">
-        </div>
-
-        <div class="form-group">
-          <label for="filtroDataFim">Data final</label>
-          <input class="input" id="filtroDataFim" type="date">
-        </div>
-
-        <div class="form-group">
-          <label for="filtroPlacaConsulta">Placa</label>
-          <input class="input" id="filtroPlacaConsulta" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
-        </div>
-
-        <div class="form-group">
-          <label for="filtroTipoConsulta">Tipo</label>
-          <select class="select" id="filtroTipoConsulta">
-            <option value="">Todos</option>
-            <option value="entrada">Entrada</option>
-            <option value="saida">Saída</option>
-          </select>
-        </div>
-
-        <div class="form-group full">
-          <label for="filtroTextoConsulta">Busca geral</label>
-          <input class="input" id="filtroTextoConsulta" maxlength="80" placeholder="Condutor, veículo, autorizador, motivo...">
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-primary" id="btnFiltrarConsulta" type="button">Filtrar</button>
-        <button class="btn btn-light" id="btnLimparConsulta" type="button">Limpar</button>
-      </div>
-
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Data/Hora</th><th>Tipo</th><th>Loja</th><th>Placa</th><th>Veículo</th>
-              <th>Motivo</th><th>Condutor</th><th>Autorizador</th><th>Observação</th><th>Fotos</th>
-            </tr>
-          </thead>
-          <tbody id="consultaBody"></tbody>
-        </table>
-      </div>
-
-      <div class="empty" id="consultaEmpty"></div>
-    `);
-
-    attachInputMasks();
-    document.getElementById("btnFiltrarConsulta").addEventListener("click", applyConsultaFilter);
-    document.getElementById("btnLimparConsulta").addEventListener("click", renderConsulta);
-    applyConsultaFilter();
-  }
-
-  function applyConsultaFilter(){
-    const body = document.getElementById("consultaBody");
-    const empty = document.getElementById("consultaEmpty");
-    if(!body || !empty) return;
-
-    const lojaId = userIsGeneralManager()
-      ? (document.getElementById("filtroLojaConsulta")?.value || "")
-      : currentUserStoreId();
-
-    const placa = normalizePlate(document.getElementById("filtroPlacaConsulta")?.value || "");
-    const tipo = (document.getElementById("filtroTipoConsulta")?.value || "").toLowerCase();
-    const texto = (document.getElementById("filtroTextoConsulta")?.value || "").trim().toLowerCase();
-
-    const dIni = ymdToDateStart(document.getElementById("filtroDataIni")?.value || "");
-    const dFim = ymdToDateEnd(document.getElementById("filtroDataFim")?.value || "");
-
-    let items = [...state.movimentos];
-
-    if(lojaId) items = items.filter(i => i.lojaId === lojaId);
-    if(placa) items = items.filter(i => normalizePlate(i.placa).includes(placa));
-    if(tipo) items = items.filter(i => String(i.tipo||"").toLowerCase() === tipo);
-
-    if(dIni || dFim){
-      const sIni = dIni ? Math.floor(dIni.getTime()/1000) : null;
-      const sFim = dFim ? Math.floor(dFim.getTime()/1000) : null;
-      items = items.filter(i=>{
-        const s = getTimestampSeconds(i);
-        if(sIni !== null && s < sIni) return false;
-        if(sFim !== null && s > sFim) return false;
-        return true;
-      });
-    }
-
-    if(texto){
-      items = items.filter(i=>{
-        const motivoFinal = i.motivo === "Outro" && i.motivoOutro ? `Outro: ${i.motivoOutro}` : (i.motivo || "");
-        const hay = [i.veiculo,motivoFinal,i.condutor,i.autorizador,i.observacao,i.placa,getStoreNameFromItem(i)].join(" ").toLowerCase();
-        return hay.includes(texto);
-      });
-    }
-
-    items.sort((a,b)=>getTimestampSeconds(b)-getTimestampSeconds(a));
-
-    body.innerHTML = items.map(i=>{
-      const fotos = i?.fotos || {};
-      const extras = Array.isArray(fotos.extras) ? fotos.extras.length : 0;
-      const base = [fotos.frente,fotos.mala,fotos.lateralEsq,fotos.lateralDir].filter(Boolean).length;
-      const total = base + extras;
-      const motivoFinal = i.motivo === "Outro" && i.motivoOutro ? `Outro: ${i.motivoOutro}` : (i.motivo || "-");
-      return `
-        <tr class="row-clickable" data-id="${i.id}">
-          <td>${formatDate(i.data)}</td>
-          <td>${i.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
-          <td>${getStoreNameFromItem(i)}</td>
-          <td>${i.placa || "-"}</td>
-          <td>${i.veiculo || "-"}</td>
-          <td>${motivoFinal}</td>
-          <td>${i.condutor || "-"}</td>
-          <td>${i.autorizador || "-"}</td>
-          <td>${i.observacao || "-"}</td>
-          <td>${total ? `${total} foto(s)` : "-"}</td>
-        </tr>
-      `;
-    }).join("");
-
-    empty.textContent = items.length ? "" : "Nenhum registro encontrado.";
-
-    setTimeout(()=>{
-      body.querySelectorAll("tr[data-id]").forEach(tr=>{
-        tr.addEventListener("click", ()=>{
-          const id = tr.getAttribute("data-id");
-          const found = state.movimentos.find(m=>m.id===id);
-          if(found) openDetailModal(found);
-        });
-      });
-    },0);
-  }
-
-  /* ===== Modal + export individual ===== */
-  function openDetailModal(item){
-    state.selectedMovimento = item;
-
-    const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
-    const fotos = item?.fotos || {};
-    const thumbs = [];
-
-    if(fotos.frente) thumbs.push({url:fotos.frente, cap:"Frente"});
-    if(fotos.mala) thumbs.push({url:fotos.mala, cap:"Mala"});
-    if(fotos.lateralEsq) thumbs.push({url:fotos.lateralEsq, cap:"Lateral esquerda"});
-    if(fotos.lateralDir) thumbs.push({url:fotos.lateralDir, cap:"Lateral direita"});
-    if(Array.isArray(fotos.extras)) fotos.extras.forEach((u,idx)=>{ if(u) thumbs.push({url:u, cap:`Extra ${idx+1}`}); });
-
-    el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
-    el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/Hora: ${formatDate(item.data)}`;
-
-    el.detailBody.innerHTML = `
-      <div class="detail-grid">
-        <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
-        <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
-
-        <div class="detail-item"><small>Loja</small><div>${getStoreNameFromItem(item)}</div></div>
-        <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
-
-        <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
-        <div class="detail-item"><small>Motivo</small><div>${motivoFinal}</div></div>
-
-        <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
-        <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
-
-        <div class="detail-item" style="grid-column:1/-1;">
-          <small>Observação</small><div>${item.observacao || "-"}</div>
-        </div>
-      </div>
-
-      <div class="section-title" style="margin-top:6px;">Fotos</div>
-      ${thumbs.length ? `
-        <div class="thumbs">
-          ${thumbs.map(t=>`
-            <div class="thumb">
-              <img src="${t.url}" alt="${t.cap}">
-              <div class="cap">${t.cap}</div>
-            </div>
-          `).join("")}
-        </div>
-      ` : `<div class="empty">Este registro não possui fotos.</div>`}
-    `;
-
-    el.detailModal.classList.add("show");
-    el.detailModal.setAttribute("aria-hidden","false");
-  }
-
-  function closeDetailModal(){
-    el.detailModal.classList.remove("show");
-    el.detailModal.setAttribute("aria-hidden","true");
-    state.selectedMovimento = null;
-  }
-
-  function exportSelectedRegistro(){
-    const item = state.selectedMovimento;
-    if(!item) return;
-
-    const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
-    const fotos = item?.fotos || {};
-    const imagens = [];
-
-    if(fotos.frente) imagens.push({url:fotos.frente, cap:"Frente"});
-    if(fotos.mala) imagens.push({url:fotos.mala, cap:"Mala"});
-    if(fotos.lateralEsq) imagens.push({url:fotos.lateralEsq, cap:"Lateral esquerda"});
-    if(fotos.lateralDir) imagens.push({url:fotos.lateralDir, cap:"Lateral direita"});
-    if(Array.isArray(fotos.extras)) fotos.extras.forEach((u,idx)=>{ if(u) imagens.push({url:u, cap:`Extra ${idx+1}`}); });
-
-    const html = `<!doctype html>
-<html lang="pt-BR"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Registro - ${item.placa || ""}</title>
-<style>
-body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
-h1{ font-size:20px; margin:0 0 6px 0; }
-.sub{ color:#475569; margin:0 0 18px 0; font-size:13px; }
-.box{ border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:12px; }
-.grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
-.k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; margin-bottom:4px; font-weight:700; }
-.v{ font-size:14px; font-weight:700; color:#0f172a; }
-.full{ grid-column:1/-1; }
-.imgs{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
-.img{ border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
-.img img{ width:100%; height:260px; object-fit:cover; display:block; }
-.cap{ padding:10px 12px; font-size:12px; font-weight:700; color:#334155; border-top:1px solid #eef2f7; }
-@media print{ body{ margin:0; } .box{ page-break-inside: avoid; } .img{ page-break-inside: avoid; } }
-</style></head><body>
-<h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
-<p class="sub">Unidade: ${getStoreNameFromItem(item)} • Data/Hora: ${formatDate(item.data)} • Exportado em: ${new Date().toLocaleString("pt-BR")}</p>
-
-<div class="box"><div class="grid">
-  <div><div class="k">Tipo</div><div class="v">${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
-  <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
-  <div><div class="k">Loja</div><div class="v">${getStoreNameFromItem(item)}</div></div>
-  <div><div class="k">Placa</div><div class="v">${item.placa || "-"}</div></div>
-  <div><div class="k">Veículo</div><div class="v">${item.veiculo || "-"}</div></div>
-  <div><div class="k">Motivo</div><div class="v">${motivoFinal}</div></div>
-  <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
-  <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
-  <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
-</div></div>
-
-<div class="box">
-  <div class="k" style="margin-bottom:10px;">Fotos</div>
-  ${imagens.length ? `
-    <div class="imgs">
-      ${imagens.map(im=>`
-        <div class="img">
-          <img src="${im.url}" alt="${im.cap}">
-          <div class="cap">${im.cap}</div>
-        </div>
-      `).join("")}
-    </div>
-  ` : `<div class="v" style="font-weight:600;">Sem fotos</div>`}
-</div>
-</body></html>`;
-
-    const w = window.open("", "_blank");
-    if(!w){ alert("Permita pop-ups para exportar."); return; }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-    w.onload = ()=>{ try{ w.focus(); w.print(); }catch(e){} };
-  }
-
-  /* ===== Condutor (CPF lookup + lista + ativar/inativar) ===== */
-  async function findCondutorByCpf(lojaId, cpfDigits){
-    const q = query(collection(db, Collections.CONDUTORES), where("lojaId","==",lojaId), where("cpf","==",cpfDigits), limit(1));
-    const snap = await getDocs(q);
-    if(snap.empty) return null;
-    const d = snap.docs[0];
-    return { id: d.id, ...d.data() };
-  }
-
-  function renderCondutor(){
-    state.condutorEditing = null;
-
-    const lojaBlock = userIsGeneralManager() ? `
-      <div class="form-group">
-        <label class="req" for="condutorLoja">Loja</label>
-        <select class="select" id="condutorLoja">${buildStoreOptions({includeBlank:true, blankLabel:"Selecione a loja"})}</select>
-      </div>
-    ` : `
-      <div class="form-group">
-        <label>Loja</label>
-        <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-      </div>
-    `;
-
-    renderPanel("Condutor", "CPF consulta. Se existir, edita. Lista abaixo permite ativar/inativar.", `
-      <div class="grid">
-        ${lojaBlock}
-
-        <div class="form-group">
-          <label class="req" for="condutorCPF">CPF</label>
-          <input class="input" id="condutorCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
-          <div class="subtle" id="condutorStatusText"></div>
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="condutorNome">Nome</label>
-          <input class="input" id="condutorNome" maxlength="80">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="condutorCargo">Cargo</label>
-          <input class="input" id="condutorCargo" maxlength="60">
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-success" id="btnSalvarCondutor" type="button">Cadastrar</button>
-        <button class="btn btn-light" id="btnLimparCondutor" type="button">Limpar</button>
-      </div>
-
-      <div id="condutorNotice" class="notice"></div>
-
-      <div class="section-title">Lista de condutores</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Loja</th><th>Nome</th><th>CPF</th><th>Cargo</th><th>Status</th><th>Ação</th></tr>
-          </thead>
-          <tbody id="condutoresListBody"></tbody>
-        </table>
-      </div>
-      <div class="empty" id="condutoresListEmpty"></div>
-    `);
-
-    attachInputMasks();
-
-    const cpfEl = document.getElementById("condutorCPF");
-    const nomeEl = document.getElementById("condutorNome");
-    const cargoEl = document.getElementById("condutorCargo");
-    const btnEl = document.getElementById("btnSalvarCondutor");
-    const statusEl = document.getElementById("condutorStatusText");
-
-    let timer = null;
-    cpfEl.addEventListener("input", ()=>{
-      clearTimeout(timer);
-      timer = setTimeout(async ()=>{
-        const lojaId = userIsGeneralManager()
-          ? (document.getElementById("condutorLoja")?.value || "")
-          : currentUserStoreId();
-        const cpfDigits = onlyDigits(cpfEl.value);
-
-        state.condutorEditing = null;
-        statusEl.textContent = "";
-        btnEl.textContent = "Cadastrar";
-
-        if(!lojaId || cpfDigits.length !== 11) return;
-
-        try{
-          const found = await findCondutorByCpf(lojaId, cpfDigits);
-          if(found){
-            state.condutorEditing = found;
-            nomeEl.value = found.nome || "";
-            cargoEl.value = found.cargo || "";
-            const ativo = (found.ativo !== false);
-            statusEl.innerHTML = ativo ? `<span class="badge badge-green">Encontrado: ATIVO</span>` : `<span class="badge badge-red">Encontrado: INATIVO</span>`;
-            btnEl.textContent = "Atualizar";
-          }else{
-            statusEl.innerHTML = `<span class="badge badge-gray">CPF não cadastrado</span>`;
-          }
-        }catch(e){
-          statusEl.innerHTML = `<span class="badge badge-red">Falha na consulta</span>`;
-        }
-      }, 450);
-    });
-
-    if(userIsGeneralManager()){
-      document.getElementById("condutorLoja").addEventListener("change", ()=>{
-        cpfEl.value=""; nomeEl.value=""; cargoEl.value=""; statusEl.textContent="";
-        state.condutorEditing=null;
-        btnEl.textContent="Cadastrar";
-        renderCondutoresList();
-      });
-    }
-
-    document.getElementById("btnSalvarCondutor").addEventListener("click", salvarCondutor);
-    document.getElementById("btnLimparCondutor").addEventListener("click", renderCondutor);
-
-    renderCondutoresList();
-  }
-
-  function getCondutorListScopeLojaId(){
-    return userIsGeneralManager()
-      ? (document.getElementById("condutorLoja")?.value || "")
-      : currentUserStoreId();
-  }
-
-  function renderCondutoresList(){
-    const body = document.getElementById("condutoresListBody");
-    const empty = document.getElementById("condutoresListEmpty");
-    if(!body || !empty) return;
-
-    const lojaId = getCondutorListScopeLojaId();
-
-    let items = [...state.condutores];
-    if(lojaId) items = items.filter(c=>c.lojaId===lojaId);
-    items.sort((a,b)=>String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
-
-    body.innerHTML = items.map(c=>{
-      const ativo = (c.ativo !== false);
-      return `
-        <tr>
-          <td>${getStoreName(c.lojaId)}</td>
-          <td>${c.nome || "-"}</td>
-          <td>${c.cpf ? formatCPF(c.cpf) : "-"}</td>
-          <td>${c.cargo || "-"}</td>
-          <td>${ativo ? `<span class="badge badge-green">Ativo</span>` : `<span class="badge badge-red">Inativo</span>`}</td>
-          <td>
-            <button class="btn ${ativo ? "btn-danger" : "btn-success"}" data-id="${c.id}" data-next="${ativo ? "false":"true"}" type="button">
-              ${ativo ? "Inativar" : "Ativar"}
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join("") || `<tr><td colspan="6">Nenhum condutor.</td></tr>`;
-
-    empty.textContent = items.length ? "" : "Nenhum condutor.";
-
-    setTimeout(()=>{
-      body.querySelectorAll("button[data-id]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-id");
-          const next = btn.getAttribute("data-next")==="true";
-
-          try{
-            await setDoc(doc(db, Collections.CONDUTORES, id), {
-              ativo: next,
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            }, { merge:true });
-
-            await refreshAfterWrite();
-            renderCondutoresList();
-          }catch(e){
-            alert(`Falha ao alterar status. (${e?.code || "erro"})`);
-          }
-        });
-      });
-    },0);
-  }
-
-  async function salvarCondutor(){
-    const notice = document.getElementById("condutorNotice");
-    clearNotice(notice);
-
-    const lojaId = userIsGeneralManager()
-      ? (document.getElementById("condutorLoja")?.value || "")
-      : currentUserStoreId();
-
-    const cpfDigits = onlyDigits(document.getElementById("condutorCPF")?.value || "");
-    const nome = (document.getElementById("condutorNome")?.value || "").trim();
-    const cargo = (document.getElementById("condutorCargo")?.value || "").trim();
-
-    if(!lojaId){ showNotice(notice,"Selecione a loja."); return; }
-    if(!isValidCPF(cpfDigits)){ showNotice(notice,"CPF inválido."); return; }
-    if(!nome){ showNotice(notice,"Informe o nome."); return; }
-    if(!cargo){ showNotice(notice,"Informe o cargo."); return; }
-
-    try{
-      const payload = {
-        lojaId,
-        cpf: cpfDigits,
-        nome,
-        cargo,
-        ativo: true,
-        atualizadoEm: new Date(),
-        atualizadoPorUid: state.authUser.uid,
-        atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-      };
-
-      if(state.condutorEditing?.id){
-        await setDoc(doc(db, Collections.CONDUTORES, state.condutorEditing.id), payload, { merge:true });
-        showNotice(notice,"Condutor atualizado com sucesso.","success");
-      }else{
-        await addDoc(collection(db, Collections.CONDUTORES), {
-          ...payload,
-          criadoEm: new Date(),
-          criadoPorUid: state.authUser.uid,
-          criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        });
-        showNotice(notice,"Condutor cadastrado com sucesso.","success");
-      }
-
-      await refreshAfterWrite();
-      renderCondutor();
-    }catch(e){
-      showNotice(notice,`Não foi possível salvar. (${e?.code || "erro"})`);
-    }
-  }
-
-  /* ===== Autorizador (CPF lookup + lista + ativar/inativar) ===== */
-  async function findAutorizadorByCpf(lojaId, cpfDigits){
-    const q = query(collection(db, Collections.AUTORIZADORES), where("lojaId","==",lojaId), where("cpf","==",cpfDigits), limit(1));
-    const snap = await getDocs(q);
-    if(snap.empty) return null;
-    const d = snap.docs[0];
-    return { id: d.id, ...d.data() };
-  }
-
-  function renderAutorizador(){
-    if(!userCanCreateAutorizador()){
-      renderPanel("Acesso restrito","Somente gerentes podem cadastrar autorizadores.", `<div class="empty">Acesso negado.</div>`);
-      return;
-    }
-
-    state.autorizadorEditing = null;
-
-    const lojaBlock = userIsGeneralManager() ? `
-      <div class="form-group">
-        <label class="req" for="autLoja">Loja</label>
-        <select class="select" id="autLoja">${buildStoreOptions({includeBlank:true, blankLabel:"Selecione a loja"})}</select>
-      </div>
-    ` : `
-      <div class="form-group">
-        <label>Loja</label>
-        <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-      </div>
-    `;
-
-    renderPanel("Autorizador","CPF consulta. Se existir, edita. Lista abaixo permite ativar/inativar.", `
-      <div class="grid">
-        ${lojaBlock}
-
-        <div class="form-group">
-          <label class="req" for="autCPF">CPF</label>
-          <input class="input" id="autCPF" data-mask="cpf" inputmode="numeric" maxlength="14">
-          <div class="subtle" id="autStatusText"></div>
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="autNome">Nome</label>
-          <input class="input" id="autNome" maxlength="80">
-        </div>
-
-        <div class="form-group">
-          <label class="req" for="autCargo">Cargo</label>
-          <input class="input" id="autCargo" maxlength="60">
-        </div>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-success" id="btnSalvarAutorizador" type="button">Cadastrar</button>
-        <button class="btn btn-light" id="btnLimparAutorizador" type="button">Limpar</button>
-      </div>
-
-      <div id="autNotice" class="notice"></div>
-
-      <div class="section-title">Lista de autorizadores</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr><th>Loja</th><th>Nome</th><th>CPF</th><th>Cargo</th><th>Status</th><th>Ação</th></tr>
-          </thead>
-          <tbody id="autListBody"></tbody>
-        </table>
-      </div>
-      <div class="empty" id="autListEmpty"></div>
-    `);
-
-    attachInputMasks();
-
-    const cpfEl = document.getElementById("autCPF");
-    const nomeEl = document.getElementById("autNome");
-    const cargoEl = document.getElementById("autCargo");
-    const btnEl = document.getElementById("btnSalvarAutorizador");
-    const statusEl = document.getElementById("autStatusText");
-
-    let timer=null;
-    cpfEl.addEventListener("input", ()=>{
-      clearTimeout(timer);
-      timer=setTimeout(async ()=>{
-        const lojaId = userIsGeneralManager()
-          ? (document.getElementById("autLoja")?.value || "")
-          : currentUserStoreId();
-        const cpfDigits = onlyDigits(cpfEl.value);
-
-        state.autorizadorEditing=null;
-        statusEl.textContent="";
-        btnEl.textContent="Cadastrar";
-
-        if(!lojaId || cpfDigits.length !== 11) return;
-
-        try{
-          const found = await findAutorizadorByCpf(lojaId, cpfDigits);
-          if(found){
-            state.autorizadorEditing=found;
-            nomeEl.value = found.nome || "";
-            cargoEl.value = found.cargo || "";
-            const ativo = (found.ativo !== false);
-            statusEl.innerHTML = ativo ? `<span class="badge badge-green">Encontrado: ATIVO</span>` : `<span class="badge badge-red">Encontrado: INATIVO</span>`;
-            btnEl.textContent="Atualizar";
-          }else{
-            statusEl.innerHTML = `<span class="badge badge-gray">CPF não cadastrado</span>`;
-          }
-        }catch(e){
-          statusEl.innerHTML = `<span class="badge badge-red">Falha na consulta</span>`;
-        }
-      },450);
-    });
-
-    if(userIsGeneralManager()){
-      document.getElementById("autLoja").addEventListener("change", ()=>{
-        cpfEl.value=""; nomeEl.value=""; cargoEl.value=""; statusEl.textContent="";
-        state.autorizadorEditing=null;
-        btnEl.textContent="Cadastrar";
-        renderAutList();
-      });
-    }
-
-    document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
-    document.getElementById("btnLimparAutorizador").addEventListener("click", renderAutorizador);
-
-    renderAutList();
-  }
-
-  function getAutListScopeLojaId(){
-    return userIsGeneralManager()
-      ? (document.getElementById("autLoja")?.value || "")
-      : currentUserStoreId();
-  }
-
-  function renderAutList(){
-    const body = document.getElementById("autListBody");
-    const empty = document.getElementById("autListEmpty");
-    if(!body || !empty) return;
-
-    const lojaId = getAutListScopeLojaId();
-
-    let items = [...state.autorizadores];
-    if(lojaId) items = items.filter(a=>a.lojaId===lojaId);
-    items.sort((a,b)=>String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
-
-    body.innerHTML = items.map(a=>{
-      const ativo = (a.ativo !== false);
-      return `
-        <tr>
-          <td>${getStoreName(a.lojaId)}</td>
-          <td>${a.nome || "-"}</td>
-          <td>${a.cpf ? formatCPF(a.cpf) : "-"}</td>
-          <td>${a.cargo || "-"}</td>
-          <td>${ativo ? `<span class="badge badge-green">Ativo</span>` : `<span class="badge badge-red">Inativo</span>`}</td>
-          <td>
-            <button class="btn ${ativo ? "btn-danger" : "btn-success"}" data-id="${a.id}" data-next="${ativo ? "false":"true"}" type="button">
-              ${ativo ? "Inativar" : "Ativar"}
-            </button>
-          </td>
-        </tr>
-      `;
-    }).join("") || `<tr><td colspan="6">Nenhum autorizador.</td></tr>`;
-
-    empty.textContent = items.length ? "" : "Nenhum autorizador.";
-
-    setTimeout(()=>{
-      body.querySelectorAll("button[data-id]").forEach(btn=>{
-        btn.addEventListener("click", async ()=>{
-          const id = btn.getAttribute("data-id");
-          const next = btn.getAttribute("data-next")==="true";
-
-          try{
-            await setDoc(doc(db, Collections.AUTORIZADORES, id), {
-              ativo: next,
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            }, { merge:true });
-
-            await refreshAfterWrite();
-            renderAutList();
-          }catch(e){
-            alert(`Falha ao alterar status. (${e?.code || "erro"})`);
-          }
-        });
-      });
-    },0);
-  }
-
-  async function salvarAutorizador(){
-    const notice = document.getElementById("autNotice");
-    clearNotice(notice);
-
-    const lojaId = userIsGeneralManager()
-      ? (document.getElementById("autLoja")?.value || "")
-      : currentUserStoreId();
-
-    const cpfDigits = onlyDigits(document.getElementById("autCPF")?.value || "");
-    const nome = (document.getElementById("autNome")?.value || "").trim();
-    const cargo = (document.getElementById("autCargo")?.value || "").trim();
-
-    if(!lojaId){ showNotice(notice,"Selecione a loja."); return; }
-    if(!isValidCPF(cpfDigits)){ showNotice(notice,"CPF inválido."); return; }
-    if(!nome){ showNotice(notice,"Informe o nome."); return; }
-    if(!cargo){ showNotice(notice,"Informe o cargo."); return; }
-
-    try{
-      const payload = {
-        lojaId,
-        cpf: cpfDigits,
-        nome,
-        cargo,
-        ativo: true,
-        atualizadoEm: new Date(),
-        atualizadoPorUid: state.authUser.uid,
-        atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-      };
-
-      if(state.autorizadorEditing?.id){
-        await setDoc(doc(db, Collections.AUTORIZADORES, state.autorizadorEditing.id), payload, { merge:true });
-        showNotice(notice,"Autorizador atualizado com sucesso.","success");
-      }else{
-        await addDoc(collection(db, Collections.AUTORIZADORES), {
-          ...payload,
-          criadoEm: new Date(),
-          criadoPorUid: state.authUser.uid,
-          criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        });
-        showNotice(notice,"Autorizador cadastrado com sucesso.","success");
-      }
-
-      await refreshAfterWrite();
-      renderAutorizador();
-    }catch(e){
-      showNotice(notice,`Não foi possível salvar. (${e?.code || "erro"})`);
-    }
-  }
-
-  /* ===== Extrato (gerente geral) ===== */
-  async function queryMovimentosExtrato(lojaId, startDate, endDate){
-    const col = collection(db, Collections.MOVIMENTOS);
-    let q;
-
-    if(lojaId){
-      q = query(col, where("lojaId","==",lojaId), where("data",">=",startDate), where("data","<=",endDate), orderBy("data","desc"));
-    }else{
-      q = query(col, where("data",">=",startDate), where("data","<=",endDate), orderBy("data","desc"));
-    }
-
-    const snap = await getDocs(q);
-    const arr = [];
-    snap.forEach(d => arr.push({ id:d.id, ...d.data() }));
-    return arr;
-  }
-
-  function exportExtratoPDF(lojaLabel, periodoLabel, items){
-    const rows = items.map(m=>`
-      <tr>
-        <td>${formatDate(m.data)}</td>
-        <td>${m.tipo || "-"}</td>
-        <td>${getStoreNameFromItem(m)}</td>
-        <td>${m.placa || "-"}</td>
-        <td>${m.veiculo || "-"}</td>
-        <td>${m.condutor || "-"}</td>
-        <td>${m.autorizador || "-"}</td>
-        <td>${m.observacao || "-"}</td>
-      </tr>
-    `).join("");
-
-    const html = `<!doctype html><html lang="pt-BR"><head>
-<meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Extrato</title>
-<style>
-body{ font-family: Arial, Helvetica, sans-serif; margin:24px; color:#0f172a; }
-h1{ margin:0 0 6px 0; font-size:20px; }
-.sub{ margin:0 0 16px 0; color:#475569; font-size:13px; }
-table{ width:100%; border-collapse:collapse; font-size:12px; }
-th,td{ border-bottom:1px solid #e5e7eb; padding:8px; text-align:left; vertical-align:top; }
-th{ background:#f8fafc; font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:.05em; }
-@media print{ body{ margin:0; } }
-</style></head><body>
-<h1>Extrato de Movimentações</h1>
-<p class="sub">Loja: ${lojaLabel} • Período: ${periodoLabel} • Gerado em: ${new Date().toLocaleString("pt-BR")}</p>
-<table>
-<thead><tr>
-<th>Data/Hora</th><th>Tipo</th><th>Loja</th><th>Placa</th><th>Veículo</th><th>Condutor</th><th>Autorizador</th><th>Obs</th>
-</tr></thead>
-<tbody>${rows || `<tr><td colspan="8">Sem registros.</td></tr>`}</tbody>
-</table>
-</body></html>`;
-
-    const w = window.open("", "_blank");
-    if(!w){ alert("Permita pop-ups para gerar o extrato."); return; }
-    w.document.open();
-    w.document.write(html);
-    w.document.close();
-    w.onload = ()=>{ try{ w.focus(); w.print(); }catch(e){} };
-  }
-
-  function renderExtrato(){
-    if(!userIsGeneralManager()){
-      renderPanel("Acesso restrito","Somente gerente geral.", `<div class="empty">Acesso negado.</div>`);
-      return;
-    }
-
-    renderPanel("Extrato","Selecione loja (ou todas), período e gere o PDF (somente dados).", `
-      <div class="grid">
-        <div class="form-group">
-          <label for="extratoLoja">Loja</label>
-          <select class="select" id="extratoLoja">${buildStoreOptions({includeAll:true})}</select>
-        </div>
-        <div class="form-group">
-          <label class="req" for="extratoIni">Data inicial</label>
-          <input class="input" id="extratoIni" type="date">
-        </div>
-        <div class="form-group">
-          <label class="req" for="extratoFim">Data final</label>
-          <input class="input" id="extratoFim" type="date">
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn btn-primary" id="btnGerarExtrato" type="button">Gerar PDF</button>
-      </div>
-      <div id="extratoNotice" class="notice"></div>
-    `);
-
-    document.getElementById("btnGerarExtrato").addEventListener("click", async ()=>{
-      const notice = document.getElementById("extratoNotice");
-      clearNotice(notice);
-
-      const lojaId = document.getElementById("extratoLoja")?.value || "";
-      const ini = ymdToDateStart(document.getElementById("extratoIni")?.value || "");
-      const fim = ymdToDateEnd(document.getElementById("extratoFim")?.value || "");
-
-      if(!ini || !fim){ showNotice(notice,"Informe data inicial e final."); return; }
-      if(fim.getTime() < ini.getTime()){ showNotice(notice,"A data final não pode ser menor que a inicial."); return; }
-
-      try{
-        const items = await queryMovimentosExtrato(lojaId, ini, fim);
-        exportExtratoPDF(lojaId ? getStoreName(lojaId) : "Todas as lojas", `${ini.toLocaleDateString("pt-BR")} até ${fim.toLocaleDateString("pt-BR")}`, items);
-        showNotice(notice,`Extrato gerado: ${items.length} registro(s).`,"success");
-      }catch(e){
-        showNotice(notice,`Não foi possível gerar o extrato. (${e?.code || "erro"})`);
-      }
-    });
-  }
-
-  /* ===== App control ===== */
-  async function refreshAfterWrite(){
-    await loadLojas();
-    await loadOperationalCollections();
-    renderShellInfo();
-    renderDashboard();
-  }
-
-  async function login(){
-    clearNotice(el.loginNotice);
-    const email = el.loginEmail.value.trim();
-    const senha = el.loginSenha.value;
-    if(!email || !senha){ showNotice(el.loginNotice,"Preencha e-mail e senha."); return; }
-    el.btnLogin.disabled = true;
-    try{ await signInWithEmailAndPassword(auth, email, senha); }
-    catch(e){ showNotice(el.loginNotice,`Não foi possível entrar. (${e?.code || "erro"})`); }
-    finally{ el.btnLogin.disabled = false; }
-  }
-
-  async function logout(){
-    try{ await signOut(auth); }
-    catch(e){ debugError(e); }
-  }
-
-  function showFatalAppError(err){
-    const msg = err?.message || String(err||"");
-    renderPanel("Erro ao carregar","O sistema não conseguiu carregar suas informações.", `
-      <div class="notice show error">
-        <strong>Falha:</strong> ${err?.code || "erro"}<br/>
-        <div style="margin-top:6px;">${msg}</div>
-        <div style="margin-top:10px; color:#7f1d1d;">
-          Se for <b>permission-denied</b>, é regra do Firestore bloqueando.
-        </div>
-      </div>
-      <div class="actions">
-        <button class="btn btn-light" id="btnRetryLoad" type="button">Tentar novamente</button>
-      </div>
-    `);
-    setTimeout(()=>{
-      document.getElementById("btnRetryLoad")?.addEventListener("click", async ()=>{
-        try{
-          await refreshAfterWrite();
-          buildMenu();
-          renderDashboardHome();
-        }catch(e){ showFatalAppError(e); }
-      });
-    },0);
-  }
-
-  async function initializeAuthenticatedUser(user){
-    state.authUser = user;
-
-    el.loginView.style.display = "none";
-    el.topbar.style.display = "flex";
-    el.footerbar.style.display = "block";
-    el.appView.style.display = "block";
-
-    try{
-      await loadUserProfile(user.uid);
-      await loadLojas();
-      await loadOperationalCollections();
-
-      renderShellInfo();
-      renderDashboard();
-      buildMenu();
-      renderDashboardHome();
-    }catch(err){
-      debugError("Falha init:", err);
-      showFatalAppError(err);
-    }
-  }
-
-  function resetAppState(){
-    state.authUser = null;
-    state.userProfile = null;
-    state.lojas = [];
-    state.lojasMap = {};
-    state.movimentos = [];
-    state.condutores = [];
-    state.autorizadores = [];
-    state.selectedMovimento = null;
-    state.condutorEditing = null;
-    state.autorizadorEditing = null;
-
-    el.topbar.style.display = "none";
-    el.footerbar.style.display = "none";
-    el.appView.style.display = "none";
-    el.loginView.style.display = "flex";
-
-    el.dashboardCards.innerHTML = "";
-    el.menuBar.innerHTML = "";
-    el.mainPanel.innerHTML = `
+    <section class="card" id="mainPanel">
       <div class="card-header">
         <div>
           <h3>Bem-vindo</h3>
           <p>Selecione uma função no menu acima.</p>
         </div>
       </div>
-    `;
-    closeDetailModal();
-  }
+    </section>
+  </main>
 
-  el.btnLogin.addEventListener("click", login);
-  el.btnLogout.addEventListener("click", logout);
-  el.loginSenha.addEventListener("keydown", (e)=>{ if(e.key==="Enter") login(); });
+  <!-- MODAL: detalhes do registro + fotos + exportar individual -->
+  <div class="modal" id="detailModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="modal-head">
+        <div>
+          <h4 id="detailTitle">Detalhes do registro</h4>
+          <p id="detailSub">Visualize informações e fotos do veículo.</p>
+        </div>
+        <button class="btn btn-light" id="btnCloseModal" style="min-width:120px;">Fechar</button>
+      </div>
+      <div class="modal-body" id="detailBody"></div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" id="btnExportRegistro">Exportar registro</button>
+        <button class="btn btn-light" id="btnCloseModal2">Fechar</button>
+      </div>
+    </div>
+  </div>
 
-  el.btnCloseModal.addEventListener("click", closeDetailModal);
-  el.btnCloseModal2.addEventListener("click", closeDetailModal);
-  el.detailModal.addEventListener("click", (e)=>{ if(e.target === el.detailModal) closeDetailModal(); });
-  el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-  onAuthStateChanged(auth, async (user)=>{
-    if(!user){ resetAppState(); return; }
-    await initializeAuthenticatedUser(user);
-  });
+    import {
+      getFirestore,
+      collection,
+      doc,
+      getDoc,
+      getDocs,
+      query,
+      where,
+      limit,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      orderBy
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  debugLog("Sistema carregado.");
-</script>
+    // ========= CONFIG =========
+    const firebaseConfig = {
+      apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
+      authDomain: "controle-ponto-26d34.firebaseapp.com",
+      projectId: "controle-ponto-26d34",
+      storageBucket: "controle-ponto-26d34.appspot.com",
+      messagingSenderId: "730360923157",
+      appId: "1:730360923157:web:cdd6ea1eeed6fd717d3a1c"
+    };
 
+    const appFirebase = initializeApp(firebaseConfig);
+    const auth = getAuth(appFirebase);
+    const db = getFirestore(appFirebase);
+
+    const Collections = {
+      LOJAS: "lojas",
+      USUARIOS: "usuarios",
+      MOVIMENTOS: "movimentos",
+      CONDUTORES: "condutores",
+      AUTORIZADORES: "autorizadores"
+    };
+
+    const Roles = {
+      CONTROLADOR: "controlador",
+      GERENTE_LOJA: "gerente_loja",
+      GERENTE_GERAL: "gerente_geral"
+    };
+
+    const MOTIVOS_ENTRADA = [
+      "Retorno test-drive",
+      "Retorno de atividade externa",
+      "Retorno de transferência",
+      "Entrada para higienização",
+      "Entrada para manutenção",
+      "Entrada para peritagem / vistoria",
+      "Entrada de veículo 0km",
+      "Entrada de veículo seminovo",
+      "Chegada de transporte / cegonha",
+      "Devolução de cliente",
+      "Entrada para exposição",
+      "Entrada por recolhimento",
+      "Outro"
+    ];
+
+    const MOTIVOS_SAIDA = [
+      "Saída test-drive",
+      "Transferência de loja",
+      "Atividade externa",
+      "Saída para manutenção",
+      "Saída para higienização",
+      "Saída para abastecimento",
+      "Saída para vistoria / laudo",
+      "Saída para emplacamento",
+      "Saída para entrega ao cliente",
+      "Saída para despachante",
+      "Saída para logística / transporte",
+      "Saída para pátio externo",
+      "Saída por recolhimento",
+      "Outro"
+    ];
+
+    // ========= ELEMENTOS =========
+    const el = {
+      topbar: document.getElementById("topbar"),
+      footerbar: document.getElementById("footerbar"),
+      loginView: document.getElementById("loginView"),
+      appView: document.getElementById("appView"),
+
+      loginEmail: document.getElementById("loginEmail"),
+      loginSenha: document.getElementById("loginSenha"),
+      btnLogin: document.getElementById("btnLogin"),
+      btnLogout: document.getElementById("btnLogout"),
+      loginNotice: document.getElementById("loginNotice"),
+
+      headerStoreText: document.getElementById("headerStoreText"),
+      footerRoleText: document.getElementById("footerRoleText"),
+      footerUserText: document.getElementById("footerUserText"),
+      footerStoreText: document.getElementById("footerStoreText"),
+
+      heroTitle: document.getElementById("heroTitle"),
+      heroSubtitle: document.getElementById("heroSubtitle"),
+
+      dashboardCards: document.getElementById("dashboardCards"),
+      menuBar: document.getElementById("menuBar"),
+      mainPanel: document.getElementById("mainPanel"),
+
+      detailModal: document.getElementById("detailModal"),
+      detailBody: document.getElementById("detailBody"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailSub: document.getElementById("detailSub"),
+      btnCloseModal: document.getElementById("btnCloseModal"),
+      btnCloseModal2: document.getElementById("btnCloseModal2"),
+      btnExportRegistro: document.getElementById("btnExportRegistro")
+    };
+
+    // ========= ESTADO =========
+    const state = {
+      authUser: null,
+      userProfile: null,
+      lojas: [],
+      lojasMap: {},
+      movimentos: [],
+      condutores: [],
+      autorizadores: [],
+      selectedMovimento: null
+    };
+
+    // ✅ debug opcional no console:
+    // window.__cv = { state, db, auth, Collections };
+
+    // ========= HELPERS =========
+    function debugLog(...args){ console.log(...args); }
+    function debugError(...args){ console.error(...args); }
+
+    function clearNotice(target){
+      target.className = "notice";
+      target.textContent = "";
+    }
+
+    function showNotice(target, message, type="error"){
+      target.className = `notice show ${type}`;
+      target.textContent = message;
+    }
+
+    function onlyDigits(v){ return String(v || "").replace(/\D/g, ""); }
+
+    function formatCPF(value){
+      const digits = onlyDigits(value).slice(0, 11);
+      return digits
+        .replace(/^(\d{3})(\d)/, "$1.$2")
+        .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/\.(\d{3})(\d)/, ".$1-$2");
+    }
+
+    function isValidCPF(cpf){
+      const clean = onlyDigits(cpf);
+      if (clean.length !== 11) return false;
+      if (/^(\d)\1{10}$/.test(clean)) return false;
+
+      let sum = 0;
+      for (let i = 0; i < 9; i++) sum += Number(clean[i]) * (10 - i);
+      let first = (sum * 10) % 11;
+      if (first === 10) first = 0;
+      if (first !== Number(clean[9])) return false;
+
+      sum = 0;
+      for (let i = 0; i < 10; i++) sum += Number(clean[i]) * (11 - i);
+      let second = (sum * 10) % 11;
+      if (second === 10) second = 0;
+      if (second !== Number(clean[10])) return false;
+
+      return true;
+    }
+
+    function normalizePlate(value){
+      return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    }
+
+    function isValidPlate(plate){
+      const clean = normalizePlate(plate);
+      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;                 // ABC1234
+      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;  // ABC1D23
+      return oldPattern.test(clean) || mercosulPattern.test(clean);
+    }
+
+    function formatPlate(value){
+      const clean = normalizePlate(value).slice(0, 7);
+      if(!clean) return "";
+      if(clean.length <= 3) return clean;
+      return clean.slice(0, 3) + "-" + clean.slice(3);
+    }
+
+    function formatDate(value){
+      try{
+        if(!value) return "-";
+        if(value.seconds) return new Date(value.seconds * 1000).toLocaleString("pt-BR");
+        return new Date(value).toLocaleString("pt-BR");
+      }catch(e){
+        return "-";
+      }
+    }
+
+    function getDateMs(value){
+      try{
+        if(!value) return 0;
+        if(value.seconds) return value.seconds * 1000;
+        return new Date(value).getTime();
+      }catch(e){
+        return 0;
+      }
+    }
+
+    function parseDateInputToRange(dateStr){
+      // dateStr: YYYY-MM-DD
+      if(!dateStr) return null;
+      const start = new Date(dateStr + "T00:00:00");
+      const end = new Date(dateStr + "T23:59:59.999");
+      return { startMs: start.getTime(), endMs: end.getTime() };
+    }
+
+    function getRoleLabel(role){
+      if(role === Roles.CONTROLADOR) return "Controlador de acesso";
+      if(role === Roles.GERENTE_LOJA) return "Gerente de loja";
+      if(role === Roles.GERENTE_GERAL) return "Gerente geral";
+      return "Perfil não definido";
+    }
+
+    function userIsGeneral(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
+    function userIsStore(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
+    function userIsCtrl(){ return state.userProfile?.role === Roles.CONTROLADOR; }
+
+    // ✅ conforme você pediu depois: qualquer nível pode consultar e alterar movimentações
+    function userCanEditMovimentos(){ return true; }
+    function userCanManageCondutores(){ return userIsGeneral() || userIsStore() || userIsCtrl(); }
+    function userCanManageAutorizadores(){ return userIsGeneral() || userIsStore(); }
+    function userCanGerenciarLojas(){ return userIsGeneral(); }
+    function userCanExtrato(){ return userIsGeneral(); }
+
+    function currentUserStoreId(){
+      return state.userProfile?.lojaId || null;
+    }
+
+    function getStoreName(lojaId){
+      if(!lojaId) return "Todas as lojas";
+      return state.lojasMap[lojaId]?.nome || lojaId;
+    }
+
+    function getStoreNameFromItem(item){
+      const lojaId = item?.lojaId || "";
+      if(lojaId && state.lojasMap[lojaId]?.nome) return state.lojasMap[lojaId].nome;
+      return item?.lojaNome || (lojaId || "-");
+    }
+
+    function buildStoreOptions(includeBlank = true){
+      const options = [];
+      if(includeBlank) options.push(`<option value="">Selecione a loja</option>`);
+      state.lojas.forEach(loja => {
+        options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`);
+      });
+      return options.join("");
+    }
+
+    function buildPeopleOptions(list){
+      const options = [`<option value="">Selecione</option>`];
+      list.forEach(item => {
+        const ativo = item.ativo !== false;
+        const label = ativo ? item.nome : `${item.nome} - INATIVO`;
+        const disabled = ativo ? "" : "disabled";
+        options.push(`<option value="${ativo ? item.nome : ""}" ${disabled}>${label}</option>`);
+      });
+      return options.join("");
+    }
+
+    function buildMotivoOptions(list){
+      const options = [`<option value="">Selecione</option>`];
+      list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
+      return options.join("");
+    }
+
+    function attachInputMasks(){
+      document.querySelectorAll("[data-mask='cpf']").forEach(input => {
+        input.addEventListener("input", () => { input.value = formatCPF(input.value); });
+      });
+
+      document.querySelectorAll("[data-mask='plate']").forEach(input => {
+        input.addEventListener("input", () => { input.value = formatPlate(input.value); });
+      });
+
+      document.querySelectorAll("[data-only='digits']").forEach(input => {
+        input.addEventListener("input", () => { input.value = onlyDigits(input.value); });
+      });
+    }
+
+    function renderPanel(title, subtitle, bodyHTML){
+      el.mainPanel.innerHTML = `
+        <div class="card-header">
+          <div>
+            <h3>${title}</h3>
+            <p>${subtitle}</p>
+          </div>
+        </div>
+        ${bodyHTML}
+      `;
+    }
+
+    // ========= LOADERS =========
+    async function loadUserProfile(uid){
+      const userRef = doc(db, Collections.USUARIOS, uid);
+      const userSnap = await getDoc(userRef);
+      if(!userSnap.exists()) throw new Error("Usuário não encontrado");
+      const data = userSnap.data();
+
+      if(data.ativo === false) throw new Error("Usuário desativado");
+      if(!data.role) throw new Error("Usuário sem role");
+      if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada");
+
+      state.userProfile = { id: userSnap.id, ...data };
+    }
+
+    async function loadLojas(){
+      const lojasSnap = await getDocs(collection(db, Collections.LOJAS));
+      state.lojas = [];
+      state.lojasMap = {};
+
+      lojasSnap.forEach(docSnap => {
+        const data = docSnap.data();
+        const item = { id: docSnap.id, ...data };
+        state.lojas.push(item);
+        state.lojasMap[item.id] = item;
+      });
+
+      state.lojas.sort((a,b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+    }
+
+    function sortOperationalArrays(){
+      state.movimentos.sort((a,b) => getDateMs(b.data) - getDateMs(a.data));
+      state.condutores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+      state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+    }
+
+    async function loadOperationalCollections(){
+      const lojaId = currentUserStoreId();
+
+      // gerente geral: carrega tudo
+      if(userIsGeneral()){
+        const [movSnap, condSnap, autSnap] = await Promise.all([
+          getDocs(query(collection(db, Collections.MOVIMENTOS), limit(2000))),
+          getDocs(query(collection(db, Collections.CONDUTORES), limit(3000))),
+          getDocs(query(collection(db, Collections.AUTORIZADORES), limit(3000)))
+        ]);
+
+        state.movimentos = [];
+        movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
+
+        state.condutores = [];
+        condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
+
+        state.autorizadores = [];
+        autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
+
+        sortOperationalArrays();
+        return;
+      }
+
+      // outros perfis: apenas a própria loja (evita índice composto)
+      const [movSnap, condSnap, autSnap] = await Promise.all([
+        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(2000))),
+        getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(3000))),
+        getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(3000)))
+      ]);
+
+      state.movimentos = [];
+      movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
+
+      state.condutores = [];
+      condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
+
+      state.autorizadores = [];
+      autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
+
+      sortOperationalArrays();
+    }
+
+    // ========= SHELL =========
+    function renderShellInfo(){
+      const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
+      const roleLabel = getRoleLabel(state.userProfile?.role);
+      const lojaNome = userIsGeneral() ? "Todas as lojas" : getStoreName(state.userProfile?.lojaId);
+
+      el.headerStoreText.textContent = lojaNome;
+      el.footerUserText.textContent = nome;
+      el.footerRoleText.textContent = roleLabel;
+      el.footerStoreText.textContent = lojaNome;
+
+      if(userIsGeneral()){
+        el.heroTitle.textContent = "Dashboard geral";
+        el.heroSubtitle.textContent = "Acompanhe movimentações e cadastros de todas as lojas.";
+      }else if(userIsStore()){
+        el.heroTitle.textContent = "Dashboard da loja";
+        el.heroSubtitle.textContent = "Acompanhe a operação e os registros da sua unidade.";
+      }else{
+        el.heroTitle.textContent = "Painel operacional";
+        el.heroSubtitle.textContent = "Registre entradas/saídas e consulte registros.";
+      }
+    }
+
+    function computePatioCount(movimentos){
+      const patioMap = {};
+      movimentos
+        .slice()
+        .sort((a,b) => getDateMs(a.data) - getDateMs(b.data))
+        .forEach(item => {
+          const plate = normalizePlate(item.placa);
+          if(!plate) return;
+          const key = userIsGeneral() ? `${item.lojaId || ""}__${plate}` : plate;
+          if(item.tipo === "entrada") patioMap[key] = true;
+          if(item.tipo === "saida") delete patioMap[key];
+        });
+
+      return Object.keys(patioMap).length;
+    }
+
+    function buildDashboardMetrics(){
+      const movimentos = [...state.movimentos];
+      const condutores = [...state.condutores];
+      const autorizadores = [...state.autorizadores];
+
+      const vehiclesInPatio = computePatioCount(movimentos);
+      const entradas = movimentos.filter(m => m.tipo === "entrada").length;
+      const saidas = movimentos.filter(m => m.tipo === "saida").length;
+
+      const cards = [
+        {
+          title: "Veículos no pátio",
+          value: vehiclesInPatio,
+          subtitle: userIsGeneral() ? "Somatório de todas as lojas" : "Veículos atualmente dentro da unidade"
+        },
+        {
+          title: "Movimentações",
+          value: movimentos.length,
+          subtitle: "Total de entradas e saídas"
+        },
+        {
+          title: "Condutores",
+          value: condutores.length,
+          subtitle: "Cadastros disponíveis"
+        },
+        {
+          title: "Autorizadores",
+          value: autorizadores.length,
+          subtitle: "Cadastros disponíveis"
+        }
+      ];
+
+      if(!userIsGeneral()){
+        cards.push({ title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" });
+      }else{
+        cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades cadastradas" });
+      }
+
+      return cards;
+    }
+
+    function renderDashboard(){
+      const cards = buildDashboardMetrics();
+      el.dashboardCards.innerHTML = cards.map(card => `
+        <article class="stat">
+          <small>${card.title}</small>
+          <strong>${card.value}</strong>
+          <span>${card.subtitle}</span>
+        </article>
+      `).join("");
+    }
+
+    function buildMenu(){
+      const items = [];
+
+      items.push({ id: "menu-dashboard", label: userIsGeneral() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome });
+      items.push({ id: "menu-entrada", label: "Entrada", action: renderEntrada });
+      items.push({ id: "menu-saida", label: "Saída", action: renderSaida });
+      items.push({ id: "menu-consulta", label: "Consulta", action: renderConsulta });
+
+      if(userCanManageCondutores()){
+        items.push({ id: "menu-condutor", label: "Condutores", action: renderCondutores });
+      }
+      if(userCanManageAutorizadores()){
+        items.push({ id: "menu-autorizador", label: "Autorizadores", action: renderAutorizadores });
+      }
+      if(userCanExtrato()){
+        items.push({ id: "menu-extrato", label: "Extrato (PDF)", action: renderExtrato });
+      }
+      if(userCanGerenciarLojas()){
+        items.push({ id: "menu-lojas-admin", label: "Gerenciar lojas", action: renderGerenciarLojas });
+      }
+
+      el.menuBar.innerHTML = "";
+      items.forEach(item => {
+        const btn = document.createElement("button");
+        btn.className = "btn btn-primary";
+        btn.id = item.id;
+        btn.textContent = item.label;
+        btn.addEventListener("click", item.action);
+        el.menuBar.appendChild(btn);
+      });
+    }
+
+    function renderDashboardHome(){
+      const movimentos = [...state.movimentos];
+      const lastFive = movimentos.slice(0, 5);
+
+      const rows = lastFive.map(item => `
+        <tr>
+          <td>${formatDate(item.data)}</td>
+          <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
+          <td>${getStoreNameFromItem(item)}</td>
+          <td>${item.placa || "-"}</td>
+          <td>${item.veiculo || "-"}</td>
+          <td>${item.condutor || "-"}</td>
+          <td>${item.autorizador || "-"}</td>
+        </tr>
+      `).join("");
+
+      renderPanel(
+        userIsGeneral() ? "Dashboard geral" : "Dashboard",
+        "Últimas movimentações registradas.",
+        `
+          <div class="section-title">Últimas movimentações</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Loja</th>
+                  <th>Placa</th>
+                  <th>Veículo</th>
+                  <th>Condutor</th>
+                  <th>Autorizador</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || `<tr><td colspan="7">Nenhum registro encontrado.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `
+      );
+    }
+
+    // ========= CAMERA / FOTOS =========
+    function readFileAsDataURL(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(reader.error || new Error("Falha ao ler arquivo"));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function getImageDataFromInput(inputId){
+      const input = document.getElementById(inputId);
+      const file = input?.files?.[0];
+      if(!file) return "";
+      if(!file.type?.startsWith("image/")) return "";
+      return await readFileAsDataURL(file);
+    }
+
+    function setPreview(previewId, dataUrl){
+      const preview = document.getElementById(previewId);
+      if(!preview) return;
+      if(!dataUrl){
+        preview.innerHTML = `<div class="photo-hint">Sem foto</div>`;
+        return;
+      }
+      preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
+    }
+
+    function wireCameraButton(btnId, inputId){
+      const btn = document.getElementById(btnId);
+      const input = document.getElementById(inputId);
+      if(!btn || !input) return;
+      btn.addEventListener("click", () => input.click());
+    }
+
+    function wirePhotoPreview(inputId, previewId){
+      const input = document.getElementById(inputId);
+      if(!input) return;
+      input.addEventListener("change", async () => {
+        try{
+          const dataUrl = await getImageDataFromInput(inputId);
+          setPreview(previewId, dataUrl);
+        }catch(e){
+          setPreview(previewId, "");
+        }
+      });
+    }
+
+    // ========= ENTRADA / SAÍDA =========
+    function toggleMotivoOutro(prefix){
+      const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
+      const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
+      if(!wrap) return;
+      if(motivo === "Outro"){
+        wrap.classList.remove("hidden");
+      }else{
+        wrap.classList.add("hidden");
+        const input = document.getElementById(`${prefix}MotivoOutro`);
+        if(input) input.value = "";
+      }
+    }
+
+    function validateRequired(value){ return String(value || "").trim().length > 0; }
+
+    function renderEntrada(){
+      const lojaField = userIsGeneral()
+        ? `
+          <div class="form-group">
+            <div class="label-row"><label for="entradaLoja">Loja</label><span class="req">*</span></div>
+            <select class="select" id="entradaLoja">${buildStoreOptions(true)}</select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+          </div>
+        `;
+
+      renderPanel(
+        "Entrada",
+        "Registre a entrada de um veículo. Campos com * são obrigatórios.",
+        `
+          <div class="grid">
+            ${lojaField}
+
+            <div class="form-group">
+              <div class="label-row"><label for="entradaPlaca">Placa</label><span class="req">*</span></div>
+              <input class="input" id="entradaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="entradaVeiculo">Veículo</label><span class="req">*</span></div>
+              <input class="input" id="entradaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="entradaMotivo">Motivo da entrada</label><span class="req">*</span></div>
+              <select class="select" id="entradaMotivo">${buildMotivoOptions(MOTIVOS_ENTRADA)}</select>
+              <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
+            </div>
+
+            <div class="form-group hidden" id="entradaMotivoOutroWrap">
+              <div class="label-row"><label for="entradaMotivoOutro">Descreva o motivo</label><span class="req">*</span></div>
+              <input class="input" id="entradaMotivoOutro" maxlength="60" placeholder="Ex.: Inspeção rápida">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="entradaCondutor">Condutor</label><span class="req">*</span></div>
+              <select class="select" id="entradaCondutor">${buildPeopleOptions(state.condutores)}</select>
+              <div class="subtle">Condutores inativos aparecem, mas não podem ser selecionados.</div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="entradaAutorizador">Autorizador</label><span class="req">*</span></div>
+              <select class="select" id="entradaAutorizador">${buildPeopleOptions(state.autorizadores)}</select>
+              <div class="subtle">Autorizadores inativos aparecem, mas não podem ser selecionados.</div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="entradaDano">Condição do veículo</label><span class="req">*</span></div>
+              <select class="select" id="entradaDano">
+                <option value="">Selecione</option>
+                <option value="nao">Sem dano</option>
+                <option value="sim">Com dano</option>
+              </select>
+              <div class="subtle">Se “Com dano”, as 4 fotos principais são obrigatórias.</div>
+            </div>
+
+            <div class="form-group full">
+              <div class="label-row"><label>Fotos do veículo</label><span class="req">*</span></div>
+              <div class="subtle" id="entradaFotosHint">No tablet, toque em “Abrir câmera” para fotografar. Preview aparece na hora.</div>
+
+              <div class="photo-grid" id="entradaPhotoGrid">
+                ${photoCardHTML("Frente", "Frente", "fotoFrente", "previewFrente", "btnCamFrente")}
+                ${photoCardHTML("Mala", "Mala", "fotoMala", "previewMala", "btnCamMala")}
+                ${photoCardHTML("Lateral esquerda", "Lateral esquerda", "fotoLatEsq", "previewLatEsq", "btnCamLatEsq")}
+                ${photoCardHTML("Lateral direita", "Lateral direita", "fotoLatDir", "previewLatDir", "btnCamLatDir")}
+              </div>
+
+              <div class="actions" style="margin-top:12px;">
+                <button class="btn btn-light" id="btnAddExtraFoto">Fotografar mais partes</button>
+              </div>
+              <div class="subtle">Você pode adicionar fotos extras (detalhes, riscos, acessórios, etc.).</div>
+            </div>
+
+            <div class="form-group full">
+              <div class="label-row"><label for="entradaObs">Observação</label></div>
+              <textarea class="textarea" id="entradaObs" maxlength="300" placeholder="(opcional)"></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-success" id="btnSalvarEntrada">Salvar entrada</button>
+            <button class="btn btn-light" id="btnLimparEntrada">Limpar</button>
+          </div>
+
+          <div id="entradaNotice" class="notice"></div>
+        `
+      );
+
+      attachInputMasks();
+
+      // camera buttons + previews
+      wireCameraButton("btnCamFrente", "fotoFrente");
+      wireCameraButton("btnCamMala", "fotoMala");
+      wireCameraButton("btnCamLatEsq", "fotoLatEsq");
+      wireCameraButton("btnCamLatDir", "fotoLatDir");
+
+      wirePhotoPreview("fotoFrente", "previewFrente");
+      wirePhotoPreview("fotoMala", "previewMala");
+      wirePhotoPreview("fotoLatEsq", "previewLatEsq");
+      wirePhotoPreview("fotoLatDir", "previewLatDir");
+
+      document.getElementById("btnSalvarEntrada").addEventListener("click", salvarEntrada);
+      document.getElementById("btnLimparEntrada").addEventListener("click", renderEntrada);
+
+      document.getElementById("entradaMotivo").addEventListener("change", () => toggleMotivoOutro("entrada"));
+      toggleMotivoOutro("entrada");
+
+      document.getElementById("entradaDano").addEventListener("change", updateEntradaFotosHint);
+      updateEntradaFotosHint();
+
+      document.getElementById("btnAddExtraFoto").addEventListener("click", addExtraPhotoInput);
+    }
+
+    function photoCardHTML(title, hint, inputId, previewId, btnId){
+      return `
+        <div class="photo-card">
+          <strong>${title}</strong>
+          <div class="photo-preview" id="${previewId}"><div class="photo-hint">${hint}</div></div>
+          <button type="button" class="btn-camera" id="${btnId}">Abrir câmera</button>
+          <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+        </div>
+      `;
+    }
+
+    function updateEntradaFotosHint(){
+      const dano = document.getElementById("entradaDano")?.value || "";
+      const hint = document.getElementById("entradaFotosHint");
+      if(!hint) return;
+
+      if(dano === "sim"){
+        hint.textContent = "Como há dano, as 4 fotos principais são obrigatórias. Toque em “Abrir câmera”.";
+      }else if(dano === "nao"){
+        hint.textContent = "Sem dano: fotos são opcionais, mas recomendadas para registro.";
+      }else{
+        hint.textContent = "No tablet, toque em “Abrir câmera” para fotografar. Preview aparece na hora.";
+      }
+    }
+
+    function addExtraPhotoInput(){
+      const grid = document.getElementById("entradaPhotoGrid");
+      if(!grid) return;
+
+      const index = grid.querySelectorAll("[data-extra='1']").length + 1;
+      const inputId = `fotoExtra_${index}`;
+      const previewId = `previewExtra_${index}`;
+      const btnId = `btnCamExtra_${index}`;
+
+      const card = document.createElement("div");
+      card.className = "photo-card";
+      card.setAttribute("data-extra", "1");
+      card.innerHTML = `
+        <strong>Extra ${index}</strong>
+        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Fotografe um detalhe</div></div>
+        <button type="button" class="btn-camera" id="${btnId}">Abrir câmera</button>
+        <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+      `;
+
+      grid.appendChild(card);
+      wireCameraButton(btnId, inputId);
+      wirePhotoPreview(inputId, previewId);
+    }
+
+    async function collectExtraPhotosData(){
+      const extraInputs = Array.from(document.querySelectorAll("input[id^='fotoExtra_']"));
+      const data = [];
+      for(const input of extraInputs){
+        const file = input?.files?.[0];
+        if(!file) continue;
+        if(!file.type?.startsWith("image/")) continue;
+        try{
+          const url = await readFileAsDataURL(file);
+          if(url) data.push(url);
+        }catch(e){}
+      }
+      return data;
+    }
+
+    function validatePhotoRequired(inputId, label, required){
+      if(!required) return "";
+      const input = document.getElementById(inputId);
+      const file = input?.files?.[0];
+      if(!file) return `${label} é obrigatória.`;
+      if(!file.type?.startsWith("image/")) return `${label} deve ser uma imagem.`;
+      return "";
+    }
+
+    async function salvarEntrada(){
+      const notice = document.getElementById("entradaNotice");
+      clearNotice(notice);
+
+      const lojaId = userIsGeneral()
+        ? (document.getElementById("entradaLoja")?.value || "")
+        : currentUserStoreId();
+
+      const placa = formatPlate(document.getElementById("entradaPlaca")?.value || "");
+      const veiculo = (document.getElementById("entradaVeiculo")?.value || "").trim();
+      const motivo = document.getElementById("entradaMotivo")?.value || "";
+      const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
+      const condutor = document.getElementById("entradaCondutor")?.value || "";
+      const autorizador = document.getElementById("entradaAutorizador")?.value || "";
+      const dano = document.getElementById("entradaDano")?.value || "";
+      const observacao = (document.getElementById("entradaObs")?.value || "").trim();
+
+      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
+      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
+      if(!validateRequired(veiculo)){ showNotice(notice, "Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice, "Selecione o motivo da entrada."); return; }
+      if(motivo === "Outro" && !validateRequired(motivoOutro)){ showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”)."); return; }
+      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
+      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
+      if(!dano){ showNotice(notice, "Selecione a condição do veículo."); return; }
+
+      const requiredPhotos = (dano === "sim");
+      const errFrente = validatePhotoRequired("fotoFrente", "Foto da frente", requiredPhotos);
+      const errMala = validatePhotoRequired("fotoMala", "Foto da mala", requiredPhotos);
+      const errLatEsq = validatePhotoRequired("fotoLatEsq", "Foto da lateral esquerda", requiredPhotos);
+      const errLatDir = validatePhotoRequired("fotoLatDir", "Foto da lateral direita", requiredPhotos);
+      const photoErrors = [errFrente, errMala, errLatEsq, errLatDir].filter(Boolean);
+      if(photoErrors.length){ showNotice(notice, photoErrors[0]); return; }
+
+      if(dano === "nao"){
+        const ok = window.confirm("Tem certeza que este veículo NÃO possui danos?");
+        if(!ok){
+          showNotice(notice, "Revise a condição do veículo e, se necessário, selecione “Com dano” e fotografe.", "warn");
+          return;
+        }
+      }
+
+      try{
+        const [fotoFrente, fotoMala, fotoLateralEsq, fotoLateralDir] = await Promise.all([
+          getImageDataFromInput("fotoFrente"),
+          getImageDataFromInput("fotoMala"),
+          getImageDataFromInput("fotoLatEsq"),
+          getImageDataFromInput("fotoLatDir")
+        ]);
+
+        const fotosExtras = await collectExtraPhotosData();
+
+        // salva como dado (base64), mas só exibe em consulta individual
+        const payload = {
+          tipo: "entrada",
+          lojaId,
+          placa,
+          veiculo,
+          motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
+          condutor,
+          autorizador,
+          dano,
+          observacao,
+          fotos: {
+            frente: fotoFrente || "",
+            mala: fotoMala || "",
+            lateralEsq: fotoLateralEsq || "",
+            lateralDir: fotoLateralDir || "",
+            extras: fotosExtras || []
+          },
+          criadoPorUid: state.authUser.uid,
+          criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
+          data: new Date()
+        };
+
+        // ID determinístico para evitar duplicação? aqui deixei auto (movimentos é histórico)
+        // Usando setDoc com id aleatório é ok, mas aqui vamos criar doc novo via setDoc com id timestamp.
+        const id = `mov_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        await setDoc(doc(db, Collections.MOVIMENTOS, id), payload);
+
+        await refreshAfterWrite();
+        showNotice(notice, "Entrada registrada com sucesso.", "success");
+        renderEntrada();
+      }catch(error){
+        debugError("Erro ao salvar entrada:", error);
+        showNotice(notice, `Não foi possível salvar. (${error?.code || "erro"})`);
+      }
+    }
+
+    function renderSaida(){
+      const lojaField = userIsGeneral()
+        ? `
+          <div class="form-group">
+            <div class="label-row"><label for="saidaLoja">Loja</label><span class="req">*</span></div>
+            <select class="select" id="saidaLoja">${buildStoreOptions(true)}</select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+          </div>
+        `;
+
+      renderPanel(
+        "Saída",
+        "Registre a saída de um veículo. Campos com * são obrigatórios.",
+        `
+          <div class="grid">
+            ${lojaField}
+
+            <div class="form-group">
+              <div class="label-row"><label for="saidaPlaca">Placa</label><span class="req">*</span></div>
+              <input class="input" id="saidaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="saidaVeiculo">Veículo</label><span class="req">*</span></div>
+              <input class="input" id="saidaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="saidaMotivo">Motivo da saída</label><span class="req">*</span></div>
+              <select class="select" id="saidaMotivo">${buildMotivoOptions(MOTIVOS_SAIDA)}</select>
+              <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
+            </div>
+
+            <div class="form-group hidden" id="saidaMotivoOutroWrap">
+              <div class="label-row"><label for="saidaMotivoOutro">Descreva o motivo</label><span class="req">*</span></div>
+              <input class="input" id="saidaMotivoOutro" maxlength="60" placeholder="Ex.: Saída para vistoria extra">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="saidaCondutor">Condutor</label><span class="req">*</span></div>
+              <select class="select" id="saidaCondutor">${buildPeopleOptions(state.condutores)}</select>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="saidaAutorizador">Autorizador</label><span class="req">*</span></div>
+              <select class="select" id="saidaAutorizador">${buildPeopleOptions(state.autorizadores)}</select>
+            </div>
+
+            <div class="form-group full">
+              <div class="label-row"><label for="saidaObs">Observação</label></div>
+              <textarea class="textarea" id="saidaObs" maxlength="300" placeholder="(opcional)"></textarea>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-danger" id="btnSalvarSaida">Salvar saída</button>
+            <button class="btn btn-light" id="btnLimparSaida">Limpar</button>
+          </div>
+
+          <div id="saidaNotice" class="notice"></div>
+        `
+      );
+
+      attachInputMasks();
+
+      document.getElementById("btnSalvarSaida").addEventListener("click", salvarSaida);
+      document.getElementById("btnLimparSaida").addEventListener("click", renderSaida);
+
+      document.getElementById("saidaMotivo").addEventListener("change", () => toggleMotivoOutro("saida"));
+      toggleMotivoOutro("saida");
+    }
+
+    async function salvarSaida(){
+      const notice = document.getElementById("saidaNotice");
+      clearNotice(notice);
+
+      const lojaId = userIsGeneral()
+        ? (document.getElementById("saidaLoja")?.value || "")
+        : currentUserStoreId();
+
+      const placa = formatPlate(document.getElementById("saidaPlaca")?.value || "");
+      const veiculo = (document.getElementById("saidaVeiculo")?.value || "").trim();
+      const motivo = document.getElementById("saidaMotivo")?.value || "";
+      const motivoOutro = (document.getElementById("saidaMotivoOutro")?.value || "").trim();
+      const condutor = document.getElementById("saidaCondutor")?.value || "";
+      const autorizador = document.getElementById("saidaAutorizador")?.value || "";
+      const observacao = (document.getElementById("saidaObs")?.value || "").trim();
+
+      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
+      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
+      if(!validateRequired(veiculo)){ showNotice(notice, "Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice, "Selecione o motivo da saída."); return; }
+      if(motivo === "Outro" && !validateRequired(motivoOutro)){ showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”)."); return; }
+      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
+      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
+
+      try{
+        const payload = {
+          tipo: "saida",
+          lojaId,
+          placa,
+          veiculo,
+          motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
+          condutor,
+          autorizador,
+          dano: "",
+          observacao,
+          fotos: { frente:"", mala:"", lateralEsq:"", lateralDir:"", extras: [] }, // mantém padrão (dados)
+          criadoPorUid: state.authUser.uid,
+          criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
+          data: new Date()
+        };
+
+        const id = `mov_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+        await setDoc(doc(db, Collections.MOVIMENTOS, id), payload);
+
+        await refreshAfterWrite();
+        showNotice(notice, "Saída registrada com sucesso.", "success");
+        renderSaida();
+      }catch(error){
+        debugError("Erro ao salvar saída:", error);
+        showNotice(notice, `Não foi possível salvar. (${error?.code || "erro"})`);
+      }
+    }
+
+    // ========= CONSULTA (lista) + DETALHE (modal) + EXPORT INDIVIDUAL =========
+    function renderConsulta(){
+      const storeFilterHTML = userIsGeneral()
+        ? `
+          <div class="form-group">
+            <div class="label-row"><label for="filtroLojaConsulta">Loja</label></div>
+            <select class="select" id="filtroLojaConsulta">
+              <option value="">Todas as lojas</option>
+              ${state.lojas.map(loja => `<option value="${loja.id}">${loja.nome || loja.id}</option>`).join("")}
+            </select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <div class="label-row"><label>Loja</label></div>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+          </div>
+        `;
+
+      renderPanel(
+        "Consulta",
+        "Toque em um registro para abrir os detalhes e visualizar fotos. (Fotos apenas na consulta individual.)",
+        `
+          <div class="grid">
+            ${storeFilterHTML}
+
+            <div class="form-group">
+              <div class="label-row"><label for="filtroDataConsulta">Data</label></div>
+              <input class="input" id="filtroDataConsulta" type="date">
+              <div class="subtle">Filtra registros do dia selecionado.</div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="filtroPlacaConsulta">Placa</label></div>
+              <input class="input" id="filtroPlacaConsulta" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="filtroTipoConsulta">Tipo</label></div>
+              <select class="select" id="filtroTipoConsulta">
+                <option value="">Todos</option>
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="filtroTextoConsulta">Busca geral</label></div>
+              <input class="input" id="filtroTextoConsulta" maxlength="80" placeholder="Condutor, veículo, autorizador, motivo...">
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="btnFiltrarConsulta">Filtrar</button>
+            <button class="btn btn-light" id="btnLimparConsulta">Limpar</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Loja</th>
+                  <th>Placa</th>
+                  <th>Veículo</th>
+                  <th>Motivo</th>
+                  <th>Condutor</th>
+                  <th>Autorizador</th>
+                  <th>Dano</th>
+                  <th>Obs.</th>
+                  <th>Fotos</th>
+                  <th>Registrado por</th>
+                </tr>
+              </thead>
+              <tbody id="consultaBody"></tbody>
+            </table>
+          </div>
+
+          <div class="empty" id="consultaEmpty"></div>
+        `
+      );
+
+      attachInputMasks();
+      document.getElementById("btnFiltrarConsulta").addEventListener("click", applyConsultaFilter);
+      document.getElementById("btnLimparConsulta").addEventListener("click", renderConsulta);
+
+      // filtro rápido ao mudar data/tipo
+      ["filtroTipoConsulta","filtroLojaConsulta","filtroDataConsulta"].forEach(id=>{
+        const node = document.getElementById(id);
+        if(node) node.addEventListener("change", applyConsultaFilter);
+      });
+
+      applyConsultaFilter();
+    }
+
+    function applyConsultaFilter(){
+      const body = document.getElementById("consultaBody");
+      const empty = document.getElementById("consultaEmpty");
+      if(!body || !empty) return;
+
+      const lojaId = userIsGeneral()
+        ? (document.getElementById("filtroLojaConsulta")?.value || "")
+        : currentUserStoreId();
+
+      const dateStr = document.getElementById("filtroDataConsulta")?.value || "";
+      const dateRange = parseDateInputToRange(dateStr);
+
+      const placa = normalizePlate(document.getElementById("filtroPlacaConsulta")?.value || "");
+      const tipo = (document.getElementById("filtroTipoConsulta")?.value || "").toLowerCase();
+      const texto = (document.getElementById("filtroTextoConsulta")?.value || "").trim().toLowerCase();
+
+      let items = [...state.movimentos];
+
+      if(lojaId) items = items.filter(item => item.lojaId === lojaId);
+      if(tipo) items = items.filter(item => String(item.tipo || "").toLowerCase() === tipo);
+      if(placa) items = items.filter(item => normalizePlate(item.placa).includes(placa));
+
+      if(dateRange){
+        items = items.filter(item => {
+          const ms = getDateMs(item.data);
+          return ms >= dateRange.startMs && ms <= dateRange.endMs;
+        });
+      }
+
+      if(texto){
+        items = items.filter(item => {
+          const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "");
+          const haystack = [
+            item.veiculo,
+            motivoFinal,
+            item.condutor,
+            item.autorizador,
+            item.observacao,
+            item.criadoPorNome,
+            item.lojaNome,
+            getStoreNameFromItem(item),
+            item.placa
+          ].join(" ").toLowerCase();
+          return haystack.includes(texto);
+        });
+      }
+
+      items.sort((a,b) => getDateMs(b.data) - getDateMs(a.data));
+
+      body.innerHTML = items.map(item => {
+        const fotos = item?.fotos || {};
+        const extrasCount = Array.isArray(fotos.extras) ? fotos.extras.length : 0;
+        const baseCount = [fotos.frente, fotos.mala, fotos.lateralEsq, fotos.lateralDir].filter(Boolean).length;
+        const totalFotos = baseCount + extrasCount;
+
+        const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+
+        return `
+          <tr class="row-clickable" data-id="${item.id}">
+            <td>${formatDate(item.data)}</td>
+            <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
+            <td>${getStoreNameFromItem(item)}</td>
+            <td>${item.placa || "-"}</td>
+            <td>${item.veiculo || "-"}</td>
+            <td>${motivoFinal}</td>
+            <td>${item.condutor || "-"}</td>
+            <td>${item.autorizador || "-"}</td>
+            <td>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</td>
+            <td>${item.observacao ? item.observacao : "-"}</td>
+            <td>${totalFotos ? `${totalFotos} foto(s)` : "-"}</td>
+            <td>${item.criadoPorNome || "-"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      empty.textContent = items.length ? "" : "Nenhum registro encontrado.";
+
+      Array.from(body.querySelectorAll("tr[data-id]")).forEach(tr => {
+        tr.addEventListener("click", () => {
+          const id = tr.getAttribute("data-id");
+          const found = state.movimentos.find(m => m.id === id);
+          if(found) openDetailModal(found);
+        });
+      });
+    }
+
+    function openDetailModal(item){
+      state.selectedMovimento = item;
+
+      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+      const fotos = item?.fotos || {};
+      const thumbs = [];
+
+      if(fotos.frente) thumbs.push({ url: fotos.frente, cap: "Frente" });
+      if(fotos.mala) thumbs.push({ url: fotos.mala, cap: "Mala" });
+      if(fotos.lateralEsq) thumbs.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
+      if(fotos.lateralDir) thumbs.push({ url: fotos.lateralDir, cap: "Lateral direita" });
+
+      if(Array.isArray(fotos.extras)){
+        fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` }); });
+      }
+
+      el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
+      el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
+
+      el.detailBody.innerHTML = `
+        <div class="detail-grid">
+          <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
+          <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
+
+          <div class="detail-item"><small>Loja</small><div>${getStoreNameFromItem(item)}</div></div>
+          <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
+
+          <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
+          <div class="detail-item"><small>Motivo</small><div>${motivoFinal}</div></div>
+
+          <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
+          <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
+
+          <div class="detail-item"><small>Condição</small><div>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
+          <div class="detail-item"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
+
+          <div class="detail-item" style="grid-column:1/-1;">
+            <small>Observação</small>
+            <div>${item.observacao ? item.observacao : "-"}</div>
+          </div>
+        </div>
+
+        <div class="section-title" style="margin-top:6px;">Fotos (somente neste detalhe)</div>
+        ${thumbs.length ? `
+          <div class="thumbs">
+            ${thumbs.map(t => `
+              <div class="thumb">
+                <img src="${t.url}" alt="${t.cap}">
+                <div class="cap">${t.cap}</div>
+              </div>
+            `).join("")}
+          </div>
+        ` : `<div class="empty">Este registro não possui fotos.</div>`}
+      `;
+
+      el.detailModal.classList.add("show");
+      el.detailModal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDetailModal(){
+      el.detailModal.classList.remove("show");
+      el.detailModal.setAttribute("aria-hidden", "true");
+      state.selectedMovimento = null;
+    }
+
+    function exportSelectedRegistro(){
+      const item = state.selectedMovimento;
+      if(!item) return;
+
+      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+
+      const html = `
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registro - ${item.placa || ""}</title>
+<style>
+  body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
+  h1{ font-size:20px; margin:0 0 6px 0; }
+  .sub{ color:#475569; margin:0 0 18px 0; font-size:13px; }
+  .box{ border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:12px; }
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; margin-bottom:4px; font-weight:700; }
+  .v{ font-size:14px; font-weight:700; color:#0f172a; }
+  .full{ grid-column:1/-1; }
+</style>
+</head>
+<body>
+  <h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
+  <p class="sub">
+    Unidade: ${getStoreNameFromItem(item)} •
+    Data/Hora: ${formatDate(item.data)} •
+    Exportado em: ${new Date().toLocaleString("pt-BR")}
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div><div class="k">Tipo</div><div class="v">${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
+      <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
+
+      <div><div class="k">Loja</div><div class="v">${getStoreNameFromItem(item)}</div></div>
+      <div><div class="k">Placa</div><div class="v">${item.placa || "-"}</div></div>
+
+      <div><div class="k">Veículo</div><div class="v">${item.veiculo || "-"}</div></div>
+      <div><div class="k">Motivo</div><div class="v">${motivoFinal}</div></div>
+
+      <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
+      <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
+
+      <div><div class="k">Condição</div><div class="v">${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
+      <div><div class="k">Registrado por</div><div class="v">${item.criadoPorNome || "-"}</div></div>
+
+      <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+      const w = window.open("", "_blank");
+      if(!w){
+        alert("Bloqueio de pop-up: permita pop-ups para exportar o registro.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
+    }
+
+    // ========= CONDUTORES / AUTORIZADORES (CPF consulta, ativa/inativa, salva) =========
+    function makePeopleDocId(lojaId, cpfDigits){
+      // ✅ evita índice e permite getDoc direto
+      return `${lojaId}__${cpfDigits}`;
+    }
+
+    function renderCondutores(){
+      if(!userCanManageCondutores()){
+        renderPanel("Acesso restrito", "Você não tem permissão para gerenciar condutores.", `<div class="empty">Sem acesso.</div>`);
+        return;
+      }
+
+      const lojaField = userIsGeneral()
+        ? `
+          <div class="form-group">
+            <div class="label-row"><label for="condLoja">Loja</label><span class="req">*</span></div>
+            <select class="select" id="condLoja">${buildStoreOptions(true)}</select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+            <input type="hidden" id="condLoja" value="${currentUserStoreId() || ""}">
+          </div>
+        `;
+
+      renderPanel(
+        "Condutores",
+        "CPF consulta. Se existir, edita. Lista abaixo permite ativar/inativar.",
+        `
+          <div class="grid">
+            ${lojaField}
+
+            <div class="form-group">
+              <div class="label-row"><label for="condCPF">CPF</label><span class="req">*</span></div>
+              <input class="input" id="condCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle" id="condCpfStatus">Digite o CPF para consultar.</div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="condNome">Nome</label><span class="req">*</span></div>
+              <input class="input" id="condNome" maxlength="80" placeholder="Nome do condutor">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="condCargo">Cargo</label><span class="req">*</span></div>
+              <input class="input" id="condCargo" maxlength="60" placeholder="Cargo do condutor">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="condAtivo">Status</label><span class="req">*</span></div>
+              <select class="select" id="condAtivo">
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+              <div class="subtle">Inativo aparece nas seleções como “- INATIVO” e não pode ser selecionado.</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-success" id="btnSalvarCondutor">Salvar</button>
+            <button class="btn btn-light" id="btnLimparCondutor">Limpar</button>
+          </div>
+
+          <div id="condNotice" class="notice"></div>
+
+          <div class="section-title">Lista de condutores</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>CPF</th>
+                  <th>Nome</th>
+                  <th>Cargo</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="condListBody"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="condListEmpty"></div>
+        `
+      );
+
+      attachInputMasks();
+
+      document.getElementById("btnSalvarCondutor").addEventListener("click", salvarCondutor);
+      document.getElementById("btnLimparCondutor").addEventListener("click", renderCondutores);
+
+      document.getElementById("condCPF").addEventListener("input", debounce(async () => {
+        await consultarCondutorPorCPF();
+      }, 250));
+
+      const lojaSelect = document.getElementById("condLoja");
+      if(lojaSelect){
+        lojaSelect.addEventListener("change", async () => {
+          await consultarCondutorPorCPF(true);
+          renderCondutoresList();
+        });
+      }
+
+      renderCondutoresList();
+    }
+
+    async function consultarCondutorPorCPF(clearIfNotFound=false){
+      const status = document.getElementById("condCpfStatus");
+      const cpfRaw = document.getElementById("condCPF")?.value || "";
+      const cpf = onlyDigits(cpfRaw);
+      const lojaId = document.getElementById("condLoja")?.value || "";
+
+      if(!status) return;
+
+      if(!lojaId){
+        status.textContent = "Selecione a loja primeiro.";
+        return;
+      }
+      if(cpf.length < 11){
+        status.textContent = "Digite o CPF completo para consultar.";
+        if(clearIfNotFound){
+          document.getElementById("condNome").value = "";
+          document.getElementById("condCargo").value = "";
+          document.getElementById("condAtivo").value = "true";
+        }
+        return;
+      }
+      if(!isValidCPF(cpf)){
+        status.textContent = "CPF inválido.";
+        return;
+      }
+
+      const id = makePeopleDocId(lojaId, cpf);
+      try{
+        const snap = await getDoc(doc(db, Collections.CONDUTORES, id));
+        if(snap.exists()){
+          const data = snap.data();
+          status.textContent = "CPF já cadastrado — editando dados.";
+          document.getElementById("condNome").value = data.nome || "";
+          document.getElementById("condCargo").value = data.cargo || "";
+          document.getElementById("condAtivo").value = (data.ativo === false) ? "false" : "true";
+        }else{
+          status.textContent = "CPF não cadastrado.";
+          document.getElementById("condNome").value = "";
+          document.getElementById("condCargo").value = "";
+          document.getElementById("condAtivo").value = "true";
+        }
+      }catch(e){
+        status.textContent = `Falha ao consultar. (${e?.code || "erro"})`;
+      }
+    }
+
+    async function salvarCondutor(){
+      const notice = document.getElementById("condNotice");
+      clearNotice(notice);
+
+      const lojaId = document.getElementById("condLoja")?.value || "";
+      const cpfRaw = document.getElementById("condCPF")?.value || "";
+      const cpf = onlyDigits(cpfRaw);
+      const nome = (document.getElementById("condNome")?.value || "").trim();
+      const cargo = (document.getElementById("condCargo")?.value || "").trim();
+      const ativo = (document.getElementById("condAtivo")?.value || "true") === "true";
+
+      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
+      if(!isValidCPF(cpf)){ showNotice(notice, "Informe um CPF válido."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome."); return; }
+      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
+
+      try{
+        const id = makePeopleDocId(lojaId, cpf);
+
+        const payload = {
+          lojaId,
+          cpf,
+          nome,
+          cargo,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        };
+
+        // se não existir, cria com criadoEm
+        const existing = await getDoc(doc(db, Collections.CONDUTORES, id));
+        if(!existing.exists()){
+          payload.criadoEm = new Date();
+          payload.criadoPorUid = state.authUser.uid;
+          payload.criadoPorNome = state.userProfile?.nome || state.authUser?.email || "";
+        }
+
+        await setDoc(doc(db, Collections.CONDUTORES, id), payload, { merge: true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Condutor salvo com sucesso.", "success");
+        renderCondutores();
+      }catch(e){
+        debugError("Erro salvar condutor:", e);
+        showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
+      }
+    }
+
+    function renderCondutoresList(){
+      const body = document.getElementById("condListBody");
+      const empty = document.getElementById("condListEmpty");
+      if(!body || !empty) return;
+
+      const lojaSel = document.getElementById("condLoja")?.value || "";
+      let items = [...state.condutores];
+      if(userIsGeneral() && lojaSel) items = items.filter(x => x.lojaId === lojaSel);
+      if(!userIsGeneral()) items = items.filter(x => x.lojaId === currentUserStoreId());
+
+      body.innerHTML = items.map(item => {
+        const ativo = item.ativo !== false;
+        const status = ativo ? `<span class="badge badge-green">Ativo</span>` : `<span class="badge badge-gray">Inativo</span>`;
+        return `
+          <tr>
+            <td>${getStoreName(item.lojaId || "")}</td>
+            <td>${formatCPF(item.cpf || "")}</td>
+            <td>${item.nome || "-"}</td>
+            <td>${item.cargo || "-"}</td>
+            <td>${status}</td>
+            <td>
+              <button class="btn btn-light" data-toggle-cond="${item.id}">${ativo ? "Inativar" : "Ativar"}</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      empty.textContent = items.length ? "" : "Nenhum condutor encontrado.";
+
+      Array.from(body.querySelectorAll("[data-toggle-cond]")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-cond");
+          const found = state.condutores.find(x => x.id === id);
+          if(!found) return;
+          try{
+            await updateDoc(doc(db, Collections.CONDUTORES, id), {
+              ativo: !(found.ativo !== false),
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+            await refreshAfterWrite();
+            renderCondutores();
+          }catch(e){
+            alert(`Falha ao alterar status. (${e?.code || "erro"})`);
+          }
+        });
+      });
+    }
+
+    function renderAutorizadores(){
+      if(!userCanManageAutorizadores()){
+        renderPanel("Acesso restrito", "Você não tem permissão para gerenciar autorizadores.", `<div class="empty">Sem acesso.</div>`);
+        return;
+      }
+
+      const lojaField = userIsGeneral()
+        ? `
+          <div class="form-group">
+            <div class="label-row"><label for="autLoja">Loja</label><span class="req">*</span></div>
+            <select class="select" id="autLoja">${buildStoreOptions(true)}</select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+            <input type="hidden" id="autLoja" value="${currentUserStoreId() || ""}">
+          </div>
+        `;
+
+      renderPanel(
+        "Autorizadores",
+        "CPF consulta. Se existir, edita. Lista abaixo permite ativar/inativar.",
+        `
+          <div class="grid">
+            ${lojaField}
+
+            <div class="form-group">
+              <div class="label-row"><label for="autCPF">CPF</label><span class="req">*</span></div>
+              <input class="input" id="autCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle" id="autCpfStatus">Digite o CPF para consultar.</div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="autNome">Nome</label><span class="req">*</span></div>
+              <input class="input" id="autNome" maxlength="80" placeholder="Nome do autorizador">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="autCargo">Cargo</label><span class="req">*</span></div>
+              <input class="input" id="autCargo" maxlength="60" placeholder="Cargo do autorizador">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="autAtivo">Status</label><span class="req">*</span></div>
+              <select class="select" id="autAtivo">
+                <option value="true">Ativo</option>
+                <option value="false">Inativo</option>
+              </select>
+              <div class="subtle">Inativo aparece nas seleções como “- INATIVO” e não pode ser selecionado.</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-success" id="btnSalvarAutorizador">Salvar</button>
+            <button class="btn btn-light" id="btnLimparAutorizador">Limpar</button>
+          </div>
+
+          <div id="autNotice" class="notice"></div>
+
+          <div class="section-title">Lista de autorizadores</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>CPF</th>
+                  <th>Nome</th>
+                  <th>Cargo</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="autListBody"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="autListEmpty"></div>
+        `
+      );
+
+      attachInputMasks();
+
+      document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
+      document.getElementById("btnLimparAutorizador").addEventListener("click", renderAutorizadores);
+
+      document.getElementById("autCPF").addEventListener("input", debounce(async () => {
+        await consultarAutorizadorPorCPF();
+      }, 250));
+
+      const lojaSelect = document.getElementById("autLoja");
+      if(lojaSelect){
+        lojaSelect.addEventListener("change", async () => {
+          await consultarAutorizadorPorCPF(true);
+          renderAutorizadoresList();
+        });
+      }
+
+      renderAutorizadoresList();
+    }
+
+    async function consultarAutorizadorPorCPF(clearIfNotFound=false){
+      const status = document.getElementById("autCpfStatus");
+      const cpfRaw = document.getElementById("autCPF")?.value || "";
+      const cpf = onlyDigits(cpfRaw);
+      const lojaId = document.getElementById("autLoja")?.value || "";
+
+      if(!status) return;
+
+      if(!lojaId){
+        status.textContent = "Selecione a loja primeiro.";
+        return;
+      }
+      if(cpf.length < 11){
+        status.textContent = "Digite o CPF completo para consultar.";
+        if(clearIfNotFound){
+          document.getElementById("autNome").value = "";
+          document.getElementById("autCargo").value = "";
+          document.getElementById("autAtivo").value = "true";
+        }
+        return;
+      }
+      if(!isValidCPF(cpf)){
+        status.textContent = "CPF inválido.";
+        return;
+      }
+
+      const id = makePeopleDocId(lojaId, cpf);
+      try{
+        const snap = await getDoc(doc(db, Collections.AUTORIZADORES, id));
+        if(snap.exists()){
+          const data = snap.data();
+          status.textContent = "CPF já cadastrado — editando dados.";
+          document.getElementById("autNome").value = data.nome || "";
+          document.getElementById("autCargo").value = data.cargo || "";
+          document.getElementById("autAtivo").value = (data.ativo === false) ? "false" : "true";
+        }else{
+          status.textContent = "CPF não cadastrado.";
+          document.getElementById("autNome").value = "";
+          document.getElementById("autCargo").value = "";
+          document.getElementById("autAtivo").value = "true";
+        }
+      }catch(e){
+        status.textContent = `Falha ao consultar. (${e?.code || "erro"})`;
+      }
+    }
+
+    async function salvarAutorizador(){
+      const notice = document.getElementById("autNotice");
+      clearNotice(notice);
+
+      const lojaId = document.getElementById("autLoja")?.value || "";
+      const cpfRaw = document.getElementById("autCPF")?.value || "";
+      const cpf = onlyDigits(cpfRaw);
+      const nome = (document.getElementById("autNome")?.value || "").trim();
+      const cargo = (document.getElementById("autCargo")?.value || "").trim();
+      const ativo = (document.getElementById("autAtivo")?.value || "true") === "true";
+
+      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
+      if(!isValidCPF(cpf)){ showNotice(notice, "Informe um CPF válido."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome."); return; }
+      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
+
+      try{
+        const id = makePeopleDocId(lojaId, cpf);
+
+        const payload = {
+          lojaId,
+          cpf,
+          nome,
+          cargo,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        };
+
+        const existing = await getDoc(doc(db, Collections.AUTORIZADORES, id));
+        if(!existing.exists()){
+          payload.criadoEm = new Date();
+          payload.criadoPorUid = state.authUser.uid;
+          payload.criadoPorNome = state.userProfile?.nome || state.authUser?.email || "";
+        }
+
+        await setDoc(doc(db, Collections.AUTORIZADORES, id), payload, { merge: true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Autorizador salvo com sucesso.", "success");
+        renderAutorizadores();
+      }catch(e){
+        debugError("Erro salvar autorizador:", e);
+        showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
+      }
+    }
+
+    function renderAutorizadoresList(){
+      const body = document.getElementById("autListBody");
+      const empty = document.getElementById("autListEmpty");
+      if(!body || !empty) return;
+
+      const lojaSel = document.getElementById("autLoja")?.value || "";
+      let items = [...state.autorizadores];
+      if(userIsGeneral() && lojaSel) items = items.filter(x => x.lojaId === lojaSel);
+      if(!userIsGeneral()) items = items.filter(x => x.lojaId === currentUserStoreId());
+
+      body.innerHTML = items.map(item => {
+        const ativo = item.ativo !== false;
+        const status = ativo ? `<span class="badge badge-green">Ativo</span>` : `<span class="badge badge-gray">Inativo</span>`;
+        return `
+          <tr>
+            <td>${getStoreName(item.lojaId || "")}</td>
+            <td>${formatCPF(item.cpf || "")}</td>
+            <td>${item.nome || "-"}</td>
+            <td>${item.cargo || "-"}</td>
+            <td>${status}</td>
+            <td>
+              <button class="btn btn-light" data-toggle-aut="${item.id}">${ativo ? "Inativar" : "Ativar"}</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      empty.textContent = items.length ? "" : "Nenhum autorizador encontrado.";
+
+      Array.from(body.querySelectorAll("[data-toggle-aut]")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-aut");
+          const found = state.autorizadores.find(x => x.id === id);
+          if(!found) return;
+          try{
+            await updateDoc(doc(db, Collections.AUTORIZADORES, id), {
+              ativo: !(found.ativo !== false),
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+            await refreshAfterWrite();
+            renderAutorizadores();
+          }catch(e){
+            alert(`Falha ao alterar status. (${e?.code || "erro"})`);
+          }
+        });
+      });
+    }
+
+    // ========= EXTRATO (GERENTE GERAL) =========
+    function renderExtrato(){
+      if(!userCanExtrato()){
+        renderPanel("Acesso restrito", "Somente gerente geral pode gerar extrato.", `<div class="empty">Sem acesso.</div>`);
+        return;
+      }
+
+      renderPanel(
+        "Extrato (PDF básico)",
+        "Selecione loja (ou todas) e período. Gera PDF (via imprimir). Sem fotos.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <div class="label-row"><label for="extLoja">Loja</label></div>
+              <select class="select" id="extLoja">
+                <option value="">Todas as lojas</option>
+                ${state.lojas.map(loja => `<option value="${loja.id}">${loja.nome || loja.id}</option>`).join("")}
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="extInicio">Data início</label><span class="req">*</span></div>
+              <input class="input" id="extInicio" type="date">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="extFim">Data fim</label><span class="req">*</span></div>
+              <input class="input" id="extFim" type="date">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="extTipo">Tipo</label></div>
+              <select class="select" id="extTipo">
+                <option value="">Todos</option>
+                <option value="entrada">Entrada</option>
+                <option value="saida">Saída</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary" id="btnGerarExtrato">Gerar PDF</button>
+          </div>
+
+          <div id="extNotice" class="notice"></div>
+        `
+      );
+
+      document.getElementById("btnGerarExtrato").addEventListener("click", gerarExtratoPDF);
+    }
+
+    function gerarExtratoPDF(){
+      const notice = document.getElementById("extNotice");
+      clearNotice(notice);
+
+      const lojaId = document.getElementById("extLoja")?.value || "";
+      const ini = document.getElementById("extInicio")?.value || "";
+      const fim = document.getElementById("extFim")?.value || "";
+      const tipo = document.getElementById("extTipo")?.value || "";
+
+      if(!ini || !fim){
+        showNotice(notice, "Informe data início e fim.");
+        return;
+      }
+
+      const iniMs = new Date(ini + "T00:00:00").getTime();
+      const fimMs = new Date(fim + "T23:59:59.999").getTime();
+      if(fimMs < iniMs){
+        showNotice(notice, "Data fim deve ser maior ou igual à data início.");
+        return;
+      }
+
+      let items = [...state.movimentos];
+      if(lojaId) items = items.filter(x => x.lojaId === lojaId);
+      if(tipo) items = items.filter(x => x.tipo === tipo);
+      items = items.filter(x => {
+        const ms = getDateMs(x.data);
+        return ms >= iniMs && ms <= fimMs;
+      });
+      items.sort((a,b) => getDateMs(a.data) - getDateMs(b.data));
+
+      const titleLoja = lojaId ? getStoreName(lojaId) : "Todas as lojas";
+      const rows = items.map(x => `
+        <tr>
+          <td>${formatDate(x.data)}</td>
+          <td>${x.tipo === "entrada" ? "Entrada" : "Saída"}</td>
+          <td>${getStoreNameFromItem(x)}</td>
+          <td>${x.placa || "-"}</td>
+          <td>${x.veiculo || "-"}</td>
+          <td>${x.motivo === "Outro" && x.motivoOutro ? ("Outro: " + x.motivoOutro) : (x.motivo || "-")}</td>
+          <td>${x.condutor || "-"}</td>
+          <td>${x.autorizador || "-"}</td>
+          <td>${x.dano === "sim" ? "Com dano" : x.dano === "nao" ? "Sem dano" : "-"}</td>
+          <td>${x.observacao || "-"}</td>
+        </tr>
+      `).join("");
+
+      const html = `
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Extrato</title>
+<style>
+  body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
+  h1{ font-size:20px; margin:0 0 6px 0; }
+  .sub{ color:#475569; margin:0 0 18px 0; font-size:13px; }
+  table{ width:100%; border-collapse:collapse; }
+  th,td{ border:1px solid #e5e7eb; padding:8px 10px; font-size:12px; vertical-align:top; }
+  th{ background:#f8fafc; text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
+  @media print{ body{ margin:0; } }
+</style>
+</head>
+<body>
+  <h1>Extrato de movimentações</h1>
+  <div class="sub">
+    Loja: <b>${titleLoja}</b> • Período: <b>${ini}</b> a <b>${fim}</b> • Tipo: <b>${tipo || "Todos"}</b><br/>
+    Gerado em: ${new Date().toLocaleString("pt-BR")} • Total: ${items.length}
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Data/Hora</th>
+        <th>Tipo</th>
+        <th>Loja</th>
+        <th>Placa</th>
+        <th>Veículo</th>
+        <th>Motivo</th>
+        <th>Condutor</th>
+        <th>Autorizador</th>
+        <th>Dano</th>
+        <th>Obs.</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows || `<tr><td colspan="10">Nenhum registro no período.</td></tr>`}
+    </tbody>
+  </table>
+</body>
+</html>
+      `;
+
+      const w = window.open("", "_blank");
+      if(!w){
+        alert("Bloqueio de pop-up: permita pop-ups para exportar o extrato.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
+    }
+
+    // ========= GERENCIAR LOJAS (criar/editar) =========
+    function renderGerenciarLojas(){
+      if(!userCanGerenciarLojas()){
+        renderPanel("Acesso restrito", "Somente gerente geral pode gerenciar lojas.", `<div class="empty">Sem acesso.</div>`);
+        return;
+      }
+
+      const rows = state.lojas.map(l => `
+        <tr>
+          <td>${l.id}</td>
+          <td>${l.nome || "-"}</td>
+          <td>${l.ativo === false ? "Não" : "Sim"}</td>
+        </tr>
+      `).join("");
+
+      renderPanel(
+        "Gerenciar lojas",
+        "Crie/atualize lojas (lojas/{lojaId}).",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <div class="label-row"><label for="lojaIdNovo">ID da loja</label><span class="req">*</span></div>
+              <input class="input" id="lojaIdNovo" maxlength="40" placeholder="Ex.: nissan-guarulhos">
+              <div class="subtle">Use apenas letras/números/_/-. (sem espaços)</div>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="lojaNomeNovo">Nome da loja</label><span class="req">*</span></div>
+              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: NISSAN - GUARULHOS">
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label for="lojaAtivaNovo">Ativa</label><span class="req">*</span></div>
+              <select class="select" id="lojaAtivaNovo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <div class="label-row"><label>&nbsp;</label></div>
+              <button class="btn btn-success" id="btnCriarLoja">Salvar loja</button>
+            </div>
+          </div>
+
+          <div id="lojasNotice" class="notice"></div>
+
+          <div class="section-title">Lojas cadastradas</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Ativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `
+      );
+
+      document.getElementById("btnCriarLoja").addEventListener("click", salvarLojaAdmin);
+    }
+
+    async function salvarLojaAdmin(){
+      const notice = document.getElementById("lojasNotice");
+      clearNotice(notice);
+
+      const lojaId = (document.getElementById("lojaIdNovo")?.value || "").trim();
+      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
+      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
+
+      if(!lojaId){ showNotice(notice, "Informe o ID da loja."); return; }
+      if(!/^[a-zA-Z0-9_-]+$/.test(lojaId)){ showNotice(notice, "ID inválido. Use apenas letras, números, _ ou -."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome da loja."); return; }
+
+      try{
+        await setDoc(doc(db, Collections.LOJAS, lojaId), {
+          nome,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        }, { merge: true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Loja salva com sucesso.", "success");
+        renderGerenciarLojas();
+      }catch(e){
+        debugError("Erro salvar loja:", e);
+        showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
+      }
+    }
+
+    // ========= REFRESH =========
+    async function refreshAfterWrite(){
+      await loadLojas();
+      await loadOperationalCollections();
+      renderShellInfo();
+      renderDashboard();
+      buildMenu();
+    }
+
+    // ========= AUTH =========
+    async function login(){
+      clearNotice(el.loginNotice);
+
+      const email = el.loginEmail.value.trim();
+      const senha = el.loginSenha.value;
+
+      if(!email || !senha){
+        showNotice(el.loginNotice, "Preencha e-mail e senha.");
+        return;
+      }
+
+      el.btnLogin.disabled = true;
+      try{
+        await signInWithEmailAndPassword(auth, email, senha);
+      }catch(error){
+        debugError("Erro no login:", error);
+        showNotice(el.loginNotice, `Não foi possível entrar. (${error?.code || "erro"})`);
+      }finally{
+        el.btnLogin.disabled = false;
+      }
+    }
+
+    async function logout(){
+      try{ await signOut(auth); }catch(e){}
+    }
+
+    function showFatalAppError(err){
+      const code = err?.code || "erro";
+      const msg = err?.message || String(err || "");
+      renderPanel(
+        "Erro ao carregar",
+        "O sistema não conseguiu carregar suas informações.",
+        `
+          <div class="notice show error">
+            <strong>Falha:</strong> ${code}<br/>
+            <div style="margin-top:6px;">${msg}</div>
+            <div style="margin-top:10px; color:#7f1d1d;">
+              Se este erro for <b>permission-denied</b>, revise as rules e os campos obrigatórios (ex.: lojaId, ativo).
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn btn-light" id="btnRetryLoad">Tentar novamente</button>
+          </div>
+        `
+      );
+
+      setTimeout(() => {
+        const btn = document.getElementById("btnRetryLoad");
+        if(btn){
+          btn.addEventListener("click", async () => {
+            try{
+              await refreshAfterWrite();
+              renderDashboardHome();
+            }catch(e){
+              showFatalAppError(e);
+            }
+          });
+        }
+      }, 0);
+    }
+
+    async function initializeAuthenticatedUser(user){
+      state.authUser = user;
+
+      // abre shell
+      el.loginView.style.display = "none";
+      el.topbar.style.display = "flex";
+      el.footerbar.style.display = "block";
+      el.appView.style.display = "block";
+
+      try{
+        await loadUserProfile(user.uid);
+        await loadLojas();
+        await loadOperationalCollections();
+
+        renderShellInfo();
+        renderDashboard();
+        buildMenu();
+        renderDashboardHome();
+      }catch(err){
+        debugError("Falha ao inicializar:", err);
+        showFatalAppError(err);
+      }
+    }
+
+    function resetAppState(){
+      state.authUser = null;
+      state.userProfile = null;
+      state.lojas = [];
+      state.lojasMap = {};
+      state.movimentos = [];
+      state.condutores = [];
+      state.autorizadores = [];
+      state.selectedMovimento = null;
+
+      el.topbar.style.display = "none";
+      el.footerbar.style.display = "none";
+      el.appView.style.display = "none";
+      el.loginView.style.display = "flex";
+
+      el.dashboardCards.innerHTML = "";
+      el.menuBar.innerHTML = "";
+      el.mainPanel.innerHTML = `
+        <div class="card-header">
+          <div>
+            <h3>Bem-vindo</h3>
+            <p>Selecione uma função no menu acima.</p>
+          </div>
+        </div>
+      `;
+      closeDetailModal();
+    }
+
+    // ========= DEBOUNCE =========
+    function debounce(fn, wait=250){
+      let t = null;
+      return (...args) => {
+        if(t) clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+      };
+    }
+
+    // ========= EVENTOS =========
+    el.btnLogin.addEventListener("click", login);
+    el.btnLogout.addEventListener("click", logout);
+
+    el.loginSenha.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") login();
+    });
+
+    el.btnCloseModal.addEventListener("click", closeDetailModal);
+    el.btnCloseModal2.addEventListener("click", closeDetailModal);
+    el.detailModal.addEventListener("click", (e) => {
+      if(e.target === el.detailModal) closeDetailModal();
+    });
+
+    el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
+
+    onAuthStateChanged(auth, async (user) => {
+      if(!user){
+        resetAppState();
+        return;
+      }
+      await initializeAuthenticatedUser(user);
+    });
+
+    debugLog("Sistema carregado.");
+  </script>
 </body>
 </html>

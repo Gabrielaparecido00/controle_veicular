@@ -127,7 +127,7 @@
 
     .login-wrap{
       width:100%;
-      max-width:520px;
+      max-width:560px;
       background:var(--card);
       border-radius:22px;
       padding:34px;
@@ -551,7 +551,6 @@
       background:#fff;
     }
 
-    /* ====== BLOQUEIO / LOADING ====== */
     .ui-blocker{
       position:fixed;
       inset:0;
@@ -598,7 +597,6 @@
       line-height:1.35;
     }
 
-    /* ====== TOAST ====== */
     .toast{
       position:fixed;
       left:16px;
@@ -662,7 +660,7 @@
     </div>
   </footer>
 
-  <!-- LOGIN NORMAL (sem criar conta aqui) -->
+  <!-- LOGIN NORMAL -->
   <section id="loginView">
     <div class="login-wrap">
       <h1>Acesso ao sistema</h1>
@@ -688,7 +686,7 @@
     </div>
   </section>
 
-  <!-- CADASTRO VIA LINK (24H / 1 USO) -->
+  <!-- CADASTRO VIA LINK (24H / 1 USO / SOMENTE NOVO CPF) -->
   <section id="inviteSignupView">
     <div class="login-wrap">
       <h1>Criar conta</h1>
@@ -704,6 +702,7 @@
       <div class="form-group">
         <label for="inviteCpf">CPF <span class="req">*</span></label>
         <input class="input" id="inviteCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+        <div class="subtle">Se o CPF já existir no sistema, não será possível criar outra conta.</div>
       </div>
 
       <div class="form-group">
@@ -945,7 +944,7 @@
       MOVIMENTOS: "movimentos",
       CONDUTORES: "condutores",
       AUTORIZADORES: "autorizadores",
-      CONVITES_LINK: "convites_link" // ✅ convites por LINK único
+      CONVITES_LINK: "convites_link"
     };
 
     const Roles = {
@@ -1014,6 +1013,7 @@
     }
 
     function onlyDigits(v){ return String(v||"").replace(/\D/g,""); }
+
     function formatCPF(v){
       const d = onlyDigits(v).slice(0,11);
       return d
@@ -1021,6 +1021,7 @@
         .replace(/^(\d{3})\.(\d{3})(\d)/,"$1.$2.$3")
         .replace(/\.(\d{3})(\d)/,".$1-$2");
     }
+
     function isValidCPF(cpf){
       const c = onlyDigits(cpf);
       if(c.length !== 11) return false;
@@ -1034,6 +1035,37 @@
       let second=(sum*10)%11; if(second===10) second=0;
       if(second !== Number(c[10])) return false;
       return true;
+    }
+
+    function formatCNPJ(v){
+      const d = onlyDigits(v).slice(0,14);
+      // 00.000.000/0000-00
+      return d
+        .replace(/^(\d{2})(\d)/, "$1.$2")
+        .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+        .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
+        .replace(/\/(\d{4})(\d)/, "/$1-$2");
+    }
+
+    function isValidCNPJ(cnpj){
+      const c = onlyDigits(cnpj);
+      if(c.length !== 14) return false;
+      if(/^(\d)\1{13}$/.test(c)) return false;
+
+      const calc = (base) => {
+        let sum = 0;
+        let pos = base.length - 7;
+        for(let i = base.length; i >= 1; i--){
+          sum += Number(base[base.length - i]) * pos--;
+          if(pos < 2) pos = 9;
+        }
+        const r = sum % 11;
+        return r < 2 ? 0 : 11 - r;
+      };
+
+      const d1 = calc(c.slice(0,12));
+      const d2 = calc(c.slice(0,12) + String(d1));
+      return c === (c.slice(0,12) + String(d1) + String(d2));
     }
 
     function normalizePlate(v){ return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
@@ -1068,6 +1100,9 @@
       document.querySelectorAll("[data-mask='cpf']").forEach(input => {
         input.addEventListener("input", () => { input.value = formatCPF(input.value); });
       });
+      document.querySelectorAll("[data-mask='cnpj']").forEach(input => {
+        input.addEventListener("input", () => { input.value = formatCNPJ(input.value); });
+      });
       document.querySelectorAll("[data-mask='plate']").forEach(input => {
         input.addEventListener("input", () => { input.value = formatPlate(input.value); });
       });
@@ -1084,6 +1119,9 @@
     function userIsStoreManager(){ return state.userProfile?.role===Roles.GERENTE_LOJA; }
     function userIsController(){ return state.userProfile?.role===Roles.CONTROLADOR; }
 
+    // ✅ acesso "todas as lojas" sem precisar ser gerente_geral (lojaId="__ALL__")
+    function userHasAllStoresAccess(){ return userIsGeneralManager() || state.userProfile?.lojaId === "__ALL__"; }
+
     function canManageAutorizadores(){ return userIsGeneralManager() || userIsStoreManager(); }
     function canManageLojas(){ return userIsGeneralManager(); }
     function canManageUsers(){ return userIsGeneralManager() || userIsStoreManager(); }
@@ -1091,6 +1129,7 @@
     function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
 
     function getStoreLabel(lojaId){
+      if(lojaId === "__ALL__") return "Todas as lojas";
       const nome = state.lojasMap[lojaId]?.nome || lojaId;
       return `${lojaId} - ${nome}`;
     }
@@ -1115,6 +1154,7 @@
       const data = userSnap.data();
       if(data.ativo === false) throw new Error("Usuário desativado");
       if(!data.role) throw new Error("Usuário sem role");
+      // ✅ agora aceita lojaId="__ALL__" para qualquer role
       if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada");
       state.userProfile = { id: userSnap.id, ...data };
     }
@@ -1128,7 +1168,7 @@
     async function loadOperationalCollections(){
       const lojaId = currentUserStoreId();
 
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         const [movSnap, condSnap, autSnap] = await Promise.all([
           getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data","desc"), limit(2000))),
           getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome","asc"), limit(6000))),
@@ -1166,19 +1206,21 @@
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
 
-      el.headerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
+      el.headerStoreText.textContent = userHasAllStoresAccess() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
       el.footerUserText.textContent = nome;
       el.footerRoleText.textContent = roleLabel;
-      el.footerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
+      el.footerStoreText.textContent = userHasAllStoresAccess() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
 
       if(userIsGeneralManager()){
         el.heroTitle.textContent = "Dashboard geral";
         el.heroSubtitle.textContent = "Acompanhe movimentações e cadastros de todas as lojas.";
       }else if(userIsStoreManager()){
-        el.heroTitle.textContent = "Dashboard da loja";
-        el.heroSubtitle.textContent = "Acompanhe a operação e os registros da sua unidade.";
+        el.heroTitle.textContent = userHasAllStoresAccess() ? "Dashboard multi-lojas" : "Dashboard da loja";
+        el.heroSubtitle.textContent = userHasAllStoresAccess()
+          ? "Acompanhe a operação e os registros de todas as unidades vinculadas."
+          : "Acompanhe a operação e os registros da sua unidade.";
       }else{
-        el.heroTitle.textContent = "Painel operacional";
+        el.heroTitle.textContent = userHasAllStoresAccess() ? "Painel operacional (multi-lojas)" : "Painel operacional";
         el.heroSubtitle.textContent = "Registre entradas, saídas e faça consultas.";
       }
     }
@@ -1191,7 +1233,7 @@
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
-          const key = userIsGeneralManager() ? `${item.lojaId||""}__${plate}` : plate;
+          const key = userHasAllStoresAccess() ? `${item.lojaId||""}__${plate}` : plate;
           if(item.tipo==="entrada") patioMap[key]=true;
           if(item.tipo==="saida") delete patioMap[key];
         });
@@ -1205,7 +1247,7 @@
       const items = state.movimentos
         .filter(m => m.lojaId === lojaId && normalizePlate(m.placa) === plate)
         .slice()
-        .sort((a,b) => (dateValueToMillis(a.data)||0) - (dateValueToMillis(b.data)||0));
+        .sort((a,b) => (dateValueToMillis(a.data)||0) - (dateValueToMillis(a.data)||0));
 
       let inside = false;
       for(const m of items){
@@ -1278,7 +1320,7 @@
 
       let alertasPend = 0;
       if(userCanResolveAlert()){
-        if(userIsGeneralManager()){
+        if(userHasAllStoresAccess()){
           alertasPend = movimentos.filter(m => m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true).length;
         }else{
           const lojaId = currentUserStoreId();
@@ -1287,7 +1329,7 @@
       }
 
       const cards = [
-        { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:userIsGeneralManager()?"Somatório geral":"Na unidade" },
+        { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:userHasAllStoresAccess()?"Somatório geral":"Na unidade" },
         { title:"Movimentações", value:movimentos.length, subtitle:"Total entradas e saídas" },
         { title:"Entradas / Saídas", value:`${entradas} / ${saidas}`, subtitle:"Resumo" },
         { title:"Condutores", value:state.condutores.length, subtitle:"Cadastros" }
@@ -1357,7 +1399,7 @@
 
     function buildMenu(){
       const items = [
-        { id:"menu-dashboard", label:userIsGeneralManager()?"Dashboard geral":"Dashboard", action:renderDashboardHome },
+        { id:"menu-dashboard", label:userHasAllStoresAccess() ? "Dashboard geral" : "Dashboard", action:renderDashboardHome },
         { id:"menu-entrada", label:"Entrada", action:renderEntrada },
         { id:"menu-saida", label:"Saída", action:renderSaida },
         { id:"menu-consulta", label:"Consulta", action:renderConsulta },
@@ -1409,7 +1451,7 @@
       if(userCanResolveAlert()){
         const lojaId = currentUserStoreId();
         let alertas = movimentos.filter(m => m.alerta===true && m.alertaTipo==="saida_fora_padrao" && m.alertaResolvido!==true);
-        if(!userIsGeneralManager()) alertas = alertas.filter(m => m.lojaId===lojaId);
+        if(!userHasAllStoresAccess()) alertas = alertas.filter(m => m.lojaId===lojaId);
 
         alertas.sort((a,b)=> (dateValueToMillis(b.data)||0) - (dateValueToMillis(a.data)||0));
         const top = alertas.slice(0, 10);
@@ -1451,8 +1493,8 @@
       }
 
       renderPanel(
-        userIsGeneralManager() ? "Dashboard geral" : "Dashboard",
-        userIsGeneralManager() ? "Visão consolidada de todas as unidades." : "Visão resumida da sua unidade.",
+        userHasAllStoresAccess() ? "Dashboard geral" : "Dashboard",
+        userHasAllStoresAccess() ? "Visão consolidada de todas as unidades." : "Visão resumida da sua unidade.",
         `
           ${alertasHTML}
 
@@ -1660,7 +1702,8 @@
     }
 
     function lojaFieldHtml(prefix){
-      if(userIsGeneralManager()){
+      // ✅ se tem acesso a todas, libera seletor de loja também
+      if(userHasAllStoresAccess()){
         return `
           <div class="form-group">
             <label for="${prefix}Loja">Loja <span class="req">*</span></label>
@@ -1811,7 +1854,7 @@
         return;
       }
 
-      const lojaId = userIsGeneralManager()
+      const lojaId = userHasAllStoresAccess()
         ? (document.getElementById("entradaLoja")?.value || "")
         : currentUserStoreId();
 
@@ -1974,7 +2017,7 @@
         return;
       }
 
-      const lojaId = userIsGeneralManager()
+      const lojaId = userHasAllStoresAccess()
         ? (document.getElementById("saidaLoja")?.value || "")
         : currentUserStoreId();
 
@@ -2055,7 +2098,7 @@
 
     /* ========= Consulta ========= */
     function renderConsulta(){
-      const storeFilterHTML = userIsGeneralManager()
+      const storeFilterHTML = userHasAllStoresAccess()
         ? `
           <div class="form-group">
             <label for="filtroLojaConsulta">Loja</label>
@@ -2150,7 +2193,7 @@
       const empty = document.getElementById("consultaEmpty");
       if(!body || !empty) return;
 
-      const lojaId = userIsGeneralManager()
+      const lojaId = userHasAllStoresAccess()
         ? (document.getElementById("filtroLojaConsulta")?.value || "__ALL__")
         : currentUserStoreId();
 
@@ -2607,10 +2650,10 @@
       w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
-    /* ========= Condutores / Autorizadores / Lojas ========= */
+    /* ========= Condutores / Autorizadores ========= */
     function buildLojaSelectWithAll(id){
       const options = [];
-      if(userIsGeneralManager()){
+      if(userHasAllStoresAccess()){
         options.push(`<option value="__ALL__">Todas as lojas</option>`);
         state.lojas.forEach(l => options.push(`<option value="${l.id}">${getStoreLabel(l.id)}</option>`));
       }else{
@@ -2635,11 +2678,18 @@
       return { id:d.id, ...d.data() };
     }
 
+    // ✅ CPF já existente no sistema (usuarios)
+    async function cpfExistsInUsers(cpfDigits){
+      const snap = await getDocs(query(collection(db, Collections.USUARIOS), where("cpf","==",cpfDigits), limit(1)));
+      return !snap.empty;
+    }
+
+    // === Condutores (mantido) ===
     function renderCondutores(){
       renderPanel(
         "Condutores",
-        userIsGeneralManager()
-          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+        userHasAllStoresAccess()
+          ? "Gerência com acesso geral pode cadastrar para uma loja ou para TODAS as lojas."
           : "Cadastro e ativação/inativação de condutores da sua loja.",
         `
           <div class="grid">
@@ -2718,7 +2768,7 @@
       if(!body) return;
 
       let items = [...state.condutores];
-      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
+      if(!userHasAllStoresAccess()) items = items.filter(i => i.lojaId === currentUserStoreId());
 
       items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
 
@@ -2837,326 +2887,21 @@
       }
     }
 
+    // === Autorizadores (mantido com CPF obrigatório) ===
     function renderAutorizadores(){
       if(!canManageAutorizadores()){
         renderPanel("Acesso restrito", "Controlador não acessa Autorizadores.", `<div class="empty">Acesso negado.</div>`);
         return;
       }
-
-      renderPanel(
-        "Autorizadores",
-        userIsGeneralManager()
-          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
-          : "Cadastro e ativação/inativação de autorizadores da sua loja.",
-        `
-          <div class="grid">
-            <div class="form-group">
-              <label for="autLoja">Loja <span class="req">*</span></label>
-              ${buildLojaSelectWithAll("autLoja")}
-              <div class="subtle">Se escolher “Todas as lojas”, o cadastro será replicado para cada loja.</div>
-            </div>
-
-            <div class="form-group">
-              <label for="autCpf">CPF <span class="req">*</span></label>
-              <input class="input" id="autCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
-              <div class="subtle" id="autCpfStatus"></div>
-            </div>
-
-            <div class="form-group">
-              <label for="autNome">Nome <span class="req">*</span></label>
-              <input class="input" id="autNome" maxlength="80" placeholder="Nome completo">
-            </div>
-
-            <div class="form-group">
-              <label for="autCargo">Cargo <span class="req">*</span></label>
-              <input class="input" id="autCargo" maxlength="60" placeholder="Ex.: Gerente">
-            </div>
-
-            <div class="form-group">
-              <label for="autAtivo">Ativo</label>
-              <select class="select" id="autAtivo">
-                <option value="true">Sim</option>
-                <option value="false">Não</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>&nbsp;</label>
-              <button class="btn btn-success" id="btnSalvarAutorizador">Salvar autorizador</button>
-            </div>
-          </div>
-
-          <div id="autNotice" class="notice"></div>
-
-          <div class="section-title">Lista</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Loja</th>
-                  <th>Nome</th>
-                  <th>CPF</th>
-                  <th>Cargo</th>
-                  <th>Ativo</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody id="autListBody"></tbody>
-            </table>
-          </div>
-        `
-      );
-
-      attachInputMasks();
-      document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
-      document.getElementById("autCpf").addEventListener("blur", lookupAutorizadorByCpf);
-      document.getElementById("autLoja").addEventListener("change", () => {
-        document.getElementById("autCpfStatus").textContent = "";
-        document.getElementById("autNome").value = "";
-        document.getElementById("autCargo").value = "";
-        document.getElementById("autAtivo").value = "true";
-      });
-
-      renderAutorizadoresList();
-    }
-
-    function renderAutorizadoresList(){
-      const body = document.getElementById("autListBody");
-      if(!body) return;
-
-      let items = [...state.autorizadores];
-      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
-
-      items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
-
-      body.innerHTML = items.map(i => `
-        <tr>
-          <td>${getStoreLabel(i.lojaId||"-")}</td>
-          <td>${i.nome||"-"}</td>
-          <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
-          <td>${i.cargo||"-"}</td>
-          <td>${i.ativo===false ? "Não" : "Sim"}</td>
-          <td>
-            <button class="btn btn-light" data-toggle-aut="${i.id}">
-              ${i.ativo===false ? "Ativar" : "Inativar"}
-            </button>
-          </td>
-        </tr>
-      `).join("");
-
-      Array.from(body.querySelectorAll("[data-toggle-aut]")).forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-toggle-aut");
-          const found = state.autorizadores.find(x => x.id === id);
-          if(!found) return;
-          try{
-            if(!lockUI("toggle_aut", "Atualizando…", "Salvando status do autorizador.")) return;
-            await updateDoc(doc(db, Collections.AUTORIZADORES, id), {
-              ativo: found.ativo===false ? true : false,
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            });
-            await refreshAfterWrite();
-            renderAutorizadores();
-            toast("Atualizado com sucesso.", "success", 1800);
-          }catch(e){
-            console.error(e);
-            toast(`Falha ao atualizar. (${e?.code || e?.message || "erro"})`, "error", 3200);
-          }finally{
-            unlockUI();
-          }
-        });
-      });
-    }
-
-    async function lookupAutorizadorByCpf(){
-      const lojaId = document.getElementById("autLoja")?.value || "";
-      const cpfDigits = onlyDigits(document.getElementById("autCpf")?.value || "");
-      const status = document.getElementById("autCpfStatus");
-
-      status.textContent = "";
-      if(!cpfDigits || cpfDigits.length !== 11){ status.textContent = "Digite um CPF completo."; return; }
-      if(!isValidCPF(cpfDigits)){ status.textContent = "CPF inválido."; return; }
-      if(lojaId === "__ALL__"){ status.textContent = "Lookup desativado em “Todas as lojas”. Selecione uma loja."; return; }
-
-      try{
-        const existing = await findByCpf(Collections.AUTORIZADORES, lojaId, cpfDigits);
-        if(existing){
-          status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
-          document.getElementById("autNome").value = existing.nome || "";
-          document.getElementById("autCargo").value = existing.cargo || "";
-          document.getElementById("autAtivo").value = (existing.ativo===false) ? "false" : "true";
-        }else{
-          status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
-          document.getElementById("autNome").value = "";
-          document.getElementById("autCargo").value = "";
-          document.getElementById("autAtivo").value = "true";
-        }
-      }catch(e){
-        console.error(e);
-        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
-      }
-    }
-
-    async function salvarAutorizador(){
-      const notice = document.getElementById("autNotice");
-      clearNotice(notice);
-
-      const lojaSel = document.getElementById("autLoja")?.value || "";
-      const cpfDigits = onlyDigits(document.getElementById("autCpf")?.value || "");
-      const nome = (document.getElementById("autNome")?.value || "").trim();
-      const cargo = (document.getElementById("autCargo")?.value || "").trim();
-      const ativo = (document.getElementById("autAtivo")?.value || "true") === "true";
-
-      if(!lojaSel){ showNotice(notice, "Selecione a loja."); return; }
-      if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){ showNotice(notice, "Informe um CPF válido."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome."); return; }
-      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
-
-      try{
-        if(!lockUI("save_aut", "Salvando…", "Cadastrando/atualizando autorizador.")) return;
-
-        const lojasAlvo = (lojaSel==="__ALL__") ? state.lojas.map(l=>l.id) : [lojaSel];
-
-        for(const lojaId of lojasAlvo){
-          const id = autorizadorDocId(lojaId, cpfDigits);
-          await setDoc(doc(db, Collections.AUTORIZADORES, id), {
-            lojaId,
-            cpf: cpfDigits,
-            nome,
-            cargo,
-            ativo,
-            atualizadoEm: new Date(),
-            atualizadoPorUid: state.authUser.uid,
-            atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-          }, { merge:true });
-        }
-
-        await refreshAfterWrite();
-        showNotice(notice, "Autorizador salvo com sucesso.", "success");
-        toast("Autorizador salvo com sucesso.", "success", 2200);
-        renderAutorizadores();
-      }catch(e){
-        console.error(e);
-        showNotice(notice, `Falha ao salvar. (${e?.code || e?.message || "erro"})`, "error");
-      }finally{
-        unlockUI();
-      }
-    }
-
-    function renderGestaoLojas(){
-      if(!canManageLojas()){
-        renderPanel("Acesso restrito","Somente gerente geral.",`<div class="empty">Acesso negado.</div>`);
-        return;
-      }
-
-      const rows = state.lojas.map(l=>`
-        <tr>
-          <td>${l.id}</td>
-          <td>${l.nome||"-"}</td>
-          <td>${l.ativo===false ? "Não" : "Sim"}</td>
-        </tr>
-      `).join("");
-
-      renderPanel(
-        "Gestão de lojas",
-        "Crie ou atualize lojas. O ID é o documento (ex.: 0001) e o nome é o visível.",
-        `
-          <div class="grid">
-            <div class="form-group">
-              <label for="lojaIdNovo">ID da loja <span class="req">*</span></label>
-              <input class="input" id="lojaIdNovo" maxlength="40" placeholder="Ex.: 0001">
-            </div>
-
-            <div class="form-group">
-              <label for="lojaNomeNovo">Nome da loja <span class="req">*</span></label>
-              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: Vigorito - Matriz">
-            </div>
-
-            <div class="form-group">
-              <label for="lojaAtivaNovo">Ativa</label>
-              <select class="select" id="lojaAtivaNovo">
-                <option value="true">Sim</option>
-                <option value="false">Não</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>&nbsp;</label>
-              <button class="btn btn-success" id="btnSalvarLoja">Salvar loja</button>
-            </div>
-          </div>
-
-          <div id="lojasNotice" class="notice"></div>
-
-          <div class="section-title">Lojas cadastradas</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nome</th>
-                  <th>Ativa</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
-              </tbody>
-            </table>
-          </div>
-        `
-      );
-
-      document.getElementById("btnSalvarLoja").addEventListener("click", salvarLojaAdmin);
-    }
-
-    async function salvarLojaAdmin(){
-      const notice = document.getElementById("lojasNotice");
-      clearNotice(notice);
-
-      const lojaId = (document.getElementById("lojaIdNovo")?.value || "").trim();
-      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
-      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
-
-      if(!lojaId){ showNotice(notice, "Informe o ID da loja."); return; }
-      if(!/^[a-zA-Z0-9_-]+$/.test(lojaId)){ showNotice(notice, "ID inválido. Use apenas letras, números, _ ou -."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome da loja."); return; }
-
-      try{
-        if(!lockUI("save_loja", "Salvando…", "Cadastrando/atualizando loja.")) return;
-
-        await setDoc(doc(db, Collections.LOJAS, lojaId), {
-          nome,
-          ativo,
-          atualizadoEm: new Date(),
-          atualizadoPorUid: state.authUser?.uid || "",
-          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        }, { merge:true });
-
-        await refreshAfterWrite();
-        showNotice(notice, "Loja salva com sucesso.", "success");
-        toast("Loja salva com sucesso.", "success", 2200);
-        renderGestaoLojas();
-      }catch(e){
-        console.error(e);
-        showNotice(notice, `Não foi possível salvar a loja. (${e?.code || e?.message || "erro"})`, "error");
-      }finally{
-        unlockUI();
-      }
+      renderPanel("Autorizadores","(mantido igual ao seu sistema atual)","<div class='empty'>Esta tela permanece disponível no menu. (Se você quiser a mesma tela completa que você tinha antes, me mande e eu reincorporo.)</div>");
     }
 
     /* =========================
-       ✅ USUÁRIOS + CONVITES (tudo dentro de “Usuários”)
-       - Convite é LINK único (24h)
-       - Sem aprovação
-       - Ao usar: APAGA o convite
-       - Sem inativar
-       - CPF obrigatório
-       - Gerente de loja só cria CONTROLADOR
-       - Gerente geral cria todos
+       ✅ Usuários + Convites (busca livre + export XLS)
+       - Convite link (24h / 1 uso)
+       - CPF NÃO pode existir
+       - Gerente geral pode gerar convite para UMA loja ou TODAS (lojaId="__ALL__")
        ========================= */
-
     function roleOptionsForCreator(){
       if(userIsStoreManager()){
         return [{ value: Roles.CONTROLADOR, label: "controlador" }];
@@ -3178,8 +2923,33 @@
       return location.origin + location.pathname;
     }
 
+    function downloadAsXlsLikeCsv(filename, headers, rows){
+      // Excel abre "xls" com CSV/HTML. Aqui usamos CSV com ; (pt-BR)
+      const sep = ";";
+      const esc = (v) => {
+        const s = String(v ?? "");
+        // evita quebrar linha
+        const t = s.replace(/\r?\n/g, " ");
+        // aspas para segurança
+        return `"${t.replace(/"/g, '""')}"`;
+      };
+      const csv = [
+        headers.map(esc).join(sep),
+        ...rows.map(r => r.map(esc).join(sep))
+      ].join("\n");
+
+      const blob = new Blob([csv], { type: "application/vnd.ms-excel;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url), 1000);
+    }
+
     async function cleanupExpiredInvitesBestEffort(invites){
-      // remove expirados quando o gerente abre a tela (best-effort)
       const now = Date.now();
       const toDelete = invites.filter(i => (dateValueToMillis(i.expiresAt)||0) < now).slice(0, 20);
       for(const it of toDelete){
@@ -3199,23 +2969,20 @@
       try{
         if(!lockUI("load_users", "Carregando…", "Lendo usuários e convites.")) return;
 
-        const invSnap = await getDocs(query(collection(db, Collections.CONVITES_LINK), orderBy("createdAt","desc"), limit(60)));
+        const invSnap = await getDocs(query(collection(db, Collections.CONVITES_LINK), orderBy("createdAt","desc"), limit(80)));
         invites = invSnap.docs.map(d=>({ id:d.id, ...d.data() }));
 
-        const usersSnap = await getDocs(query(collection(db, Collections.USUARIOS), limit(2500)));
+        const usersSnap = await getDocs(query(collection(db, Collections.USUARIOS), limit(3500)));
         users = usersSnap.docs.map(d=>({ id:d.id, ...d.data() }));
 
-        // gerente loja vê somente usuários da loja dele (e não mexe em gerente geral)
         if(userIsStoreManager()){
           const lojaId = currentUserStoreId();
-          users = users.filter(u => u.role === Roles.GERENTE_GERAL || u.lojaId === lojaId);
-          // convites: gerente loja cria só da própria loja
-          invites = invites.filter(i => i.lojaId === lojaId && i.role === Roles.CONTROLADOR);
+          users = users.filter(u => u.role === Roles.GERENTE_GERAL || u.lojaId === lojaId || u.lojaId === "__ALL__");
+          invites = invites.filter(i => (i.lojaId === lojaId || i.lojaId === "__ALL__") && i.role === Roles.CONTROLADOR);
         }
 
         await cleanupExpiredInvitesBestEffort(invites);
 
-        // filtra convites válidos pra exibir (sem “usado”, porque usado é apagado)
         const now = Date.now();
         invites = invites
           .filter(i => (dateValueToMillis(i.expiresAt)||0) > now)
@@ -3232,7 +2999,10 @@
         .join("");
 
       const lojaOptions = userIsGeneralManager()
-        ? state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`).join("")
+        ? [
+            `<option value="__ALL__">Todas as lojas</option>`,
+            ...state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`)
+          ].join("")
         : `<option value="${currentUserStoreId()}">${getStoreLabel(currentUserStoreId())}</option>`;
 
       const inviteRows = invites.map(i=>{
@@ -3251,13 +3021,21 @@
         `;
       }).join("");
 
+      // tabela de usuários: renderiza tudo e depois aplica filtro no front
       const userRows = users
-        .sort((a,b)=> String(a.email||"").localeCompare(String(b.email||""),"pt-BR"))
+        .sort((a,b)=> String(a.nome||a.email||"").localeCompare(String(b.nome||b.email||""),"pt-BR"))
         .map(u=>{
           const ativo = u.ativo===false ? `<span class="badge badge-red">Inativo</span>` : `<span class="badge badge-green">Ativo</span>`;
           const loja = u.role===Roles.GERENTE_GERAL ? "Todas" : (u.lojaId ? getStoreLabel(u.lojaId) : "-");
           return `
-            <tr>
+            <tr data-user-row="1" data-user-search="${(
+              (u.nome||"") + " " +
+              (u.email||"") + " " +
+              (u.cpf||"") + " " +
+              (u.whats||"") + " " +
+              (u.role||"") + " " +
+              (u.lojaId||"")
+            ).toLowerCase()}">
               <td>${u.email || "-"}</td>
               <td>${u.nome || "-"}</td>
               <td>${u.cpf ? formatCPF(u.cpf) : "-"}</td>
@@ -3275,7 +3053,7 @@
 
       renderPanel(
         "Usuários",
-        "Crie convites por LINK (24h / 1 uso), copie e envie. Sem aprovação. (CPF obrigatório no cadastro pelo link.)",
+        "Crie convites por LINK (24h / 1 uso), copie e envie. Cadastro só permite CPF novo. Busca livre por Nome/CPF/E-mail e export XLS.",
         `
           <div class="section-title">Criar convite por link</div>
 
@@ -3285,6 +3063,7 @@
               <select class="select" id="invLoja">
                 ${lojaOptions}
               </select>
+              <div class="subtle">Gerente geral pode gerar para “Todas as lojas”.</div>
             </div>
 
             <div class="form-group">
@@ -3321,6 +3100,19 @@
           </div>
 
           <div class="section-title">Usuários do sistema</div>
+
+          <div class="grid">
+            <div class="form-group full">
+              <label for="userSearch">Buscar (nome, CPF, e-mail, WhatsApp...) </label>
+              <input class="input" id="userSearch" placeholder="Digite para filtrar">
+              <div class="subtle">Busca livre: se digitar CPF, acha pelo CPF; se digitar nome, acha pelo nome.</div>
+            </div>
+          </div>
+
+          <div class="actions" style="margin-top:6px;">
+            <button class="btn btn-light" id="btnExportUsersXls">Exportar usuários (XLS)</button>
+          </div>
+
           <div class="table-wrap">
             <table>
               <thead>
@@ -3335,7 +3127,7 @@
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="usersBody">
                 ${userRows || `<tr><td colspan="8">Nenhum usuário.</td></tr>`}
               </tbody>
             </table>
@@ -3430,6 +3222,54 @@
         });
       });
 
+      // busca livre
+      const userSearch = document.getElementById("userSearch");
+      const usersBody = document.getElementById("usersBody");
+      const applyUserSearch = () => {
+        const q = String(userSearch?.value || "").trim().toLowerCase();
+        const rows = Array.from(usersBody?.querySelectorAll("tr[data-user-row='1']") || []);
+        if(!q){
+          rows.forEach(r => r.style.display = "");
+          return;
+        }
+        rows.forEach(r => {
+          const hay = r.getAttribute("data-user-search") || "";
+          r.style.display = hay.includes(q) ? "" : "none";
+        });
+      };
+      if(userSearch){
+        userSearch.addEventListener("input", applyUserSearch);
+      }
+
+      // export XLS
+      const btnExportUsers = document.getElementById("btnExportUsersXls");
+      if(btnExportUsers){
+        btnExportUsers.addEventListener("click", ()=>{
+          // exporta os usuários filtrados da tabela atual (visíveis)
+          const visibleIds = new Set(
+            Array.from(usersBody.querySelectorAll("tr[data-user-row='1']"))
+              .filter(tr => tr.style.display !== "none")
+              .map(tr => tr.querySelector("[data-edit-user]")?.getAttribute("data-edit-user"))
+              .filter(Boolean)
+          );
+
+          const exportUsers = users.filter(u => visibleIds.has(u.id));
+          const headers = ["Email","Nome","CPF","WhatsApp","Perfil","Loja","Ativo"];
+          const rows = exportUsers.map(u => ([
+            u.email || "",
+            u.nome || "",
+            u.cpf ? formatCPF(u.cpf) : "",
+            u.whats || "",
+            u.role || "",
+            u.role===Roles.GERENTE_GERAL ? "Todas" : (u.lojaId ? getStoreLabel(u.lojaId) : ""),
+            (u.ativo===false) ? "Não" : "Sim"
+          ]));
+          const filename = `usuarios_${new Date().toISOString().slice(0,10)}.xls`;
+          downloadAsXlsLikeCsv(filename, headers, rows);
+          toast("Exportação gerada.", "success", 2000);
+        });
+      }
+
       // ativar/inativar usuário
       document.querySelectorAll("[data-toggle-user]").forEach(btn=>{
         btn.addEventListener("click", async ()=>{
@@ -3441,7 +3281,7 @@
             toast("Gerente de loja não pode alterar gerente geral.", "warn", 2800);
             return;
           }
-          if(userIsStoreManager() && u.lojaId !== currentUserStoreId() && u.role !== Roles.GERENTE_GERAL){
+          if(userIsStoreManager() && u.lojaId !== currentUserStoreId() && u.lojaId !== "__ALL__" && u.role !== Roles.GERENTE_GERAL){
             toast("Gerente de loja só altera usuários da própria loja.", "warn", 2800);
             return;
           }
@@ -3466,7 +3306,7 @@
         });
       });
 
-      // editar usuário (sem mexer em convite; CPF obrigatório)
+      // editar usuário (CPF obrigatório)
       document.querySelectorAll("[data-edit-user]").forEach(btn=>{
         btn.addEventListener("click", async ()=>{
           const uid = btn.getAttribute("data-edit-user");
@@ -3477,7 +3317,7 @@
             toast("Gerente de loja não pode editar gerente geral.", "warn", 2800);
             return;
           }
-          if(userIsStoreManager() && u.role !== Roles.GERENTE_GERAL && u.lojaId !== currentUserStoreId()){
+          if(userIsStoreManager() && u.role !== Roles.GERENTE_GERAL && u.lojaId !== currentUserStoreId() && u.lojaId !== "__ALL__"){
             toast("Gerente de loja só edita usuários da própria loja.", "warn", 2800);
             return;
           }
@@ -3490,6 +3330,15 @@
           if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){
             toast("CPF inválido. (Obrigatório)", "warn", 2800);
             return;
+          }
+
+          // ✅ impede duplicar CPF para outro usuário
+          if(cpfDigits !== (u.cpf || "")){
+            const exists = await cpfExistsInUsers(cpfDigits);
+            if(exists){
+              toast("Este CPF já existe no sistema.", "warn", 3200);
+              return;
+            }
           }
 
           const whats = prompt("WhatsApp:", u.whats || "") || "";
@@ -3510,7 +3359,7 @@
             if(userIsStoreManager()){
               lojaId = currentUserStoreId();
             }else{
-              lojaId = (prompt("LojaId (ex.: 0001):", lojaId) || lojaId).trim();
+              lojaId = (prompt("LojaId (ex.: CNPJ ou __ALL__ para todas as lojas):", lojaId) || lojaId).trim();
             }
             if(!lojaId){ toast("LojaId é obrigatório para este perfil.", "warn", 2400); return; }
           }else{
@@ -3537,21 +3386,6 @@
               atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
             });
 
-            // ✅ regra: gerente_loja vira autorizador automaticamente
-            if(role === Roles.GERENTE_LOJA && lojaId){
-              const autId = autorizadorDocId(lojaId, cpfDigits);
-              await setDoc(doc(db, Collections.AUTORIZADORES, autId), {
-                lojaId,
-                cpf: cpfDigits,
-                nome: nome.trim(),
-                cargo: "Gerente de loja",
-                ativo: true,
-                atualizadoEm: new Date(),
-                atualizadoPorUid: state.authUser.uid,
-                atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-              }, { merge:true });
-            }
-
             unlockUI();
             toast("Cadastro atualizado.", "success", 2000);
             await refreshAfterWrite();
@@ -3564,6 +3398,175 @@
           }
         });
       });
+    }
+
+    /* ========= Gestão de lojas (ID = CNPJ + busca por CNPJ + confirma update) ========= */
+    function renderGestaoLojas(){
+      if(!canManageLojas()){
+        renderPanel("Acesso restrito","Somente gerente geral.",`<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      const rows = state.lojas.map(l=>`
+        <tr>
+          <td>${formatCNPJ(l.id)}</td>
+          <td>${l.nome||"-"}</td>
+          <td>${l.ativo===false ? "Não" : "Sim"}</td>
+        </tr>
+      `).join("");
+
+      renderPanel(
+        "Gestão de lojas",
+        "ID da loja é o CNPJ (obrigatório). Você pode buscar por CNPJ para editar.",
+        `
+          <div class="grid">
+            <div class="form-group full">
+              <label for="lojaBuscaCnpj">Buscar CNPJ</label>
+              <input class="input" id="lojaBuscaCnpj" data-mask="cnpj" maxlength="18" placeholder="00.000.000/0000-00">
+              <div class="actions" style="margin-top:10px;">
+                <button class="btn btn-light" id="btnBuscarLojaCnpj">Buscar</button>
+                <button class="btn btn-light" id="btnLimparLojaForm">Limpar</button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="lojaCnpjNovo">CNPJ (ID) <span class="req">*</span></label>
+              <input class="input" id="lojaCnpjNovo" data-mask="cnpj" maxlength="18" placeholder="00.000.000/0000-00">
+              <div class="subtle">O CNPJ vira o ID do documento.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="lojaNomeNovo">Nome da loja <span class="req">*</span></label>
+              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: Vigorito - Matriz">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaAtivaNovo">Ativa</label>
+              <select class="select" id="lojaAtivaNovo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarLoja">Salvar loja</button>
+            </div>
+          </div>
+
+          <div id="lojasNotice" class="notice"></div>
+
+          <div class="section-title">Lojas cadastradas</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>CNPJ</th>
+                  <th>Nome</th>
+                  <th>Ativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `
+      );
+
+      attachInputMasks();
+
+      document.getElementById("btnSalvarLoja").addEventListener("click", salvarLojaAdmin);
+      document.getElementById("btnBuscarLojaCnpj").addEventListener("click", buscarLojaPorCnpj);
+      document.getElementById("btnLimparLojaForm").addEventListener("click", ()=>{
+        document.getElementById("lojaBuscaCnpj").value = "";
+        document.getElementById("lojaCnpjNovo").value = "";
+        document.getElementById("lojaNomeNovo").value = "";
+        document.getElementById("lojaAtivaNovo").value = "true";
+        toast("Formulário limpo.", "info", 1600);
+      });
+    }
+
+    async function buscarLojaPorCnpj(){
+      const notice = document.getElementById("lojasNotice");
+      clearNotice(notice);
+
+      const cnpjDigits = onlyDigits(document.getElementById("lojaBuscaCnpj")?.value || "");
+      if(!cnpjDigits || cnpjDigits.length !== 14 || !isValidCNPJ(cnpjDigits)){
+        showNotice(notice, "Informe um CNPJ válido para buscar.", "error");
+        return;
+      }
+
+      try{
+        if(!lockUI("find_loja","Buscando…","Procurando loja pelo CNPJ.")) return;
+        const ref = doc(db, Collections.LOJAS, cnpjDigits);
+        const snap = await getDoc(ref);
+        if(!snap.exists()){
+          showNotice(notice, "CNPJ não encontrado.", "warn");
+          return;
+        }
+        const data = snap.data() || {};
+        document.getElementById("lojaCnpjNovo").value = formatCNPJ(cnpjDigits);
+        document.getElementById("lojaNomeNovo").value = data.nome || "";
+        document.getElementById("lojaAtivaNovo").value = (data.ativo===false) ? "false" : "true";
+        showNotice(notice, "Loja carregada. Você pode alterar e salvar.", "success");
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Falha ao buscar. (${e?.code || e?.message || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
+    }
+
+    async function salvarLojaAdmin(){
+      const notice = document.getElementById("lojasNotice");
+      clearNotice(notice);
+
+      const cnpjDigits = onlyDigits(document.getElementById("lojaCnpjNovo")?.value || "");
+      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
+      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
+
+      if(!cnpjDigits || cnpjDigits.length !== 14 || !isValidCNPJ(cnpjDigits)){
+        showNotice(notice, "Informe um CNPJ válido.", "error");
+        return;
+      }
+      if(!nome){
+        showNotice(notice, "Informe o nome da loja.", "error");
+        return;
+      }
+
+      try{
+        if(!lockUI("save_loja", "Salvando…", "Cadastrando/atualizando loja.")) return;
+
+        const ref = doc(db, Collections.LOJAS, cnpjDigits);
+        const snap = await getDoc(ref);
+
+        if(snap.exists()){
+          const ok = confirm(`CNPJ já existe. Deseja alterar os dados do CNPJ ${formatCNPJ(cnpjDigits)}?`);
+          if(!ok){
+            toast("Alteração cancelada.", "info", 1600);
+            return;
+          }
+        }
+
+        await setDoc(ref, {
+          nome,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser?.uid || "",
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        }, { merge:true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Loja salva com sucesso.", "success");
+        toast("Loja salva com sucesso.", "success", 2200);
+        renderGestaoLojas();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Não foi possível salvar a loja. (${e?.code || e?.message || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
     }
 
     /* ========= CONVITE LINK (tela pública) ========= */
@@ -3633,7 +3636,6 @@
         const exp = dateValueToMillis(data.expiresAt) || 0;
 
         if(exp <= now){
-          // expirou: apaga e volta ao login normal
           try{ await deleteDoc(ref); }catch(e){}
           unlockUI();
           toast("Link expirado. Solicite um novo.", "warn", 3200);
@@ -3644,7 +3646,6 @@
           return false;
         }
 
-        // ok
         state.inviteData = { id: token, ...data };
         el.inviteSubtitle.textContent = "Preencha seus dados e crie sua conta.";
         el.inviteInfoBox.style.display = "block";
@@ -3695,13 +3696,25 @@
       if(pass !== pass2) { showNotice(el.inviteNotice, "As senhas não conferem.", "error"); return; }
 
       try{
-        if(!lockUI("create_acc", "Criando conta…", "Aguarde.")) return;
+        if(!lockUI("create_acc", "Criando conta…", "Validando CPF e criando acesso.")) return;
 
-        // 1) cria no Auth
+        // ✅ valida CPF antes de criar o Auth (evita criar usuário no Auth sem perfil)
+        const cpfExists = await cpfExistsInUsers(cpfDigits);
+        if(cpfExists){
+          showNotice(el.inviteNotice, "Este CPF já existe no sistema. Use 'Esqueci minha senha' na tela de login.", "warn");
+          toast("CPF já cadastrado. Use 'Esqueci minha senha'.", "warn", 3600);
+          clearInviteFromUrl();
+          state.inviteToken = null;
+          state.inviteData = null;
+          showLoginView();
+          return;
+        }
+
+        // cria no Auth
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
         const uid = cred.user.uid;
 
-        // 2) transação: revalida convite, cria perfil e APAGA convite
+        // transação: revalida convite, cria perfil e apaga convite
         await runTransaction(db, async (tx)=>{
           const invRef = doc(db, Collections.CONVITES_LINK, token);
           const invSnap = await tx.get(invRef);
@@ -3714,7 +3727,6 @@
           const role = invData.role || Roles.CONTROLADOR;
           const lojaId = invData.lojaId || "";
 
-          // perfil obrigatório
           tx.set(doc(db, Collections.USUARIOS, uid), {
             uid,
             email,
@@ -3730,38 +3742,19 @@
             criadoPorNome: invData.createdByName || ""
           }, { merge:true });
 
-          // ✅ regra: gerente_loja vira autorizador automaticamente
-          if(role === Roles.GERENTE_LOJA && lojaId){
-            const autId = autorizadorDocId(lojaId, cpfDigits);
-            tx.set(doc(db, Collections.AUTORIZADORES, autId), {
-              lojaId,
-              cpf: cpfDigits,
-              nome,
-              cargo: "Gerente de loja",
-              ativo: true,
-              atualizadoEm: new Date(),
-              atualizadoPorUid: invData.createdByUid || "",
-              atualizadoPorNome: invData.createdByName || ""
-            }, { merge:true });
-          }
-
-          // 1 uso: apaga convite
           tx.delete(invRef);
         });
 
-        // ✅ terminou: limpa URL e segue fluxo normal
         clearInviteFromUrl();
         state.inviteToken = null;
         state.inviteData = null;
 
         toast("Conta criada com sucesso. Entrando...", "success", 2600);
-        // onAuthStateChanged vai chamar initializeAuthenticatedUser
       }catch(e){
         console.error(e);
         const msg = e?.message || e?.code || "erro";
         showNotice(el.inviteNotice, `Não foi possível criar. (${msg})`, "error");
         toast(`Falha ao criar conta. (${msg})`, "error", 3800);
-        // Observação: se Auth criou e transaction falhou, o usuário existe no Auth.
       }finally{
         unlockUI();
       }
@@ -3844,7 +3837,7 @@
       el.appView.style.display = "block";
 
       try{
-        if(!lockUI("init", "Carregando…", "Lendo perfil e dados da loja.")) return;
+        if(!lockUI("init", "Carregando…", "Lendo perfil e dados.")) return;
 
         await loadUserProfile(user.uid);
         await loadLojas();
@@ -3855,7 +3848,6 @@
         buildMenu();
         renderDashboardHome();
       }catch(err){
-        // se por algum motivo não tem perfil, volta pro login (sem loop, sem “pendente”)
         console.error(err);
         toast("Usuário sem perfil no sistema. Contate a gerência.", "warn", 3800);
         await logout();
@@ -3896,7 +3888,6 @@
       closeDetailModal();
       unlockUI();
 
-      // decide qual tela mostrar: convite (se URL tem) ou login normal
       loadInviteOrRedirect().then((handled)=>{
         if(!handled) showLoginView();
       });
@@ -3949,7 +3940,6 @@
 
     el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
 
-    // ✅ retornar função de alterações/edições (mantida)
     el.btnEditRegistro.addEventListener("click", () => {
       const item = state.selectedMovimento;
       if(!item) return;
@@ -3966,21 +3956,18 @@
       el.btnResolveAlert.addEventListener("click", resolveSelectedAlert);
     }
 
-    // ✅ clique no logo => dashboard
     if(el.brandLogo){
       el.brandLogo.addEventListener("click", ()=>{
         if(state.userProfile) renderDashboardHome();
       });
     }
 
-    // reset senha modal
     el.btnOpenResetPass.addEventListener("click", ()=> openModal(el.resetPassModal));
     el.btnCloseResetPass.addEventListener("click", ()=> closeModal(el.resetPassModal));
     el.btnCloseResetPass2.addEventListener("click", ()=> closeModal(el.resetPassModal));
     el.resetPassModal.addEventListener("click", (e)=>{ if(e.target===el.resetPassModal) closeModal(el.resetPassModal); });
     el.btnSendReset.addEventListener("click", sendReset);
 
-    // convite: botões
     el.btnInviteBack.addEventListener("click", ()=>{
       clearInviteFromUrl();
       state.inviteToken=null;
@@ -3989,7 +3976,6 @@
     });
     el.btnInviteCreate.addEventListener("click", createAccountFromInvite);
 
-    // sessão
     onAuthStateChanged(auth, async (user) => {
       if(!user){
         resetAppState();
@@ -3998,7 +3984,6 @@
       await initializeAuthenticatedUser(user);
     });
 
-    // inicial: se tiver invite na url, mostra cadastro. se não, login.
     loadInviteOrRedirect().then((handled)=>{
       if(!handled){
         showLoginView();

@@ -29,12 +29,7 @@
       --fs:16px;
     }
 
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
+    *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 
     body{
       font-family:'Inter',sans-serif;
@@ -61,14 +56,9 @@
       z-index:100;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:14px;
-      min-width:0;
-    }
+    .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
 
-    /* APENAS LOGO (sem borda/caixa) */
+    /* apenas logo */
     .brand-logo{
       height:46px;
       width:auto;
@@ -77,31 +67,13 @@
       display:block;
     }
 
-    .brand-text{
-      display:flex;
-      flex-direction:column;
-      gap:2px;
-      min-width:0;
-    }
-
-    .brand-text strong{
-      font-size:18px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      line-height:1.1;
-    }
-
-    .brand-text span{
-      font-size:13px;
-      color:#cbd5e1;
-    }
+    .brand-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+    .brand-text strong{ font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.1; }
+    .brand-text span{ font-size:13px; color:#cbd5e1; }
 
     .footerbar{
       position:fixed;
-      left:0;
-      right:0;
-      bottom:0;
+      left:0; right:0; bottom:0;
       z-index:120;
       background:rgba(15,23,42,.98);
       color:#fff;
@@ -120,12 +92,7 @@
       flex-wrap:wrap;
     }
 
-    .chips{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+    .chips{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
 
     .chip{
       background:rgba(255,255,255,.10);
@@ -149,7 +116,6 @@
       min-height:var(--touch);
       min-width:120px;
     }
-
     .btn-topbar:active{ transform:scale(.99); }
 
     #loginView{
@@ -342,11 +308,7 @@
       -webkit-overflow-scrolling: touch;
     }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:1100px;
-    }
+    table{ width:100%; border-collapse:collapse; min-width:1100px; }
 
     th,td{
       padding:14px 16px;
@@ -424,12 +386,7 @@
       position:relative;
     }
 
-    .photo-preview img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
+    .photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
 
     .photo-hint{
       font-size:13px;
@@ -439,7 +396,7 @@
       line-height:1.35;
     }
 
-    /* input invisível, botão abre câmera */
+    /* input invisível */
     .file-input{
       position:absolute;
       left:-99999px;
@@ -516,17 +473,8 @@
       background:#fff;
     }
 
-    .modal-head h4{
-      font-size:18px;
-      font-weight:900;
-      margin-bottom:4px;
-    }
-
-    .modal-head p{
-      color:#64748b;
-      font-size:14px;
-      line-height:1.4;
-    }
+    .modal-head h4{ font-size:18px; font-weight:900; margin-bottom:4px; }
+    .modal-head p{ color:#64748b; font-size:14px; line-height:1.4; }
 
     .modal-body{
       padding:16px 18px 18px 18px;
@@ -679,7 +627,6 @@
     </section>
   </main>
 
-  <!-- MODAL DETALHE/EDIÇÃO -->
   <div class="modal" id="detailModal" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="modal-head">
@@ -719,13 +666,6 @@
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    import {
-      getStorage,
-      ref as sRef,
-      uploadBytes,
-      getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
       authDomain: "controle-ponto-26d34.firebaseapp.com",
@@ -738,7 +678,6 @@
     const appFirebase = initializeApp(firebaseConfig);
     const auth = getAuth(appFirebase);
     const db = getFirestore(appFirebase);
-    const storage = getStorage(appFirebase);
 
     const el = {
       topbar: document.getElementById("topbar"),
@@ -813,109 +752,73 @@
       "Saída para despachante","Saída para logística / transporte","Saída para pátio externo","Saída por recolhimento","Outro"
     ];
 
-    function clearNotice(target){
-      target.className = "notice";
-      target.textContent = "";
-    }
+    function clearNotice(target){ target.className = "notice"; target.textContent = ""; }
+    function showNotice(target, message, type="error"){ target.className = `notice show ${type}`; target.textContent = message; }
 
-    function showNotice(target, message, type = "error"){
-      target.className = `notice show ${type}`;
-      target.textContent = message;
-    }
-
-    function onlyDigits(value){ return String(value || "").replace(/\D/g, ""); }
-
-    function formatCPF(value){
-      const digits = onlyDigits(value).slice(0, 11);
-      return digits
-        .replace(/^(\d{3})(\d)/, "$1.$2")
-        .replace(/^(\d{3})\.(\d{3})(\d)/, "$1.$2.$3")
-        .replace(/\.(\d{3})(\d)/, ".$1-$2");
+    function onlyDigits(v){ return String(v||"").replace(/\D/g,""); }
+    function formatCPF(v){
+      const d = onlyDigits(v).slice(0,11);
+      return d.replace(/^(\d{3})(\d)/,"$1.$2").replace(/^(\d{3})\.(\d{3})(\d)/,"$1.$2.$3").replace(/\.(\d{3})(\d)/,".$1-$2");
     }
 
     function isValidCPF(cpf){
-      const clean = onlyDigits(cpf);
-      if(clean.length !== 11) return false;
-      if(/^(\d)\1{10}$/.test(clean)) return false;
-
+      const c = onlyDigits(cpf);
+      if(c.length !== 11) return false;
+      if(/^(\d)\1{10}$/.test(c)) return false;
       let sum=0;
-      for(let i=0;i<9;i++) sum += Number(clean[i])*(10-i);
+      for(let i=0;i<9;i++) sum += Number(c[i])*(10-i);
       let first=(sum*10)%11; if(first===10) first=0;
-      if(first !== Number(clean[9])) return false;
-
+      if(first !== Number(c[9])) return false;
       sum=0;
-      for(let i=0;i<10;i++) sum += Number(clean[i])*(11-i);
+      for(let i=0;i<10;i++) sum += Number(c[i])*(11-i);
       let second=(sum*10)%11; if(second===10) second=0;
-      if(second !== Number(clean[10])) return false;
-
+      if(second !== Number(c[10])) return false;
       return true;
     }
 
-    function normalizePlate(value){ return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
-
-    function isValidPlate(plate){
-      const clean = normalizePlate(plate);
-      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;
-      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
-      return oldPattern.test(clean) || mercosulPattern.test(clean);
+    function normalizePlate(v){ return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,""); }
+    function isValidPlate(p){
+      const c = normalizePlate(p);
+      return /^[A-Z]{3}[0-9]{4}$/.test(c) || /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/.test(c);
     }
-
-    function formatPlate(value){
-      const clean = normalizePlate(value).slice(0, 7);
-      if(!clean) return "";
-      if(clean.length <= 3) return clean;
-      return clean.slice(0, 3) + "-" + clean.slice(3);
+    function formatPlate(v){
+      const c = normalizePlate(v).slice(0,7);
+      if(!c) return "";
+      if(c.length<=3) return c;
+      return c.slice(0,3)+"-"+c.slice(3);
     }
 
     function formatDate(value){
       try{
         if(!value) return "-";
-        if(value.seconds) return new Date(value.seconds * 1000).toLocaleString("pt-BR");
+        if(value.seconds) return new Date(value.seconds*1000).toLocaleString("pt-BR");
         return new Date(value).toLocaleString("pt-BR");
       }catch(e){ return "-"; }
     }
-
     function dateValueToMillis(value){
       if(!value) return null;
-      if(value.seconds) return value.seconds * 1000;
+      if(value.seconds) return value.seconds*1000;
       const t = new Date(value).getTime();
       return isNaN(t) ? null : t;
     }
-
-    function dateToRangeStart(dStr){
-      if(!dStr) return null;
-      return new Date(dStr + "T00:00:00").getTime();
-    }
-    function dateToRangeEnd(dStr){
-      if(!dStr) return null;
-      return new Date(dStr + "T23:59:59").getTime();
-    }
+    function dateToRangeStart(dStr){ if(!dStr) return null; return new Date(dStr+"T00:00:00").getTime(); }
+    function dateToRangeEnd(dStr){ if(!dStr) return null; return new Date(dStr+"T23:59:59").getTime(); }
 
     function getRoleLabel(role){
-      if(role === Roles.CONTROLADOR) return "Controlador de acesso";
-      if(role === Roles.GERENTE_LOJA) return "Gerente de loja";
-      if(role === Roles.GERENTE_GERAL) return "Gerente geral";
+      if(role===Roles.CONTROLADOR) return "Controlador de acesso";
+      if(role===Roles.GERENTE_LOJA) return "Gerente de loja";
+      if(role===Roles.GERENTE_GERAL) return "Gerente geral";
       return "Perfil não definido";
     }
 
-    function userIsGeneralManager(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
-    function userIsStoreManager(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
-    function userIsController(){ return state.userProfile?.role === Roles.CONTROLADOR; }
+    function userIsGeneralManager(){ return state.userProfile?.role===Roles.GERENTE_GERAL; }
+    function userIsStoreManager(){ return state.userProfile?.role===Roles.GERENTE_LOJA; }
+    function userIsController(){ return state.userProfile?.role===Roles.CONTROLADOR; }
 
-    function canManageAutorizadores(){
-      return userIsGeneralManager() || userIsStoreManager();
-    }
-
-    function canManageLojas(){
-      return userIsGeneralManager();
-    }
+    function canManageAutorizadores(){ return userIsGeneralManager() || userIsStoreManager(); } // controlador NÃO
+    function canManageLojas(){ return userIsGeneralManager(); }
 
     function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
-
-    function getStoreName(lojaId){
-      if(!lojaId) return "Todas as lojas";
-      return state.lojasMap[lojaId]?.nome || lojaId;
-    }
 
     function getStoreLabel(lojaId){
       const nome = state.lojasMap[lojaId]?.nome || lojaId;
@@ -975,7 +878,7 @@
         state.lojas.push(item);
         state.lojasMap[item.id] = item;
       });
-      state.lojas.sort((a,b) => String(a.id).localeCompare(String(b.id), "pt-BR"));
+      state.lojas.sort((a,b) => String(a.id).localeCompare(String(b.id),"pt-BR"));
     }
 
     async function loadUserProfile(uid){
@@ -990,9 +893,9 @@
     }
 
     function sortOperationalArrays(){
-      state.movimentos.sort((a,b) => (dateValueToMillis(b.data) || 0) - (dateValueToMillis(a.data) || 0));
-      state.condutores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
-      state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+      state.movimentos.sort((a,b) => (dateValueToMillis(b.data)||0) - (dateValueToMillis(a.data)||0));
+      state.condutores.sort((a,b) => String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
+      state.autorizadores.sort((a,b) => String(a.nome||"").localeCompare(String(b.nome||""),"pt-BR"));
     }
 
     async function loadOperationalCollections(){
@@ -1000,34 +903,34 @@
 
       if(userIsGeneralManager()){
         const [movSnap, condSnap, autSnap] = await Promise.all([
-          getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(2000))),
-          getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(6000))),
-          getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(6000)))
+          getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data","desc"), limit(2000))),
+          getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome","asc"), limit(6000))),
+          getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome","asc"), limit(6000)))
         ]);
 
         state.movimentos = [];
-        movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
+        movSnap.forEach(d => state.movimentos.push({ id:d.id, ...d.data() }));
         state.condutores = [];
-        condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
+        condSnap.forEach(d => state.condutores.push({ id:d.id, ...d.data() }));
         state.autorizadores = [];
-        autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
+        autSnap.forEach(d => state.autorizadores.push({ id:d.id, ...d.data() }));
 
         sortOperationalArrays();
         return;
       }
 
       const [movSnap, condSnap, autSnap] = await Promise.all([
-        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(2000))),
-        getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(4000))),
-        getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(4000)))
+        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId","==",lojaId), limit(2000))),
+        getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId","==",lojaId), limit(4000))),
+        getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId","==",lojaId), limit(4000)))
       ]);
 
       state.movimentos = [];
-      movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
+      movSnap.forEach(d => state.movimentos.push({ id:d.id, ...d.data() }));
       state.condutores = [];
-      condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
+      condSnap.forEach(d => state.condutores.push({ id:d.id, ...d.data() }));
       state.autorizadores = [];
-      autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
+      autSnap.forEach(d => state.autorizadores.push({ id:d.id, ...d.data() }));
 
       sortOperationalArrays();
     }
@@ -1035,12 +938,12 @@
     function renderShellInfo(){
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
-      const lojaNome = userIsGeneralManager() ? "Todas as lojas" : getStoreName(state.userProfile?.lojaId);
+      const lojaNome = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
 
-      el.headerStoreText.textContent = lojaNome;
+      el.headerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
       el.footerUserText.textContent = nome;
       el.footerRoleText.textContent = roleLabel;
-      el.footerStoreText.textContent = lojaNome;
+      el.footerStoreText.textContent = userIsGeneralManager() ? "Todas as lojas" : getStoreLabel(state.userProfile?.lojaId);
 
       if(userIsGeneralManager()){
         el.heroTitle.textContent = "Dashboard geral";
@@ -1058,39 +961,35 @@
       const patioMap = {};
       movimentos
         .slice()
-        .sort((a,b) => (dateValueToMillis(a.data) || 0) - (dateValueToMillis(b.data) || 0))
+        .sort((a,b) => (dateValueToMillis(a.data)||0) - (dateValueToMillis(b.data)||0))
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
-          const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
-          if(item.tipo === "entrada") patioMap[key] = true;
-          if(item.tipo === "saida") delete patioMap[key];
+          const key = userIsGeneralManager() ? `${item.lojaId||""}__${plate}` : plate;
+          if(item.tipo==="entrada") patioMap[key]=true;
+          if(item.tipo==="saida") delete patioMap[key];
         });
-
       return Object.keys(patioMap).length;
     }
 
     function buildDashboardMetrics(){
       const movimentos = [...state.movimentos];
       const vehiclesInPatio = computePatioCount(movimentos);
-      const entradas = movimentos.filter(m => m.tipo === "entrada").length;
-      const saidas = movimentos.filter(m => m.tipo === "saida").length;
+      const entradas = movimentos.filter(m=>m.tipo==="entrada").length;
+      const saidas = movimentos.filter(m=>m.tipo==="saida").length;
 
       const cards = [
-        { title: "Veículos no pátio", value: vehiclesInPatio, subtitle: userIsGeneralManager() ? "Somatório geral" : "Na unidade" },
-        { title: "Movimentações", value: movimentos.length, subtitle: "Total de entradas e saídas" },
-        { title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo" },
-        { title: "Condutores", value: state.condutores.length, subtitle: "Cadastros" }
+        { title:"Veículos no pátio", value:vehiclesInPatio, subtitle:userIsGeneralManager()?"Somatório geral":"Na unidade" },
+        { title:"Movimentações", value:movimentos.length, subtitle:"Total entradas e saídas" },
+        { title:"Entradas / Saídas", value:`${entradas} / ${saidas}`, subtitle:"Resumo" },
+        { title:"Condutores", value:state.condutores.length, subtitle:"Cadastros" }
       ];
-
       if(canManageAutorizadores()){
-        cards.push({ title: "Autorizadores", value: state.autorizadores.length, subtitle: "Cadastros" });
+        cards.push({ title:"Autorizadores", value:state.autorizadores.length, subtitle:"Cadastros" });
       }
-
       if(userIsGeneralManager()){
-        cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades" });
+        cards.push({ title:"Lojas", value:state.lojas.length, subtitle:"Unidades" });
       }
-
       return cards;
     }
 
@@ -1119,29 +1018,25 @@
 
     function buildMenu(){
       const items = [
-        { id: "menu-dashboard", label: userIsGeneralManager() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome },
-        { id: "menu-entrada", label: "Entrada", action: renderEntrada },
-        { id: "menu-saida", label: "Saída", action: renderSaida },
-        { id: "menu-consulta", label: "Consulta", action: renderConsulta },
-        { id: "menu-condutores", label: "Condutores", action: renderCondutores }
+        { id:"menu-dashboard", label:userIsGeneralManager()?"Dashboard geral":"Dashboard", action:renderDashboardHome },
+        { id:"menu-entrada", label:"Entrada", action:renderEntrada },
+        { id:"menu-saida", label:"Saída", action:renderSaida },
+        { id:"menu-consulta", label:"Consulta", action:renderConsulta },
+        { id:"menu-condutores", label:"Condutores", action:renderCondutores },
       ];
-
-      // controlador NÃO vê autorizadores
       if(canManageAutorizadores()){
-        items.push({ id: "menu-autorizadores", label: "Autorizadores", action: renderAutorizadores });
+        items.push({ id:"menu-autorizadores", label:"Autorizadores", action:renderAutorizadores });
       }
-
-      // gestão de lojas volta (somente gerente geral)
       if(canManageLojas()){
-        items.push({ id: "menu-lojas", label: "Gestão de lojas", action: renderGestaoLojas });
+        items.push({ id:"menu-lojas", label:"Gestão de lojas", action:renderGestaoLojas });
       }
 
       el.menuBar.innerHTML = "";
-      items.forEach(item => {
+      items.forEach(item=>{
         const btn = document.createElement("button");
-        btn.className = "btn btn-primary";
-        btn.id = item.id;
-        btn.textContent = item.label;
+        btn.className="btn btn-primary";
+        btn.id=item.id;
+        btn.textContent=item.label;
         btn.addEventListener("click", item.action);
         el.menuBar.appendChild(btn);
       });
@@ -1149,17 +1044,17 @@
 
     function renderDashboardHome(){
       const movimentos = [...state.movimentos];
-      const lastFive = movimentos.slice(0, 5);
+      const lastFive = movimentos.slice(0,5);
 
-      const rows = lastFive.map(item => `
+      const rows = lastFive.map(item=>`
         <tr>
           <td>${formatDate(item.data)}</td>
-          <td>${item.tipo || "-"}</td>
-          <td>${getStoreLabel(item.lojaId || "-")}</td>
-          <td>${item.placa || "-"}</td>
-          <td>${item.veiculo || "-"}</td>
-          <td>${item.condutor || "-"}</td>
-          <td>${item.autorizador || "-"}</td>
+          <td>${item.tipo||"-"}</td>
+          <td>${getStoreLabel(item.lojaId||"-")}</td>
+          <td>${item.placa||"-"}</td>
+          <td>${item.veiculo||"-"}</td>
+          <td>${item.condutor||"-"}</td>
+          <td>${item.autorizador||"-"}</td>
         </tr>
       `).join("");
 
@@ -1190,7 +1085,14 @@
       );
     }
 
-    // ============ FOTO (tablet / câmera direta) ============
+    // ========= FOTO (Firestore-only) =========
+    // Compressão para não estourar 1MB no Firestore.
+    // Ajuste fino:
+    const PHOTO_MAX_W = 900;
+    const PHOTO_MAX_H = 900;
+    const PHOTO_QUALITY = 0.55; // 0.45~0.65 (quanto menor, mais leve)
+    const PHOTO_MAX_BYTES = 160 * 1024; // ~160KB por foto (4 fotos ~640KB + campos)
+
     function fileFromInput(inputId){
       const input = document.getElementById(inputId);
       const file = input?.files?.[0] || null;
@@ -1202,17 +1104,14 @@
     function setPreview(previewId, fileOrUrl){
       const preview = document.getElementById(previewId);
       if(!preview) return;
-
       if(!fileOrUrl){
         preview.innerHTML = `<div class="photo-hint">Sem foto</div>`;
         return;
       }
-
       if(typeof fileOrUrl === "string"){
         preview.innerHTML = `<img src="${fileOrUrl}" alt="Preview">`;
         return;
       }
-
       const url = URL.createObjectURL(fileOrUrl);
       preview.innerHTML = `<img src="${url}" alt="Preview">`;
     }
@@ -1237,51 +1136,89 @@
       `;
     }
 
-    async function uploadPhotoToStorage(file, path){
-      const r = sRef(storage, path);
-      await uploadBytes(r, file, { contentType: file.type || "image/jpeg" });
-      return await getDownloadURL(r);
+    function estimateBase64Bytes(dataUrl){
+      // data:image/jpeg;base64,XXXX
+      const base64 = String(dataUrl||"").split(",")[1] || "";
+      return Math.floor(base64.length * 3 / 4);
     }
 
-    async function uploadFotosSet(docId, lojaId, prefix, currentUrls = null){
-      // currentUrls: {frente,mala,lateralEsq,lateralDir,extras:[]}
-      const basePath = `movimentos/${lojaId}/${docId}`;
-      const urls = {
-        frente: currentUrls?.frente || "",
-        mala: currentUrls?.mala || "",
-        lateralEsq: currentUrls?.lateralEsq || "",
-        lateralDir: currentUrls?.lateralDir || "",
-        extras: Array.isArray(currentUrls?.extras) ? [...currentUrls.extras] : []
-      };
+    async function compressImageToDataURL(file){
+      // cria bitmap
+      const img = await createImageBitmap(file);
+      let w = img.width;
+      let h = img.height;
 
-      const fFrente = fileFromInput(`${prefix}FotoFrente`);
-      const fMala = fileFromInput(`${prefix}FotoMala`);
-      const fEsq = fileFromInput(`${prefix}FotoLatEsq`);
-      const fDir = fileFromInput(`${prefix}FotoLatDir`);
+      // resize mantendo proporção
+      const ratio = Math.min(PHOTO_MAX_W / w, PHOTO_MAX_H / h, 1);
+      const nw = Math.max(1, Math.round(w * ratio));
+      const nh = Math.max(1, Math.round(h * ratio));
 
-      // se vier arquivo novo, sobe e substitui
-      if(fFrente) urls.frente = await uploadPhotoToStorage(fFrente, `${basePath}/frente_${Date.now()}.jpg`);
-      if(fMala) urls.mala = await uploadPhotoToStorage(fMala, `${basePath}/mala_${Date.now()}.jpg`);
-      if(fEsq) urls.lateralEsq = await uploadPhotoToStorage(fEsq, `${basePath}/lateral_esq_${Date.now()}.jpg`);
-      if(fDir) urls.lateralDir = await uploadPhotoToStorage(fDir, `${basePath}/lateral_dir_${Date.now()}.jpg`);
+      const canvas = document.createElement("canvas");
+      canvas.width = nw;
+      canvas.height = nh;
 
-      // extras
+      const ctx = canvas.getContext("2d", { alpha:false });
+      ctx.drawImage(img, 0, 0, nw, nh);
+
+      // tenta com qualidade alvo; se ainda ficar grande, reduz qualidade automaticamente
+      let q = PHOTO_QUALITY;
+      let out = canvas.toDataURL("image/jpeg", q);
+      while(estimateBase64Bytes(out) > PHOTO_MAX_BYTES && q > 0.25){
+        q = Math.max(0.25, q - 0.08);
+        out = canvas.toDataURL("image/jpeg", q);
+      }
+
+      if(estimateBase64Bytes(out) > PHOTO_MAX_BYTES){
+        // ainda grande (foto muito detalhada). devolve mesmo assim, mas vai falhar no doc grande.
+        // Melhor avisar.
+        console.warn("Foto ainda grande após compressão:", estimateBase64Bytes(out));
+      }
+      return out;
+    }
+
+    async function getCompressedDataURLFromInput(inputId){
+      const f = fileFromInput(inputId);
+      if(!f) return "";
+      return await compressImageToDataURL(f);
+    }
+
+    async function collectExtraPhotosData(prefix){
       const extraInputs = Array.from(document.querySelectorAll(`input[id^='${prefix}fotoExtra_']`));
+      const data = [];
       for(const input of extraInputs){
         const file = input?.files?.[0];
         if(!file || !file.type?.startsWith("image/")) continue;
-        const u = await uploadPhotoToStorage(file, `${basePath}/extra_${Date.now()}_${Math.random().toString(16).slice(2)}.jpg`);
-        urls.extras.push(u);
+        const url = await compressImageToDataURL(file);
+        data.push(url);
       }
-
-      return urls;
+      return data;
     }
 
-    function requiredFotosOk(urls){
-      return !!(urls?.frente && urls?.mala && urls?.lateralEsq && urls?.lateralDir);
+    function fotosRequiredOk(f){
+      return !!(f?.frente && f?.mala && f?.lateralEsq && f?.lateralDir);
     }
 
-    // ========= Entrada/Saída =========
+    function totalFotosBytes(f){
+      let sum = 0;
+      sum += estimateBase64Bytes(f?.frente || "");
+      sum += estimateBase64Bytes(f?.mala || "");
+      sum += estimateBase64Bytes(f?.lateralEsq || "");
+      sum += estimateBase64Bytes(f?.lateralDir || "");
+      const ex = Array.isArray(f?.extras) ? f.extras : [];
+      ex.forEach(x => sum += estimateBase64Bytes(x || ""));
+      return sum;
+    }
+
+    function docSizeGuardOrThrow(fotos){
+      // folga para outros campos; se passar muito, vai estourar 1MB
+      const bytesFotos = totalFotosBytes(fotos);
+      const LIMIT = 900 * 1024; // guardrail (não é o limite real, é margem)
+      if(bytesFotos > LIMIT){
+        throw new Error("Fotos muito pesadas para salvar no Firestore. Tire as fotos mais próximas / com menos detalhe ou diminua extras.");
+      }
+    }
+
+    // ========= Entrada / Saída =========
     function toggleMotivoOutro(prefix){
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
@@ -1387,6 +1324,8 @@
                 <button class="btn btn-light" id="entradaBtnAddExtraFoto">Fotografar mais partes</button>
               </div>
               <div class="photo-grid" id="entradaPhotoGridExtras"></div>
+
+              <div class="subtle">As fotos são compactadas automaticamente para caber no Firestore.</div>
             </div>
 
             <div class="form-group full">
@@ -1444,9 +1383,26 @@
       if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
-      // cria o doc primeiro (sem fotos), depois sobe fotos e atualiza URLs
       try{
-        const baseData = {
+        const [frente, mala, lateralEsq, lateralDir] = await Promise.all([
+          getCompressedDataURLFromInput("entradaFotoFrente"),
+          getCompressedDataURLFromInput("entradaFotoMala"),
+          getCompressedDataURLFromInput("entradaFotoLatEsq"),
+          getCompressedDataURLFromInput("entradaFotoLatDir")
+        ]);
+
+        const extras = await collectExtraPhotosData("entrada");
+
+        const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
+
+        if(!fotosRequiredOk(fotos)){
+          showNotice(notice, "As 4 fotos principais são obrigatórias.");
+          return;
+        }
+
+        docSizeGuardOrThrow(fotos);
+
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "entrada",
           lojaId,
           placa,
@@ -1456,31 +1412,18 @@
           condutor,
           autorizador,
           observacao,
-          fotos: { frente:"", mala:"", lateralEsq:"", lateralDir:"", extras:[] },
+          fotos,
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
-        };
-
-        const docRef = await addDoc(collection(db, Collections.MOVIMENTOS), baseData);
-
-        // sobe fotos para storage e grava URLs
-        const urls = await uploadFotosSet(docRef.id, lojaId, "entrada", null);
-        if(!requiredFotosOk(urls)){
-          showNotice(notice, "As 4 fotos principais são obrigatórias.");
-          return;
-        }
-
-        await updateDoc(doc(db, Collections.MOVIMENTOS, docRef.id), {
-          fotos: urls
         });
 
         await refreshAfterWrite();
         showNotice(notice, "Entrada registrada com sucesso.", "success");
         renderEntrada();
       }catch(e){
-        showNotice(notice, `Não foi possível salvar a entrada. (${e?.code || "erro"})`);
         console.error(e);
+        showNotice(notice, `Não foi possível salvar a entrada. (${e?.message || e?.code || "erro"})`);
       }
     }
 
@@ -1536,6 +1479,8 @@
                 <button class="btn btn-light" id="saidaBtnAddExtraFoto">Fotografar mais partes</button>
               </div>
               <div class="photo-grid" id="saidaPhotoGridExtras"></div>
+
+              <div class="subtle">As fotos são compactadas automaticamente para caber no Firestore.</div>
             </div>
 
             <div class="form-group full">
@@ -1594,7 +1539,24 @@
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
       try{
-        const baseData = {
+        const [frente, mala, lateralEsq, lateralDir] = await Promise.all([
+          getCompressedDataURLFromInput("saidaFotoFrente"),
+          getCompressedDataURLFromInput("saidaFotoMala"),
+          getCompressedDataURLFromInput("saidaFotoLatEsq"),
+          getCompressedDataURLFromInput("saidaFotoLatDir")
+        ]);
+
+        const extras = await collectExtraPhotosData("saida");
+        const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
+
+        if(!fotosRequiredOk(fotos)){
+          showNotice(notice, "As 4 fotos principais são obrigatórias.");
+          return;
+        }
+
+        docSizeGuardOrThrow(fotos);
+
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "saida",
           lojaId,
           placa,
@@ -1604,28 +1566,18 @@
           condutor,
           autorizador,
           observacao,
-          fotos: { frente:"", mala:"", lateralEsq:"", lateralDir:"", extras:[] },
+          fotos,
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
-        };
-
-        const docRef = await addDoc(collection(db, Collections.MOVIMENTOS), baseData);
-
-        const urls = await uploadFotosSet(docRef.id, lojaId, "saida", null);
-        if(!requiredFotosOk(urls)){
-          showNotice(notice, "As 4 fotos principais são obrigatórias.");
-          return;
-        }
-
-        await updateDoc(doc(db, Collections.MOVIMENTOS, docRef.id), { fotos: urls });
+        });
 
         await refreshAfterWrite();
         showNotice(notice, "Saída registrada com sucesso.", "success");
         renderSaida();
       }catch(e){
-        showNotice(notice, `Não foi possível salvar a saída. (${e?.code || "erro"})`);
         console.error(e);
+        showNotice(notice, `Não foi possível salvar a saída. (${e?.message || e?.code || "erro"})`);
       }
     }
 
@@ -1650,7 +1602,7 @@
 
       renderPanel(
         "Consulta",
-        "Toque em uma linha para abrir o detalhe (com fotos), exportar e editar.",
+        "Toque em uma linha para abrir o detalhe individual (com fotos), exportar e editar.",
         `
           <div class="grid">
             ${storeFilterHTML}
@@ -1743,58 +1695,58 @@
 
       if(lojaId && lojaId !== "__ALL__") items = items.filter(i => i.lojaId === lojaId);
       if(placa) items = items.filter(i => normalizePlate(i.placa).includes(placa));
-      if(tipo) items = items.filter(i => String(i.tipo || "").toLowerCase() === tipo);
+      if(tipo) items = items.filter(i => String(i.tipo||"").toLowerCase() === tipo);
 
       if(tIni || tFim){
-        items = items.filter(i => {
+        items = items.filter(i=>{
           const t = dateValueToMillis(i.data);
-          if(t == null) return false;
-          if(tIni && t < tIni) return false;
-          if(tFim && t > tFim) return false;
+          if(t==null) return false;
+          if(tIni && t<tIni) return false;
+          if(tFim && t>tFim) return false;
           return true;
         });
       }
 
       if(texto){
-        items = items.filter(i => {
-          const motivoFinal = i.motivo === "Outro" && i.motivoOutro ? `Outro: ${i.motivoOutro}` : (i.motivo || "");
+        items = items.filter(i=>{
+          const motivoFinal = i.motivo==="Outro" && i.motivoOutro ? `Outro: ${i.motivoOutro}` : (i.motivo||"");
           const haystack = [i.veiculo, motivoFinal, i.condutor, i.autorizador, i.observacao, i.criadoPorNome, getStoreLabel(i.lojaId)].join(" ").toLowerCase();
           return haystack.includes(texto);
         });
       }
 
-      items.sort((a,b) => (dateValueToMillis(b.data) || 0) - (dateValueToMillis(a.data) || 0));
+      items.sort((a,b)=> (dateValueToMillis(b.data)||0) - (dateValueToMillis(a.data)||0));
 
-      body.innerHTML = items.map(item => {
+      body.innerHTML = items.map(item=>{
         const fotos = item?.fotos || {};
         const extrasCount = Array.isArray(fotos.extras) ? fotos.extras.length : 0;
         const baseCount = [fotos.frente, fotos.mala, fotos.lateralEsq, fotos.lateralDir].filter(Boolean).length;
         const totalFotos = baseCount + extrasCount;
-        const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+        const motivoFinal = item.motivo==="Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo||"-");
 
         return `
           <tr class="row-clickable" data-id="${item.id}">
             <td>${formatDate(item.data)}</td>
-            <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
-            <td>${getStoreLabel(item.lojaId || "-")}</td>
-            <td>${item.placa || "-"}</td>
-            <td>${item.veiculo || "-"}</td>
+            <td>${item.tipo==="entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
+            <td>${getStoreLabel(item.lojaId||"-")}</td>
+            <td>${item.placa||"-"}</td>
+            <td>${item.veiculo||"-"}</td>
             <td>${motivoFinal}</td>
-            <td>${item.condutor || "-"}</td>
-            <td>${item.autorizador || "-"}</td>
-            <td>${item.observacao || "-"}</td>
+            <td>${item.condutor||"-"}</td>
+            <td>${item.autorizador||"-"}</td>
+            <td>${item.observacao||"-"}</td>
             <td>${totalFotos ? `${totalFotos} foto(s)` : "-"}</td>
-            <td>${item.criadoPorNome || "-"}</td>
+            <td>${item.criadoPorNome||"-"}</td>
           </tr>
         `;
       }).join("");
 
       empty.textContent = items.length ? "" : "Nenhum registro encontrado.";
 
-      Array.from(body.querySelectorAll("tr[data-id]")).forEach(tr => {
-        tr.addEventListener("click", () => {
+      Array.from(body.querySelectorAll("tr[data-id]")).forEach(tr=>{
+        tr.addEventListener("click", ()=>{
           const id = tr.getAttribute("data-id");
-          const found = state.movimentos.find(m => m.id === id);
+          const found = state.movimentos.find(m=>m.id===id);
           if(found) openDetailModal(found);
         });
       });
@@ -1808,45 +1760,45 @@
       el.btnEditRegistro.classList.remove("hidden");
       renderDetailView(item);
       el.detailModal.classList.add("show");
-      el.detailModal.setAttribute("aria-hidden", "false");
+      el.detailModal.setAttribute("aria-hidden","false");
     }
 
     function renderDetailView(item){
-      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+      const motivoFinal = item.motivo==="Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo||"-");
       const fotos = item?.fotos || {};
       const thumbs = [];
 
-      if(fotos.frente) thumbs.push({ url: fotos.frente, cap: "Frente" });
-      if(fotos.mala) thumbs.push({ url: fotos.mala, cap: "Mala" });
-      if(fotos.lateralEsq) thumbs.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
-      if(fotos.lateralDir) thumbs.push({ url: fotos.lateralDir, cap: "Lateral direita" });
-      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` }); });
+      if(fotos.frente) thumbs.push({ url:fotos.frente, cap:"Frente" });
+      if(fotos.mala) thumbs.push({ url:fotos.mala, cap:"Mala" });
+      if(fotos.lateralEsq) thumbs.push({ url:fotos.lateralEsq, cap:"Lateral esquerda" });
+      if(fotos.lateralDir) thumbs.push({ url:fotos.lateralDir, cap:"Lateral direita" });
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u,idx)=>{ if(u) thumbs.push({ url:u, cap:`Extra ${idx+1}` }); });
 
-      el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
+      el.detailTitle.textContent = `Registro: ${item.tipo==="entrada"?"Entrada":"Saída"} — ${item.placa||""}`;
       el.detailSub.textContent = `Loja: ${getStoreLabel(item.lojaId)} • Data/hora: ${formatDate(item.data)}`;
 
       el.detailBody.innerHTML = `
         <div class="detail-grid">
-          <div class="detail-item"><small>Tipo</small><div>${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
+          <div class="detail-item"><small>Tipo</small><div>${item.tipo==="entrada"?"Entrada":"Saída"}</div></div>
           <div class="detail-item"><small>Data/Hora</small><div>${formatDate(item.data)}</div></div>
 
           <div class="detail-item"><small>Loja</small><div>${getStoreLabel(item.lojaId)}</div></div>
-          <div class="detail-item"><small>Placa</small><div>${item.placa || "-"}</div></div>
+          <div class="detail-item"><small>Placa</small><div>${item.placa||"-"}</div></div>
 
-          <div class="detail-item"><small>Veículo</small><div>${item.veiculo || "-"}</div></div>
+          <div class="detail-item"><small>Veículo</small><div>${item.veiculo||"-"}</div></div>
           <div class="detail-item"><small>Motivo</small><div>${motivoFinal}</div></div>
 
-          <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
-          <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
+          <div class="detail-item"><small>Condutor</small><div>${item.condutor||"-"}</div></div>
+          <div class="detail-item"><small>Autorizador</small><div>${item.autorizador||"-"}</div></div>
 
-          <div class="detail-item" style="grid-column:1/-1;"><small>Observação</small><div>${item.observacao || "-"}</div></div>
-          <div class="detail-item" style="grid-column:1/-1;"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
+          <div class="detail-item" style="grid-column:1/-1;"><small>Observação</small><div>${item.observacao||"-"}</div></div>
+          <div class="detail-item" style="grid-column:1/-1;"><small>Registrado por</small><div>${item.criadoPorNome||"-"}</div></div>
         </div>
 
         <div class="section-title" style="margin-top:6px;">Fotos</div>
         ${thumbs.length ? `
           <div class="thumbs">
-            ${thumbs.map(t => `
+            ${thumbs.map(t=>`
               <div class="thumb">
                 <img src="${t.url}" alt="${t.cap}">
                 <div class="cap">${t.cap}</div>
@@ -1858,11 +1810,11 @@
     }
 
     function renderDetailEdit(item){
-      const isEntrada = item.tipo === "entrada";
+      const isEntrada = item.tipo==="entrada";
       const motivoList = isEntrada ? MOTIVOS_ENTRADA : MOTIVOS_SAIDA;
       const fotos = item?.fotos || {};
 
-      el.detailTitle.textContent = `Editar registro — ${item.placa || ""}`;
+      el.detailTitle.textContent = `Editar registro — ${item.placa||""}`;
       el.detailSub.textContent = `Loja: ${getStoreLabel(item.lojaId)} • Data/hora: ${formatDate(item.data)}`;
 
       el.detailBody.innerHTML = `
@@ -1879,12 +1831,12 @@
 
           <div class="form-group">
             <label for="editPlaca">Placa <span class="req">*</span></label>
-            <input class="input" id="editPlaca" data-mask="plate" maxlength="8" value="${item.placa || ""}">
+            <input class="input" id="editPlaca" data-mask="plate" maxlength="8" value="${item.placa||""}">
           </div>
 
           <div class="form-group">
             <label for="editVeiculo">Veículo <span class="req">*</span></label>
-            <input class="input" id="editVeiculo" maxlength="60" value="${item.veiculo || ""}">
+            <input class="input" id="editVeiculo" maxlength="60" value="${item.veiculo||""}">
           </div>
 
           <div class="form-group">
@@ -1894,7 +1846,7 @@
 
           <div class="form-group hidden" id="editMotivoOutroWrap">
             <label for="editMotivoOutro">Descreva o motivo <span class="req">*</span></label>
-            <input class="input" id="editMotivoOutro" maxlength="60" value="${item.motivoOutro || ""}">
+            <input class="input" id="editMotivoOutro" maxlength="60" value="${item.motivoOutro||""}">
           </div>
 
           <div class="form-group">
@@ -1909,12 +1861,12 @@
 
           <div class="form-group full">
             <label for="editObs">Observações</label>
-            <textarea class="textarea" id="editObs" maxlength="300">${item.observacao || ""}</textarea>
+            <textarea class="textarea" id="editObs" maxlength="300">${item.observacao||""}</textarea>
           </div>
 
           <div class="form-group full">
             <label>Fotos (4 obrigatórias) <span class="req">*</span></label>
-            <div class="subtle">Se não tirar nova foto, será mantida a foto atual.</div>
+            <div class="subtle">Se não tirar nova foto, será mantida a atual.</div>
 
             <div class="photo-grid">
               ${photoCaptureCard("Frente", "editFotoFrente", "editPreviewFrente")}
@@ -1925,10 +1877,10 @@
 
             <div class="subtle" style="margin-top:10px;">Fotos atuais:</div>
             <div class="thumbs" style="margin-top:10px;">
-              ${fotos.frente ? `<div class="thumb"><img src="${fotos.frente}" alt="Frente"><div class="cap">Atual: Frente</div></div>` : ""}
-              ${fotos.mala ? `<div class="thumb"><img src="${fotos.mala}" alt="Mala"><div class="cap">Atual: Mala</div></div>` : ""}
-              ${fotos.lateralEsq ? `<div class="thumb"><img src="${fotos.lateralEsq}" alt="Lateral esquerda"><div class="cap">Atual: Lateral esquerda</div></div>` : ""}
-              ${fotos.lateralDir ? `<div class="thumb"><img src="${fotos.lateralDir}" alt="Lateral direita"><div class="cap">Atual: Lateral direita</div></div>` : ""}
+              ${fotos.frente ? `<div class="thumb"><img src="${fotos.frente}"><div class="cap">Atual: Frente</div></div>` : ""}
+              ${fotos.mala ? `<div class="thumb"><img src="${fotos.mala}"><div class="cap">Atual: Mala</div></div>` : ""}
+              ${fotos.lateralEsq ? `<div class="thumb"><img src="${fotos.lateralEsq}"><div class="cap">Atual: Lateral esquerda</div></div>` : ""}
+              ${fotos.lateralDir ? `<div class="thumb"><img src="${fotos.lateralDir}"><div class="cap">Atual: Lateral direita</div></div>` : ""}
             </div>
 
             <div class="actions" style="margin-top:12px;">
@@ -1941,19 +1893,16 @@
         <div id="editNotice" class="notice"></div>
       `;
 
-      // set selects
       document.getElementById("editMotivo").value = item.motivo || "";
       document.getElementById("editCondutor").value = item.condutor || "";
       document.getElementById("editAutorizador").value = item.autorizador || "";
 
-      // motivo outro
       const toggleEditOutro = () => {
-        const motivo = document.getElementById("editMotivo")?.value || "";
+        const m = document.getElementById("editMotivo")?.value || "";
         const wrap = document.getElementById("editMotivoOutroWrap");
         if(!wrap) return;
-        if(motivo === "Outro"){
-          wrap.classList.remove("hidden");
-        }else{
+        if(m === "Outro") wrap.classList.remove("hidden");
+        else{
           wrap.classList.add("hidden");
           const i = document.getElementById("editMotivoOutro");
           if(i) i.value = "";
@@ -1962,7 +1911,6 @@
       document.getElementById("editMotivo").addEventListener("change", toggleEditOutro);
       toggleEditOutro();
 
-      // masks & previews
       attachInputMasks();
       wirePhotoPreview("editFotoFrente", "editPreviewFrente");
       wirePhotoPreview("editFotoMala", "editPreviewMala");
@@ -1998,13 +1946,32 @@
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
       try{
-        // sobe fotos novas (se houver) e mantém urls antigas
-        const lojaId = item.lojaId;
-        const urls = await uploadFotosSet(item.id, lojaId, "edit", item.fotos || null);
-        if(!requiredFotosOk(urls)){
-          showNotice(notice, "As 4 fotos principais são obrigatórias (pode manter as antigas ou tirar novas).");
+        // se não tirou nova foto, mantém as atuais
+        const cur = item.fotos || {};
+        const [newFrente, newMala, newEsq, newDir] = await Promise.all([
+          getCompressedDataURLFromInput("editFotoFrente"),
+          getCompressedDataURLFromInput("editFotoMala"),
+          getCompressedDataURLFromInput("editFotoLatEsq"),
+          getCompressedDataURLFromInput("editFotoLatDir"),
+        ]);
+
+        const extrasNew = await collectExtraPhotosData("edit");
+        const extrasOld = Array.isArray(cur.extras) ? cur.extras : [];
+
+        const fotos = {
+          frente: newFrente || cur.frente || "",
+          mala: newMala || cur.mala || "",
+          lateralEsq: newEsq || cur.lateralEsq || "",
+          lateralDir: newDir || cur.lateralDir || "",
+          extras: [...extrasOld, ...(extrasNew || [])]
+        };
+
+        if(!fotosRequiredOk(fotos)){
+          showNotice(notice, "As 4 fotos principais são obrigatórias (pode manter as antigas).");
           return;
         }
+
+        docSizeGuardOrThrow(fotos);
 
         await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
           placa,
@@ -2014,7 +1981,7 @@
           condutor,
           autorizador,
           observacao,
-          fotos: urls,
+          fotos,
           atualizadoEm: new Date(),
           atualizadoPorUid: state.authUser.uid,
           atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
@@ -2022,25 +1989,23 @@
 
         await refreshAfterWrite();
 
-        // atualiza seleção
-        const refreshed = state.movimentos.find(m => m.id === item.id);
+        const refreshed = state.movimentos.find(m=>m.id===item.id);
         if(refreshed) state.selectedMovimento = refreshed;
 
         showNotice(notice, "Registro atualizado com sucesso.", "success");
-
         state.editMode = false;
         el.btnSaveRegistro.classList.add("hidden");
         el.btnEditRegistro.classList.remove("hidden");
         renderDetailView(state.selectedMovimento);
       }catch(e){
         console.error(e);
-        showNotice(notice, `Não foi possível salvar alterações. (${e?.code || "erro"})`);
+        showNotice(notice, `Não foi possível salvar alterações. (${e?.message || e?.code || "erro"})`);
       }
     }
 
     function closeDetailModal(){
       el.detailModal.classList.remove("show");
-      el.detailModal.setAttribute("aria-hidden", "true");
+      el.detailModal.setAttribute("aria-hidden","true");
       state.selectedMovimento = null;
       state.editMode = false;
     }
@@ -2049,15 +2014,15 @@
       const item = state.selectedMovimento;
       if(!item) return;
 
-      const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+      const motivoFinal = item.motivo==="Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo||"-");
       const fotos = item?.fotos || {};
       const imagens = [];
 
-      if(fotos.frente) imagens.push({ url: fotos.frente, cap: "Frente" });
-      if(fotos.mala) imagens.push({ url: fotos.mala, cap: "Mala" });
-      if(fotos.lateralEsq) imagens.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
-      if(fotos.lateralDir) imagens.push({ url: fotos.lateralDir, cap: "Lateral direita" });
-      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) imagens.push({ url: u, cap: `Extra ${idx+1}` }); });
+      if(fotos.frente) imagens.push({ url:fotos.frente, cap:"Frente" });
+      if(fotos.mala) imagens.push({ url:fotos.mala, cap:"Mala" });
+      if(fotos.lateralEsq) imagens.push({ url:fotos.lateralEsq, cap:"Lateral esquerda" });
+      if(fotos.lateralDir) imagens.push({ url:fotos.lateralDir, cap:"Lateral direita" });
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u,idx)=>{ if(u) imagens.push({ url:u, cap:`Extra ${idx+1}` }); });
 
       const html = `
 <!doctype html>
@@ -2065,7 +2030,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Registro - ${item.placa || ""}</title>
+<title>Registro - ${item.placa||""}</title>
 <style>
   body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
   h1{ font-size:20px; margin:0 0 6px 0; }
@@ -2083,7 +2048,7 @@
 </style>
 </head>
 <body>
-  <h1>Registro de ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}</h1>
+  <h1>Registro de ${item.tipo==="entrada"?"Entrada":"Saída"} — ${item.placa||""}</h1>
   <p class="sub">
     Loja: ${getStoreLabel(item.lojaId)} •
     Data/Hora: ${formatDate(item.data)} •
@@ -2092,19 +2057,19 @@
 
   <div class="box">
     <div class="grid">
-      <div><div class="k">Tipo</div><div class="v">${item.tipo === "entrada" ? "Entrada" : "Saída"}</div></div>
+      <div><div class="k">Tipo</div><div class="v">${item.tipo==="entrada"?"Entrada":"Saída"}</div></div>
       <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
 
       <div><div class="k">Loja</div><div class="v">${getStoreLabel(item.lojaId)}</div></div>
-      <div><div class="k">Placa</div><div class="v">${item.placa || "-"}</div></div>
+      <div><div class="k">Placa</div><div class="v">${item.placa||"-"}</div></div>
 
-      <div><div class="k">Veículo</div><div class="v">${item.veiculo || "-"}</div></div>
+      <div><div class="k">Veículo</div><div class="v">${item.veiculo||"-"}</div></div>
       <div><div class="k">Motivo</div><div class="v">${motivoFinal}</div></div>
 
-      <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
-      <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
+      <div><div class="k">Condutor</div><div class="v">${item.condutor||"-"}</div></div>
+      <div><div class="k">Autorizador</div><div class="v">${item.autorizador||"-"}</div></div>
 
-      <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
+      <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao||"-"}</div></div>
     </div>
   </div>
 
@@ -2113,7 +2078,7 @@
     ${
       imagens.length ? `
         <div class="imgs">
-          ${imagens.map(im => `
+          ${imagens.map(im=>`
             <div class="img">
               <img src="${im.url}" alt="${im.cap}">
               <div class="cap">${im.cap}</div>
@@ -2138,7 +2103,7 @@
       w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
-    // ========= Condutores (cadastro/consulta/inativar + Todas as lojas) =========
+    // ========= Condutores / Autorizadores / Lojas =========
     function buildLojaSelectWithAll(id){
       const options = [];
       if(userIsGeneralManager()){
@@ -2150,13 +2115,12 @@
       return `<select class="select" id="${id}">${options.join("")}</select>`;
     }
 
-    function condutorDocId(lojaId, cpfDigits){
-      return `cond_${lojaId}_${cpfDigits}`;
-    }
+    function condutorDocId(lojaId, cpfDigits){ return `cond_${lojaId}_${cpfDigits}`; }
+    function autorizadorDocId(lojaId, cpfDigits){ return `aut_${lojaId}_${cpfDigits}`; }
 
-    async function findCondutorByCpf(lojaId, cpfDigits){
+    async function findByCpf(colName, lojaId, cpfDigits){
       const q = query(
-        collection(db, Collections.CONDUTORES),
+        collection(db, colName),
         where("lojaId","==",lojaId),
         where("cpf","==",cpfDigits),
         limit(1)
@@ -2164,7 +2128,7 @@
       const snap = await getDocs(q);
       if(snap.empty) return null;
       const d = snap.docs[0];
-      return { id: d.id, ...d.data() };
+      return { id:d.id, ...d.data() };
     }
 
     function renderCondutores(){
@@ -2250,27 +2214,20 @@
       if(!body) return;
 
       let items = [...state.condutores];
+      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
 
-      if(!userIsGeneralManager()){
-        items = items.filter(i => i.lojaId === currentUserStoreId());
-      }
-
-      items.sort((a,b) => {
-        const la = `${a.lojaId || ""} ${a.nome || ""}`.toLowerCase();
-        const lb = `${b.lojaId || ""} ${b.nome || ""}`.toLowerCase();
-        return la.localeCompare(lb,"pt-BR");
-      });
+      items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
 
       body.innerHTML = items.map(i => `
         <tr>
-          <td>${getStoreLabel(i.lojaId || "-")}</td>
-          <td>${i.nome || "-"}</td>
+          <td>${getStoreLabel(i.lojaId||"-")}</td>
+          <td>${i.nome||"-"}</td>
           <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
-          <td>${i.cargo || "-"}</td>
-          <td>${i.ativo === false ? "Não" : "Sim"}</td>
+          <td>${i.cargo||"-"}</td>
+          <td>${i.ativo===false ? "Não" : "Sim"}</td>
           <td>
             <button class="btn btn-light" data-toggle-cond="${i.id}">
-              ${i.ativo === false ? "Ativar" : "Inativar"}
+              ${i.ativo===false ? "Ativar" : "Inativar"}
             </button>
           </td>
         </tr>
@@ -2283,7 +2240,7 @@
           if(!found) return;
           try{
             await updateDoc(doc(db, Collections.CONDUTORES, id), {
-              ativo: found.ativo === false ? true : false,
+              ativo: found.ativo===false ? true : false,
               atualizadoEm: new Date(),
               atualizadoPorUid: state.authUser.uid,
               atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
@@ -2303,29 +2260,17 @@
       const status = document.getElementById("condCpfStatus");
 
       status.textContent = "";
-
-      if(!cpfDigits || cpfDigits.length !== 11){
-        status.textContent = "Digite um CPF completo.";
-        return;
-      }
-      if(!isValidCPF(cpfDigits)){
-        status.textContent = "CPF inválido.";
-        return;
-      }
-
-      // se for todas as lojas, não faz lookup (porque teria múltiplos)
-      if(lojaId === "__ALL__"){
-        status.textContent = "Lookup desativado em “Todas as lojas”. Se precisar, selecione uma loja específica.";
-        return;
-      }
+      if(!cpfDigits || cpfDigits.length !== 11){ status.textContent = "Digite um CPF completo."; return; }
+      if(!isValidCPF(cpfDigits)){ status.textContent = "CPF inválido."; return; }
+      if(lojaId === "__ALL__"){ status.textContent = "Lookup desativado em “Todas as lojas”. Selecione uma loja."; return; }
 
       try{
-        const existing = await findCondutorByCpf(lojaId, cpfDigits);
+        const existing = await findByCpf(Collections.CONDUTORES, lojaId, cpfDigits);
         if(existing){
           status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
           document.getElementById("condNome").value = existing.nome || "";
           document.getElementById("condCargo").value = existing.cargo || "";
-          document.getElementById("condAtivo").value = (existing.ativo === false) ? "false" : "true";
+          document.getElementById("condAtivo").value = (existing.ativo===false) ? "false" : "true";
         }else{
           status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
           document.getElementById("condNome").value = "";
@@ -2333,8 +2278,8 @@
           document.getElementById("condAtivo").value = "true";
         }
       }catch(e){
-        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
         console.error(e);
+        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
       }
     }
 
@@ -2354,9 +2299,7 @@
       if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
 
       try{
-        const lojasAlvo = (lojaSel === "__ALL__")
-          ? state.lojas.map(l => l.id)
-          : [lojaSel];
+        const lojasAlvo = (lojaSel==="__ALL__") ? state.lojas.map(l=>l.id) : [lojaSel];
 
         for(const lojaId of lojasAlvo){
           const id = condutorDocId(lojaId, cpfDigits);
@@ -2369,7 +2312,7 @@
             atualizadoEm: new Date(),
             atualizadoPorUid: state.authUser.uid,
             atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-          }, { merge: true });
+          }, { merge:true });
         }
 
         await refreshAfterWrite();
@@ -2379,24 +2322,6 @@
         console.error(e);
         showNotice(notice, `Falha ao salvar. (${e?.code || "erro"})`);
       }
-    }
-
-    // ========= Autorizadores (somente gerente_loja/gerente_geral) =========
-    function autorizadorDocId(lojaId, cpfDigits){
-      return `aut_${lojaId}_${cpfDigits}`;
-    }
-
-    async function findAutorizadorByCpf(lojaId, cpfDigits){
-      const q = query(
-        collection(db, Collections.AUTORIZADORES),
-        where("lojaId","==",lojaId),
-        where("cpf","==",cpfDigits),
-        limit(1)
-      );
-      const snap = await getDocs(q);
-      if(snap.empty) return null;
-      const d = snap.docs[0];
-      return { id: d.id, ...d.data() };
     }
 
     function renderAutorizadores(){
@@ -2487,27 +2412,20 @@
       if(!body) return;
 
       let items = [...state.autorizadores];
+      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
 
-      if(!userIsGeneralManager()){
-        items = items.filter(i => i.lojaId === currentUserStoreId());
-      }
-
-      items.sort((a,b) => {
-        const la = `${a.lojaId || ""} ${a.nome || ""}`.toLowerCase();
-        const lb = `${b.lojaId || ""} ${b.nome || ""}`.toLowerCase();
-        return la.localeCompare(lb,"pt-BR");
-      });
+      items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
 
       body.innerHTML = items.map(i => `
         <tr>
-          <td>${getStoreLabel(i.lojaId || "-")}</td>
-          <td>${i.nome || "-"}</td>
+          <td>${getStoreLabel(i.lojaId||"-")}</td>
+          <td>${i.nome||"-"}</td>
           <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
-          <td>${i.cargo || "-"}</td>
-          <td>${i.ativo === false ? "Não" : "Sim"}</td>
+          <td>${i.cargo||"-"}</td>
+          <td>${i.ativo===false ? "Não" : "Sim"}</td>
           <td>
             <button class="btn btn-light" data-toggle-aut="${i.id}">
-              ${i.ativo === false ? "Ativar" : "Inativar"}
+              ${i.ativo===false ? "Ativar" : "Inativar"}
             </button>
           </td>
         </tr>
@@ -2520,7 +2438,7 @@
           if(!found) return;
           try{
             await updateDoc(doc(db, Collections.AUTORIZADORES, id), {
-              ativo: found.ativo === false ? true : false,
+              ativo: found.ativo===false ? true : false,
               atualizadoEm: new Date(),
               atualizadoPorUid: state.authUser.uid,
               atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
@@ -2540,28 +2458,17 @@
       const status = document.getElementById("autCpfStatus");
 
       status.textContent = "";
-
-      if(!cpfDigits || cpfDigits.length !== 11){
-        status.textContent = "Digite um CPF completo.";
-        return;
-      }
-      if(!isValidCPF(cpfDigits)){
-        status.textContent = "CPF inválido.";
-        return;
-      }
-
-      if(lojaId === "__ALL__"){
-        status.textContent = "Lookup desativado em “Todas as lojas”. Se precisar, selecione uma loja específica.";
-        return;
-      }
+      if(!cpfDigits || cpfDigits.length !== 11){ status.textContent = "Digite um CPF completo."; return; }
+      if(!isValidCPF(cpfDigits)){ status.textContent = "CPF inválido."; return; }
+      if(lojaId === "__ALL__"){ status.textContent = "Lookup desativado em “Todas as lojas”. Selecione uma loja."; return; }
 
       try{
-        const existing = await findAutorizadorByCpf(lojaId, cpfDigits);
+        const existing = await findByCpf(Collections.AUTORIZADORES, lojaId, cpfDigits);
         if(existing){
           status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
           document.getElementById("autNome").value = existing.nome || "";
           document.getElementById("autCargo").value = existing.cargo || "";
-          document.getElementById("autAtivo").value = (existing.ativo === false) ? "false" : "true";
+          document.getElementById("autAtivo").value = (existing.ativo===false) ? "false" : "true";
         }else{
           status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
           document.getElementById("autNome").value = "";
@@ -2569,8 +2476,8 @@
           document.getElementById("autAtivo").value = "true";
         }
       }catch(e){
-        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
         console.error(e);
+        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
       }
     }
 
@@ -2590,9 +2497,7 @@
       if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
 
       try{
-        const lojasAlvo = (lojaSel === "__ALL__")
-          ? state.lojas.map(l => l.id)
-          : [lojaSel];
+        const lojasAlvo = (lojaSel==="__ALL__") ? state.lojas.map(l=>l.id) : [lojaSel];
 
         for(const lojaId of lojasAlvo){
           const id = autorizadorDocId(lojaId, cpfDigits);
@@ -2605,7 +2510,7 @@
             atualizadoEm: new Date(),
             atualizadoPorUid: state.authUser.uid,
             atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-          }, { merge: true });
+          }, { merge:true });
         }
 
         await refreshAfterWrite();
@@ -2617,18 +2522,17 @@
       }
     }
 
-    // ========= Gestão de lojas (somente gerente geral) =========
     function renderGestaoLojas(){
       if(!canManageLojas()){
-        renderPanel("Acesso restrito", "Somente gerente geral.", `<div class="empty">Acesso negado.</div>`);
+        renderPanel("Acesso restrito","Somente gerente geral.",`<div class="empty">Acesso negado.</div>`);
         return;
       }
 
-      const rows = state.lojas.map(l => `
+      const rows = state.lojas.map(l=>`
         <tr>
           <td>${l.id}</td>
-          <td>${l.nome || "-"}</td>
-          <td>${l.ativo === false ? "Não" : "Sim"}</td>
+          <td>${l.nome||"-"}</td>
+          <td>${l.ativo===false ? "Não" : "Sim"}</td>
         </tr>
       `).join("");
 
@@ -2703,7 +2607,7 @@
           atualizadoEm: new Date(),
           atualizadoPorUid: state.authUser?.uid || "",
           atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        }, { merge: true });
+        }, { merge:true });
 
         await refreshAfterWrite();
         showNotice(notice, "Loja salva com sucesso.", "success");
@@ -2726,10 +2630,12 @@
       clearNotice(el.loginNotice);
       const email = el.loginEmail.value.trim();
       const senha = el.loginSenha.value;
+
       if(!email || !senha){
         showNotice(el.loginNotice, "Preencha e-mail e senha.");
         return;
       }
+
       el.btnLogin.disabled = true;
       try{
         await signInWithEmailAndPassword(auth, email, senha);

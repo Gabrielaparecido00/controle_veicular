@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -25,11 +26,17 @@
       --shadow:0 16px 40px rgba(15,23,42,.08);
       --radius:16px;
 
-      --touch:54px;  /* tablet */
+      --touch:52px;
       --fs:16px;
     }
 
-    *{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body{
       font-family:'Inter',sans-serif;
       background:var(--bg);
@@ -37,10 +44,10 @@
       font-size:var(--fs);
       overscroll-behavior: none;
     }
+
     button,input,select,textarea{ font:inherit; }
     .hidden{ display:none !important; }
 
-    /* TOPBAR (apenas logo + texto) */
     header{
       height:76px;
       background:var(--header);
@@ -54,21 +61,29 @@
       top:0;
       z-index:100;
     }
-    .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
-    /* ✅ só o logo, sem borda/fundo/padding */
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
     .brand-logo{
       height:46px;
       width:auto;
-      max-width:320px;
+      max-width:260px;
       object-fit:contain;
       display:block;
-      border:none;
-      border-radius:0;
-      background:transparent;
-      padding:0;
-      box-shadow:none;
     }
-    .brand-text{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+
+    .brand-text{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+
     .brand-text strong{
       font-size:18px;
       white-space:nowrap;
@@ -76,12 +91,17 @@
       text-overflow:ellipsis;
       line-height:1.1;
     }
-    .brand-text span{ font-size:13px; color:#cbd5e1; }
 
-    /* FOOTER fixo (perfil/nome/unidade/sair) */
+    .brand-text span{
+      font-size:13px;
+      color:#cbd5e1;
+    }
+
     .footerbar{
       position:fixed;
-      left:0; right:0; bottom:0;
+      left:0;
+      right:0;
+      bottom:0;
       z-index:120;
       background:rgba(15,23,42,.98);
       color:#fff;
@@ -89,6 +109,7 @@
       box-shadow:0 -10px 28px rgba(0,0,0,.25);
       display:none;
     }
+
     .footerbar .wrap{
       max-width:1420px;
       margin:0 auto;
@@ -98,7 +119,14 @@
       gap:12px;
       flex-wrap:wrap;
     }
-    .chips{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
     .chip{
       background:rgba(255,255,255,.10);
       color:#fff;
@@ -109,6 +137,7 @@
       line-height:1;
       white-space:nowrap;
     }
+
     .btn-topbar{
       border:none;
       background:#1e293b;
@@ -120,9 +149,9 @@
       min-height:var(--touch);
       min-width:120px;
     }
+
     .btn-topbar:active{ transform:scale(.99); }
 
-    /* LOGIN */
     #loginView{
       min-height:100vh;
       display:flex;
@@ -130,6 +159,7 @@
       justify-content:center;
       padding:24px;
     }
+
     .login-wrap{
       width:100%;
       max-width:460px;
@@ -139,15 +169,30 @@
       box-shadow:var(--shadow);
       border:1px solid #edf2f7;
     }
+
     .login-wrap h1{ font-size:30px; margin-bottom:8px; }
     .login-wrap p{ font-size:15px; color:var(--muted); margin-bottom:22px; line-height:1.55; }
 
-    .form-group{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
-    .label-row{ display:flex; align-items:center; gap:8px; }
-    .label-row label{ font-size:14px; font-weight:900; color:#334155; }
-    .req{ color:var(--danger); font-weight:900; font-size:14px; margin-left:2px; }
+    .form-group{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-bottom:14px;
+    }
 
-    .input,.select,.textarea{
+    .form-group label{
+      font-size:14px;
+      font-weight:900;
+      color:#334155;
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+    .req{ color:#ef4444; font-weight:900; font-size:14px; }
+
+    .input, .select, .textarea{
       width:100%;
       padding:14px 16px;
       border:1px solid var(--line);
@@ -159,8 +204,10 @@
       min-height:var(--touch);
       font-size:16px;
     }
+
     .textarea{ resize:vertical; min-height:120px; }
-    .input:focus,.select:focus,.textarea:focus{
+
+    .input:focus, .select:focus, .textarea:focus{
       border-color:#93c5fd;
       box-shadow:0 0 0 4px rgba(37,99,235,.10);
     }
@@ -175,8 +222,8 @@
       min-height:var(--touch);
       font-size:16px;
     }
-    .btn:disabled{ opacity:.55; cursor:not-allowed; }
 
+    .btn:disabled{ opacity:.55; cursor:not-allowed; }
     .btn-primary{ background:var(--primary); color:#fff; }
     .btn-primary:hover{ background:var(--primary-dark); }
     .btn-success{ background:var(--success); color:#fff; }
@@ -185,7 +232,6 @@
     .btn-danger:hover{ filter:brightness(.97); }
     .btn-light{ background:#e2e8f0; color:#0f172a; }
     .btn-light:hover{ background:#cfd8e3; }
-
     .btn-block{ width:100%; }
 
     .notice{
@@ -197,21 +243,30 @@
       line-height:1.45;
       word-break:break-word;
     }
+
     .notice.show{ display:block; }
     .notice.error{ background:#fee2e2; color:#991b1b; }
     .notice.success{ background:#dcfce7; color:#166534; }
     .notice.info{ background:#dbeafe; color:#1e40af; }
     .notice.warn{ background:#ffedd5; color:#9a3412; }
 
-    /* APP */
     #appView{
       display:none;
       max-width:1420px;
       margin:0 auto;
       padding:24px;
-      padding-bottom:150px; /* rodapé fixo */
+      padding-bottom:140px;
     }
-    .hero{ margin-bottom:18px; display:flex; justify-content:space-between; gap:14px; align-items:flex-start; flex-wrap:wrap; }
+
+    .hero{
+      margin-bottom:18px;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+
     .hero h2{ font-size:30px; margin-bottom:8px; }
     .hero p{ color:var(--muted); font-size:15px; line-height:1.55; }
 
@@ -221,6 +276,7 @@
       gap:14px;
       margin-bottom:18px;
     }
+
     .stat{
       background:var(--card);
       border-radius:var(--radius);
@@ -228,11 +284,18 @@
       box-shadow:var(--shadow);
       border:1px solid #edf2f7;
     }
+
     .stat small{ display:block; color:var(--muted); margin-bottom:10px; font-size:14px; font-weight:700; }
     .stat strong{ display:block; font-size:34px; line-height:1; margin-bottom:8px; font-weight:900; }
     .stat span{ color:#475569; font-size:14px; }
 
-    .menu{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }
+    .menu{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:18px;
+    }
+
     .menu .btn{ border-radius:16px; padding:14px 16px; }
 
     .card{
@@ -242,6 +305,7 @@
       padding:24px;
       border:1px solid #edf2f7;
     }
+
     .card-header{
       display:flex;
       justify-content:space-between;
@@ -250,13 +314,24 @@
       margin-bottom:18px;
       flex-wrap:wrap;
     }
+
     .card-header h3{ font-size:26px; margin-bottom:6px; }
     .card-header p{ color:var(--muted); font-size:15px; line-height:1.5; }
 
-    .grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:14px;
+    }
+
     .full{ grid-column:1 / -1; }
 
-    .actions{ display:flex; gap:10px; flex-wrap:wrap; margin-top:18px; }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
 
     .table-wrap{
       overflow:auto;
@@ -266,7 +341,13 @@
       margin-top:18px;
       -webkit-overflow-scrolling: touch;
     }
-    table{ width:100%; border-collapse:collapse; min-width:1100px; }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:1100px;
+    }
+
     th,td{
       padding:14px 16px;
       border-bottom:1px solid #eef2f7;
@@ -274,6 +355,7 @@
       vertical-align:top;
       font-size:15px;
     }
+
     th{
       background:#f8fafc;
       font-size:12px;
@@ -285,11 +367,11 @@
       top:0;
       z-index:1;
     }
+
     tr.row-clickable{ cursor:pointer; }
     tr.row-clickable:active{ background:#f8fafc; }
 
     .empty{ margin-top:14px; color:var(--muted); font-size:15px; }
-    .section-title{ margin:20px 0 10px; font-size:17px; font-weight:900; color:#1e293b; }
 
     .badge{
       display:inline-flex;
@@ -301,25 +383,24 @@
       line-height:1;
       white-space:nowrap;
     }
+
     .badge-green{ background:#dcfce7; color:#166534; }
     .badge-red{ background:#fee2e2; color:#991b1b; }
-    .badge-gray{ background:#f1f5f9; color:#334155; }
 
-    .subtle{ font-size:13px; color:#64748b; line-height:1.4; margin-top:6px; }
-
-    /* Fotos (tablet camera) */
     .photo-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
       gap:12px;
       margin-top:8px;
     }
+
     .photo-card{
       border:1px solid #e5edf5;
       border-radius:16px;
       padding:12px;
       background:#fff;
     }
+
     .photo-card strong{
       display:block;
       font-size:14px;
@@ -327,6 +408,7 @@
       color:#0f172a;
       font-weight:900;
     }
+
     .photo-preview{
       width:100%;
       height:170px;
@@ -340,23 +422,61 @@
       margin-bottom:10px;
       position:relative;
     }
-    .photo-preview img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .photo-hint{ font-size:13px; color:#64748b; text-align:center; padding:10px; line-height:1.35; }
-    .file-input{ display:none; } /* ✅ escondido: não aparece “selecionar arquivo” */
 
-    .btn-camera{
+    .photo-preview img{
       width:100%;
-      min-height:var(--touch);
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .photo-hint{
+      font-size:13px;
+      color:#64748b;
+      text-align:center;
+      padding:10px;
+      line-height:1.35;
+    }
+
+    .file-input{
+      position:absolute;
+      left:-99999px;
+      width:1px;
+      height:1px;
+      opacity:0;
+    }
+
+    .btn-cam{
+      width:100%;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      border:1px solid #dbe4ee;
+      background:#fff;
+      color:#0f172a;
       border-radius:14px;
-      border:1px solid #e5edf5;
-      background:#0f172a;
-      color:#fff;
+      padding:12px 14px;
       font-weight:900;
+      min-height:var(--touch);
       cursor:pointer;
     }
-    .btn-camera:active{ transform:scale(.99); }
+    .btn-cam:active{ transform:scale(.99); }
 
-    /* MODAL (consulta individual + fotos + exportar) */
+    .subtle{
+      font-size:13px;
+      color:#64748b;
+      line-height:1.4;
+      margin-top:6px;
+    }
+
+    .section-title{
+      margin:20px 0 10px;
+      font-size:17px;
+      font-weight:900;
+      color:#1e293b;
+    }
+
     .modal{
       position:fixed;
       inset:0;
@@ -367,7 +487,9 @@
       align-items:center;
       justify-content:center;
     }
+
     .modal.show{ display:flex; }
+
     .modal-card{
       width:100%;
       max-width:980px;
@@ -380,6 +502,7 @@
       display:flex;
       flex-direction:column;
     }
+
     .modal-head{
       padding:18px 18px 12px 18px;
       border-bottom:1px solid #edf2f7;
@@ -390,9 +513,24 @@
       flex-wrap:wrap;
       background:#fff;
     }
-    .modal-head h4{ font-size:18px; font-weight:900; margin-bottom:4px; }
-    .modal-head p{ color:#64748b; font-size:14px; line-height:1.4; }
-    .modal-body{ padding:16px 18px 18px 18px; overflow:auto; -webkit-overflow-scrolling: touch; }
+
+    .modal-head h4{
+      font-size:18px;
+      font-weight:900;
+      margin-bottom:4px;
+    }
+
+    .modal-head p{
+      color:#64748b;
+      font-size:14px;
+      line-height:1.4;
+    }
+
+    .modal-body{
+      padding:16px 18px 18px 18px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
 
     .detail-grid{
       display:grid;
@@ -400,12 +538,14 @@
       gap:12px;
       margin-bottom:14px;
     }
+
     .detail-item{
       background:#f8fafc;
       border:1px solid #e5edf5;
       border-radius:14px;
       padding:12px 14px;
     }
+
     .detail-item small{
       display:block;
       color:#64748b;
@@ -415,6 +555,7 @@
       text-transform:uppercase;
       letter-spacing:.05em;
     }
+
     .detail-item div{
       font-weight:800;
       color:#0f172a;
@@ -422,19 +563,28 @@
       line-height:1.35;
       word-break:break-word;
     }
+
     .thumbs{
       display:grid;
       grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));
       gap:10px;
       margin-top:10px;
     }
+
     .thumb{
       border:1px solid #e5edf5;
       border-radius:14px;
       overflow:hidden;
       background:#fff;
     }
-    .thumb img{ width:100%; height:160px; object-fit:cover; display:block; }
+
+    .thumb img{
+      width:100%;
+      height:160px;
+      object-fit:cover;
+      display:block;
+    }
+
     .thumb .cap{
       padding:10px 12px;
       font-size:13px;
@@ -442,6 +592,7 @@
       font-weight:900;
       border-top:1px solid #eef2f7;
     }
+
     .modal-actions{
       display:flex;
       gap:10px;
@@ -453,10 +604,11 @@
 
     @media (max-width:900px){
       .grid{ grid-template-columns:1fr; }
+      .hero h2{ font-size:26px; }
+      header{ padding:12px 14px; height:auto; }
       .detail-grid{ grid-template-columns:1fr; }
       table{ min-width:980px; }
-      header{ padding:12px 14px; height:auto; }
-      .brand-logo{ max-width:260px; }
+      .brand-logo{ max-width:220px; }
     }
   </style>
 </head>
@@ -490,17 +642,16 @@
       <p>Entre com seu e-mail e senha para acessar sua unidade e suas permissões.</p>
 
       <div class="form-group">
-        <div class="label-row"><label for="loginEmail">E-mail</label><span class="req">*</span></div>
+        <label for="loginEmail">E-mail <span class="req">*</span></label>
         <input class="input" id="loginEmail" type="email" placeholder="seuemail@empresa.com">
       </div>
 
       <div class="form-group">
-        <div class="label-row"><label for="loginSenha">Senha</label><span class="req">*</span></div>
+        <label for="loginSenha">Senha <span class="req">*</span></label>
         <input class="input" id="loginSenha" type="password" placeholder="Digite sua senha">
       </div>
 
       <button class="btn btn-primary btn-block" id="btnLogin">Entrar</button>
-
       <div id="loginNotice" class="notice"></div>
     </div>
   </section>
@@ -514,7 +665,6 @@
     </section>
 
     <section class="dashboard" id="dashboardCards"></section>
-
     <nav class="menu" id="menuBar"></nav>
 
     <section class="card" id="mainPanel">
@@ -527,7 +677,7 @@
     </section>
   </main>
 
-  <!-- MODAL: detalhes do registro + fotos + exportar individual -->
+  <!-- MODAL -->
   <div class="modal" id="detailModal" aria-hidden="true">
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
       <div class="modal-head">
@@ -539,7 +689,10 @@
       </div>
       <div class="modal-body" id="detailBody"></div>
       <div class="modal-actions">
-        <button class="btn btn-primary" id="btnExportRegistro">Exportar registro</button>
+        <!-- ✅ agora tem editar + salvar -->
+        <button class="btn btn-primary" id="btnEditRegistro">Editar</button>
+        <button class="btn btn-success hidden" id="btnSaveRegistro">Salvar alterações</button>
+        <button class="btn btn-light" id="btnExportRegistro">Exportar registro</button>
         <button class="btn btn-light" id="btnCloseModal2">Fechar</button>
       </div>
     </div>
@@ -560,16 +713,15 @@
       doc,
       getDoc,
       getDocs,
+      addDoc,
+      setDoc,
+      updateDoc,
       query,
       where,
       limit,
-      setDoc,
-      updateDoc,
-      deleteDoc,
       orderBy
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // ========= CONFIG =========
     const firebaseConfig = {
       apiKey: "AIzaSyCp9SBiDUD5YaCGm8Qzbb7uv3Goa-7eKU0",
       authDomain: "controle-ponto-26d34.firebaseapp.com",
@@ -583,6 +735,41 @@
     const auth = getAuth(appFirebase);
     const db = getFirestore(appFirebase);
 
+    const el = {
+      topbar: document.getElementById("topbar"),
+      footerbar: document.getElementById("footerbar"),
+      loginView: document.getElementById("loginView"),
+      appView: document.getElementById("appView"),
+
+      loginEmail: document.getElementById("loginEmail"),
+      loginSenha: document.getElementById("loginSenha"),
+      btnLogin: document.getElementById("btnLogin"),
+      btnLogout: document.getElementById("btnLogout"),
+      loginNotice: document.getElementById("loginNotice"),
+
+      headerStoreText: document.getElementById("headerStoreText"),
+      footerRoleText: document.getElementById("footerRoleText"),
+      footerUserText: document.getElementById("footerUserText"),
+      footerStoreText: document.getElementById("footerStoreText"),
+
+      heroTitle: document.getElementById("heroTitle"),
+      heroSubtitle: document.getElementById("heroSubtitle"),
+
+      dashboardCards: document.getElementById("dashboardCards"),
+      menuBar: document.getElementById("menuBar"),
+      mainPanel: document.getElementById("mainPanel"),
+
+      detailModal: document.getElementById("detailModal"),
+      detailBody: document.getElementById("detailBody"),
+      detailTitle: document.getElementById("detailTitle"),
+      detailSub: document.getElementById("detailSub"),
+      btnCloseModal: document.getElementById("btnCloseModal"),
+      btnCloseModal2: document.getElementById("btnCloseModal2"),
+      btnExportRegistro: document.getElementById("btnExportRegistro"),
+      btnEditRegistro: document.getElementById("btnEditRegistro"),
+      btnSaveRegistro: document.getElementById("btnSaveRegistro"),
+    };
+
     const Collections = {
       LOJAS: "lojas",
       USUARIOS: "usuarios",
@@ -595,6 +782,18 @@
       CONTROLADOR: "controlador",
       GERENTE_LOJA: "gerente_loja",
       GERENTE_GERAL: "gerente_geral"
+    };
+
+    const state = {
+      authUser: null,
+      userProfile: null,
+      lojas: [],
+      lojasMap: {},
+      movimentos: [],
+      condutores: [],
+      autorizadores: [],
+      selectedMovimento: null,
+      editMode: false
     };
 
     const MOTIVOS_ENTRADA = [
@@ -630,70 +829,17 @@
       "Outro"
     ];
 
-    // ========= ELEMENTOS =========
-    const el = {
-      topbar: document.getElementById("topbar"),
-      footerbar: document.getElementById("footerbar"),
-      loginView: document.getElementById("loginView"),
-      appView: document.getElementById("appView"),
-
-      loginEmail: document.getElementById("loginEmail"),
-      loginSenha: document.getElementById("loginSenha"),
-      btnLogin: document.getElementById("btnLogin"),
-      btnLogout: document.getElementById("btnLogout"),
-      loginNotice: document.getElementById("loginNotice"),
-
-      headerStoreText: document.getElementById("headerStoreText"),
-      footerRoleText: document.getElementById("footerRoleText"),
-      footerUserText: document.getElementById("footerUserText"),
-      footerStoreText: document.getElementById("footerStoreText"),
-
-      heroTitle: document.getElementById("heroTitle"),
-      heroSubtitle: document.getElementById("heroSubtitle"),
-
-      dashboardCards: document.getElementById("dashboardCards"),
-      menuBar: document.getElementById("menuBar"),
-      mainPanel: document.getElementById("mainPanel"),
-
-      detailModal: document.getElementById("detailModal"),
-      detailBody: document.getElementById("detailBody"),
-      detailTitle: document.getElementById("detailTitle"),
-      detailSub: document.getElementById("detailSub"),
-      btnCloseModal: document.getElementById("btnCloseModal"),
-      btnCloseModal2: document.getElementById("btnCloseModal2"),
-      btnExportRegistro: document.getElementById("btnExportRegistro")
-    };
-
-    // ========= ESTADO =========
-    const state = {
-      authUser: null,
-      userProfile: null,
-      lojas: [],
-      lojasMap: {},
-      movimentos: [],
-      condutores: [],
-      autorizadores: [],
-      selectedMovimento: null
-    };
-
-    // ✅ debug opcional no console:
-    // window.__cv = { state, db, auth, Collections };
-
-    // ========= HELPERS =========
-    function debugLog(...args){ console.log(...args); }
-    function debugError(...args){ console.error(...args); }
-
     function clearNotice(target){
       target.className = "notice";
       target.textContent = "";
     }
 
-    function showNotice(target, message, type="error"){
+    function showNotice(target, message, type = "error"){
       target.className = `notice show ${type}`;
       target.textContent = message;
     }
 
-    function onlyDigits(v){ return String(v || "").replace(/\D/g, ""); }
+    function onlyDigits(value){ return String(value || "").replace(/\D/g, ""); }
 
     function formatCPF(value){
       const digits = onlyDigits(value).slice(0, 11);
@@ -703,34 +849,12 @@
         .replace(/\.(\d{3})(\d)/, ".$1-$2");
     }
 
-    function isValidCPF(cpf){
-      const clean = onlyDigits(cpf);
-      if (clean.length !== 11) return false;
-      if (/^(\d)\1{10}$/.test(clean)) return false;
-
-      let sum = 0;
-      for (let i = 0; i < 9; i++) sum += Number(clean[i]) * (10 - i);
-      let first = (sum * 10) % 11;
-      if (first === 10) first = 0;
-      if (first !== Number(clean[9])) return false;
-
-      sum = 0;
-      for (let i = 0; i < 10; i++) sum += Number(clean[i]) * (11 - i);
-      let second = (sum * 10) % 11;
-      if (second === 10) second = 0;
-      if (second !== Number(clean[10])) return false;
-
-      return true;
-    }
-
-    function normalizePlate(value){
-      return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
-    }
+    function normalizePlate(value){ return String(value || "").toUpperCase().replace(/[^A-Z0-9]/g, ""); }
 
     function isValidPlate(plate){
       const clean = normalizePlate(plate);
-      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;                 // ABC1234
-      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;  // ABC1D23
+      const oldPattern = /^[A-Z]{3}[0-9]{4}$/;
+      const mercosulPattern = /^[A-Z]{3}[0-9][A-Z][0-9]{2}$/;
       return oldPattern.test(clean) || mercosulPattern.test(clean);
     }
 
@@ -751,24 +875,6 @@
       }
     }
 
-    function getDateMs(value){
-      try{
-        if(!value) return 0;
-        if(value.seconds) return value.seconds * 1000;
-        return new Date(value).getTime();
-      }catch(e){
-        return 0;
-      }
-    }
-
-    function parseDateInputToRange(dateStr){
-      // dateStr: YYYY-MM-DD
-      if(!dateStr) return null;
-      const start = new Date(dateStr + "T00:00:00");
-      const end = new Date(dateStr + "T23:59:59.999");
-      return { startMs: start.getTime(), endMs: end.getTime() };
-    }
-
     function getRoleLabel(role){
       if(role === Roles.CONTROLADOR) return "Controlador de acesso";
       if(role === Roles.GERENTE_LOJA) return "Gerente de loja";
@@ -776,20 +882,11 @@
       return "Perfil não definido";
     }
 
-    function userIsGeneral(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
-    function userIsStore(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
-    function userIsCtrl(){ return state.userProfile?.role === Roles.CONTROLADOR; }
+    function userIsGeneralManager(){ return state.userProfile?.role === Roles.GERENTE_GERAL; }
+    function userIsStoreManager(){ return state.userProfile?.role === Roles.GERENTE_LOJA; }
+    function userIsController(){ return state.userProfile?.role === Roles.CONTROLADOR; }
 
-    // ✅ conforme você pediu depois: qualquer nível pode consultar e alterar movimentações
-    function userCanEditMovimentos(){ return true; }
-    function userCanManageCondutores(){ return userIsGeneral() || userIsStore() || userIsCtrl(); }
-    function userCanManageAutorizadores(){ return userIsGeneral() || userIsStore(); }
-    function userCanGerenciarLojas(){ return userIsGeneral(); }
-    function userCanExtrato(){ return userIsGeneral(); }
-
-    function currentUserStoreId(){
-      return state.userProfile?.lojaId || null;
-    }
+    function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
 
     function getStoreName(lojaId){
       if(!lojaId) return "Todas as lojas";
@@ -802,29 +899,31 @@
       return item?.lojaNome || (lojaId || "-");
     }
 
-    function buildStoreOptions(includeBlank = true){
-      const options = [];
-      if(includeBlank) options.push(`<option value="">Selecione a loja</option>`);
-      state.lojas.forEach(loja => {
-        options.push(`<option value="${loja.id}">${loja.nome || loja.id}</option>`);
-      });
-      return options.join("");
-    }
-
-    function buildPeopleOptions(list){
-      const options = [`<option value="">Selecione</option>`];
-      list.forEach(item => {
-        const ativo = item.ativo !== false;
-        const label = ativo ? item.nome : `${item.nome} - INATIVO`;
-        const disabled = ativo ? "" : "disabled";
-        options.push(`<option value="${ativo ? item.nome : ""}" ${disabled}>${label}</option>`);
-      });
-      return options.join("");
-    }
-
     function buildMotivoOptions(list){
-      const options = [`<option value="">Selecione</option>`];
+      const options = [`<option value="">Selecione o motivo</option>`];
       list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
+      return options.join("");
+    }
+
+    function buildCondutorOptions(){
+      const options = [`<option value="">Selecione o condutor</option>`];
+      state.condutores.forEach(item => {
+        const ativo = item.ativo !== false;
+        const label = ativo ? item.nome : `${item.nome} - inativo`;
+        const disabled = ativo ? "" : "disabled";
+        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
+      });
+      return options.join("");
+    }
+
+    function buildAutorizadorOptions(){
+      const options = [`<option value="">Selecione o autorizador</option>`];
+      state.autorizadores.forEach(item => {
+        const ativo = item.ativo !== false;
+        const label = ativo ? item.nome : `${item.nome} - inativo`;
+        const disabled = ativo ? "" : "disabled";
+        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
+      });
       return options.join("");
     }
 
@@ -832,59 +931,41 @@
       document.querySelectorAll("[data-mask='cpf']").forEach(input => {
         input.addEventListener("input", () => { input.value = formatCPF(input.value); });
       });
-
       document.querySelectorAll("[data-mask='plate']").forEach(input => {
         input.addEventListener("input", () => { input.value = formatPlate(input.value); });
       });
-
-      document.querySelectorAll("[data-only='digits']").forEach(input => {
-        input.addEventListener("input", () => { input.value = onlyDigits(input.value); });
-      });
-    }
-
-    function renderPanel(title, subtitle, bodyHTML){
-      el.mainPanel.innerHTML = `
-        <div class="card-header">
-          <div>
-            <h3>${title}</h3>
-            <p>${subtitle}</p>
-          </div>
-        </div>
-        ${bodyHTML}
-      `;
-    }
-
-    // ========= LOADERS =========
-    async function loadUserProfile(uid){
-      const userRef = doc(db, Collections.USUARIOS, uid);
-      const userSnap = await getDoc(userRef);
-      if(!userSnap.exists()) throw new Error("Usuário não encontrado");
-      const data = userSnap.data();
-
-      if(data.ativo === false) throw new Error("Usuário desativado");
-      if(!data.role) throw new Error("Usuário sem role");
-      if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada");
-
-      state.userProfile = { id: userSnap.id, ...data };
     }
 
     async function loadLojas(){
       const lojasSnap = await getDocs(collection(db, Collections.LOJAS));
       state.lojas = [];
       state.lojasMap = {};
-
       lojasSnap.forEach(docSnap => {
         const data = docSnap.data();
         const item = { id: docSnap.id, ...data };
         state.lojas.push(item);
         state.lojasMap[item.id] = item;
       });
+      state.lojas.sort((a,b) => String(a.id).localeCompare(String(b.id), "pt-BR"));
+    }
 
-      state.lojas.sort((a,b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+    async function loadUserProfile(uid){
+      const userRef = doc(db, Collections.USUARIOS, uid);
+      const userSnap = await getDoc(userRef);
+      if(!userSnap.exists()) throw new Error("Usuário não encontrado em usuarios/{uid}");
+      const data = userSnap.data();
+      if(data.ativo === false) throw new Error("Usuário desativado");
+      if(!data.role) throw new Error("Usuário sem role");
+      if(data.role !== Roles.GERENTE_GERAL && !data.lojaId) throw new Error("Usuário sem loja vinculada");
+      state.userProfile = { id: userSnap.id, ...data };
     }
 
     function sortOperationalArrays(){
-      state.movimentos.sort((a,b) => getDateMs(b.data) - getDateMs(a.data));
+      state.movimentos.sort((a,b) => {
+        const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
+        const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
+        return tb - ta;
+      });
       state.condutores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
       state.autorizadores.sort((a,b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
     }
@@ -892,20 +973,17 @@
     async function loadOperationalCollections(){
       const lojaId = currentUserStoreId();
 
-      // gerente geral: carrega tudo
-      if(userIsGeneral()){
+      if(userIsGeneralManager()){
         const [movSnap, condSnap, autSnap] = await Promise.all([
-          getDocs(query(collection(db, Collections.MOVIMENTOS), limit(2000))),
-          getDocs(query(collection(db, Collections.CONDUTORES), limit(3000))),
-          getDocs(query(collection(db, Collections.AUTORIZADORES), limit(3000)))
+          getDocs(query(collection(db, Collections.MOVIMENTOS), orderBy("data", "desc"), limit(1500))),
+          getDocs(query(collection(db, Collections.CONDUTORES), orderBy("nome", "asc"), limit(4000))),
+          getDocs(query(collection(db, Collections.AUTORIZADORES), orderBy("nome", "asc"), limit(4000)))
         ]);
 
         state.movimentos = [];
         movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
-
         state.condutores = [];
         condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
-
         state.autorizadores = [];
         autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
 
@@ -913,45 +991,41 @@
         return;
       }
 
-      // outros perfis: apenas a própria loja (evita índice composto)
       const [movSnap, condSnap, autSnap] = await Promise.all([
-        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(2000))),
+        getDocs(query(collection(db, Collections.MOVIMENTOS), where("lojaId", "==", lojaId), limit(1500))),
         getDocs(query(collection(db, Collections.CONDUTORES), where("lojaId", "==", lojaId), limit(3000))),
         getDocs(query(collection(db, Collections.AUTORIZADORES), where("lojaId", "==", lojaId), limit(3000)))
       ]);
 
       state.movimentos = [];
       movSnap.forEach(d => state.movimentos.push({ id: d.id, ...d.data() }));
-
       state.condutores = [];
       condSnap.forEach(d => state.condutores.push({ id: d.id, ...d.data() }));
-
       state.autorizadores = [];
       autSnap.forEach(d => state.autorizadores.push({ id: d.id, ...d.data() }));
 
       sortOperationalArrays();
     }
 
-    // ========= SHELL =========
     function renderShellInfo(){
       const nome = state.userProfile?.nome || state.authUser?.email || "Usuário";
       const roleLabel = getRoleLabel(state.userProfile?.role);
-      const lojaNome = userIsGeneral() ? "Todas as lojas" : getStoreName(state.userProfile?.lojaId);
+      const lojaNome = userIsGeneralManager() ? "Todas as lojas" : getStoreName(state.userProfile?.lojaId);
 
       el.headerStoreText.textContent = lojaNome;
       el.footerUserText.textContent = nome;
       el.footerRoleText.textContent = roleLabel;
       el.footerStoreText.textContent = lojaNome;
 
-      if(userIsGeneral()){
+      if(userIsGeneralManager()){
         el.heroTitle.textContent = "Dashboard geral";
         el.heroSubtitle.textContent = "Acompanhe movimentações e cadastros de todas as lojas.";
-      }else if(userIsStore()){
+      }else if(userIsStoreManager()){
         el.heroTitle.textContent = "Dashboard da loja";
         el.heroSubtitle.textContent = "Acompanhe a operação e os registros da sua unidade.";
       }else{
         el.heroTitle.textContent = "Painel operacional";
-        el.heroSubtitle.textContent = "Registre entradas/saídas e consulte registros.";
+        el.heroSubtitle.textContent = "Registre entradas, saídas e faça consultas.";
       }
     }
 
@@ -959,11 +1033,15 @@
       const patioMap = {};
       movimentos
         .slice()
-        .sort((a,b) => getDateMs(a.data) - getDateMs(b.data))
+        .sort((a,b) => {
+          const ta = a.data?.seconds ? a.data.seconds : new Date(a.data || 0).getTime() / 1000;
+          const tb = b.data?.seconds ? b.data.seconds : new Date(b.data || 0).getTime() / 1000;
+          return ta - tb;
+        })
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
-          const key = userIsGeneral() ? `${item.lojaId || ""}__${plate}` : plate;
+          const key = userIsGeneralManager() ? `${item.lojaId || ""}__${plate}` : plate;
           if(item.tipo === "entrada") patioMap[key] = true;
           if(item.tipo === "saida") delete patioMap[key];
         });
@@ -973,39 +1051,19 @@
 
     function buildDashboardMetrics(){
       const movimentos = [...state.movimentos];
-      const condutores = [...state.condutores];
-      const autorizadores = [...state.autorizadores];
-
       const vehiclesInPatio = computePatioCount(movimentos);
       const entradas = movimentos.filter(m => m.tipo === "entrada").length;
       const saidas = movimentos.filter(m => m.tipo === "saida").length;
 
       const cards = [
-        {
-          title: "Veículos no pátio",
-          value: vehiclesInPatio,
-          subtitle: userIsGeneral() ? "Somatório de todas as lojas" : "Veículos atualmente dentro da unidade"
-        },
-        {
-          title: "Movimentações",
-          value: movimentos.length,
-          subtitle: "Total de entradas e saídas"
-        },
-        {
-          title: "Condutores",
-          value: condutores.length,
-          subtitle: "Cadastros disponíveis"
-        },
-        {
-          title: "Autorizadores",
-          value: autorizadores.length,
-          subtitle: "Cadastros disponíveis"
-        }
+        { title: "Veículos no pátio", value: vehiclesInPatio, subtitle: userIsGeneralManager() ? "Somatório geral" : "Na unidade" },
+        { title: "Movimentações", value: movimentos.length, subtitle: "Total de entradas e saídas" },
+        { title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" },
+        { title: "Condutores", value: state.condutores.length, subtitle: "Cadastros disponíveis" },
+        { title: "Autorizadores", value: state.autorizadores.length, subtitle: "Cadastros disponíveis" }
       ];
 
-      if(!userIsGeneral()){
-        cards.push({ title: "Entradas / Saídas", value: `${entradas} / ${saidas}`, subtitle: "Resumo operacional" });
-      }else{
+      if(userIsGeneralManager()){
         cards.push({ title: "Lojas", value: state.lojas.length, subtitle: "Unidades cadastradas" });
       }
 
@@ -1023,26 +1081,25 @@
       `).join("");
     }
 
+    function renderPanel(title, subtitle, bodyHTML){
+      el.mainPanel.innerHTML = `
+        <div class="card-header">
+          <div>
+            <h3>${title}</h3>
+            <p>${subtitle}</p>
+          </div>
+        </div>
+        ${bodyHTML}
+      `;
+    }
+
     function buildMenu(){
-      const items = [];
-
-      items.push({ id: "menu-dashboard", label: userIsGeneral() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome });
-      items.push({ id: "menu-entrada", label: "Entrada", action: renderEntrada });
-      items.push({ id: "menu-saida", label: "Saída", action: renderSaida });
-      items.push({ id: "menu-consulta", label: "Consulta", action: renderConsulta });
-
-      if(userCanManageCondutores()){
-        items.push({ id: "menu-condutor", label: "Condutores", action: renderCondutores });
-      }
-      if(userCanManageAutorizadores()){
-        items.push({ id: "menu-autorizador", label: "Autorizadores", action: renderAutorizadores });
-      }
-      if(userCanExtrato()){
-        items.push({ id: "menu-extrato", label: "Extrato (PDF)", action: renderExtrato });
-      }
-      if(userCanGerenciarLojas()){
-        items.push({ id: "menu-lojas-admin", label: "Gerenciar lojas", action: renderGerenciarLojas });
-      }
+      const items = [
+        { id: "menu-dashboard", label: userIsGeneralManager() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome },
+        { id: "menu-entrada", label: "Entrada", action: renderEntrada },
+        { id: "menu-saida", label: "Saída", action: renderSaida },
+        { id: "menu-consulta", label: "Consulta", action: renderConsulta },
+      ];
 
       el.menuBar.innerHTML = "";
       items.forEach(item => {
@@ -1062,7 +1119,7 @@
       const rows = lastFive.map(item => `
         <tr>
           <td>${formatDate(item.data)}</td>
-          <td>${item.tipo === "entrada" ? `<span class="badge badge-green">Entrada</span>` : `<span class="badge badge-red">Saída</span>`}</td>
+          <td>${item.tipo || "-"}</td>
           <td>${getStoreNameFromItem(item)}</td>
           <td>${item.placa || "-"}</td>
           <td>${item.veiculo || "-"}</td>
@@ -1072,8 +1129,8 @@
       `).join("");
 
       renderPanel(
-        userIsGeneral() ? "Dashboard geral" : "Dashboard",
-        "Últimas movimentações registradas.",
+        userIsGeneralManager() ? "Dashboard geral" : "Dashboard",
+        userIsGeneralManager() ? "Visão consolidada de todas as unidades." : "Visão resumida da sua unidade.",
         `
           <div class="section-title">Últimas movimentações</div>
           <div class="table-wrap">
@@ -1098,7 +1155,7 @@
       );
     }
 
-    // ========= CAMERA / FOTOS =========
+    // FOTO (tablet)
     function readFileAsDataURL(file){
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1126,13 +1183,6 @@
       preview.innerHTML = `<img src="${dataUrl}" alt="Preview">`;
     }
 
-    function wireCameraButton(btnId, inputId){
-      const btn = document.getElementById(btnId);
-      const input = document.getElementById(inputId);
-      if(!btn || !input) return;
-      btn.addEventListener("click", () => input.click());
-    }
-
     function wirePhotoPreview(inputId, previewId){
       const input = document.getElementById(inputId);
       if(!input) return;
@@ -1146,7 +1196,33 @@
       });
     }
 
-    // ========= ENTRADA / SAÍDA =========
+    function photoCaptureCard(label, inputId, previewId){
+      return `
+        <div class="photo-card">
+          <strong>${label}</strong>
+          <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
+          <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+          <label class="btn-cam" for="${inputId}">Abrir câmera</label>
+        </div>
+      `;
+    }
+
+    async function collectExtraPhotosData(prefix){
+      const extraInputs = Array.from(document.querySelectorAll(`input[id^='${prefix}fotoExtra_']`));
+      const data = [];
+      for(const input of extraInputs){
+        const file = input?.files?.[0];
+        if(!file) continue;
+        if(!file.type?.startsWith("image/")) continue;
+        try{
+          const url = await readFileAsDataURL(file);
+          if(url) data.push(url);
+        }catch(e){}
+      }
+      return data;
+    }
+
+    // Entrada
     function toggleMotivoOutro(prefix){
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
@@ -1160,93 +1236,79 @@
       }
     }
 
-    function validateRequired(value){ return String(value || "").trim().length > 0; }
-
     function renderEntrada(){
-      const lojaField = userIsGeneral()
+      const lojaField = userIsGeneralManager()
         ? `
           <div class="form-group">
-            <div class="label-row"><label for="entradaLoja">Loja</label><span class="req">*</span></div>
-            <select class="select" id="entradaLoja">${buildStoreOptions(true)}</select>
+            <label for="entradaLoja">Loja <span class="req">*</span></label>
+            <select class="select" id="entradaLoja">
+              ${state.lojas.map(l => `<option value="${l.id}">${l.id} - ${l.nome || l.id}</option>`).join("")}
+            </select>
           </div>
         `
         : `
           <div class="form-group">
-            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
+            <label>Loja</label>
             <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
           </div>
         `;
 
       renderPanel(
-        "Entrada",
-        "Registre a entrada de um veículo. Campos com * são obrigatórios.",
+        "Entrada de veículo",
+        "Campos com * são obrigatórios. Observação é opcional.",
         `
           <div class="grid">
             ${lojaField}
 
             <div class="form-group">
-              <div class="label-row"><label for="entradaPlaca">Placa</label><span class="req">*</span></div>
+              <label for="entradaPlaca">Placa <span class="req">*</span></label>
               <input class="input" id="entradaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="entradaVeiculo">Veículo</label><span class="req">*</span></div>
+              <label for="entradaVeiculo">Veículo <span class="req">*</span></label>
               <input class="input" id="entradaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="entradaMotivo">Motivo da entrada</label><span class="req">*</span></div>
+              <label for="entradaMotivo">Motivo <span class="req">*</span></label>
               <select class="select" id="entradaMotivo">${buildMotivoOptions(MOTIVOS_ENTRADA)}</select>
               <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
             </div>
 
             <div class="form-group hidden" id="entradaMotivoOutroWrap">
-              <div class="label-row"><label for="entradaMotivoOutro">Descreva o motivo</label><span class="req">*</span></div>
-              <input class="input" id="entradaMotivoOutro" maxlength="60" placeholder="Ex.: Inspeção rápida">
+              <label for="entradaMotivoOutro">Descreva o motivo <span class="req">*</span></label>
+              <input class="input" id="entradaMotivoOutro" maxlength="60">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="entradaCondutor">Condutor</label><span class="req">*</span></div>
-              <select class="select" id="entradaCondutor">${buildPeopleOptions(state.condutores)}</select>
-              <div class="subtle">Condutores inativos aparecem, mas não podem ser selecionados.</div>
+              <label for="entradaCondutor">Condutor <span class="req">*</span></label>
+              <select class="select" id="entradaCondutor">${buildCondutorOptions()}</select>
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="entradaAutorizador">Autorizador</label><span class="req">*</span></div>
-              <select class="select" id="entradaAutorizador">${buildPeopleOptions(state.autorizadores)}</select>
-              <div class="subtle">Autorizadores inativos aparecem, mas não podem ser selecionados.</div>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="entradaDano">Condição do veículo</label><span class="req">*</span></div>
-              <select class="select" id="entradaDano">
-                <option value="">Selecione</option>
-                <option value="nao">Sem dano</option>
-                <option value="sim">Com dano</option>
-              </select>
-              <div class="subtle">Se “Com dano”, as 4 fotos principais são obrigatórias.</div>
+              <label for="entradaAutorizador">Autorizador <span class="req">*</span></label>
+              <select class="select" id="entradaAutorizador">${buildAutorizadorOptions()}</select>
             </div>
 
             <div class="form-group full">
-              <div class="label-row"><label>Fotos do veículo</label><span class="req">*</span></div>
-              <div class="subtle" id="entradaFotosHint">No tablet, toque em “Abrir câmera” para fotografar. Preview aparece na hora.</div>
-
-              <div class="photo-grid" id="entradaPhotoGrid">
-                ${photoCardHTML("Frente", "Frente", "fotoFrente", "previewFrente", "btnCamFrente")}
-                ${photoCardHTML("Mala", "Mala", "fotoMala", "previewMala", "btnCamMala")}
-                ${photoCardHTML("Lateral esquerda", "Lateral esquerda", "fotoLatEsq", "previewLatEsq", "btnCamLatEsq")}
-                ${photoCardHTML("Lateral direita", "Lateral direita", "fotoLatDir", "previewLatDir", "btnCamLatDir")}
+              <label>Fotos (4 obrigatórias) <span class="req">*</span></label>
+              <div class="photo-grid">
+                ${photoCaptureCard("Frente", "entradaFotoFrente", "entradaPreviewFrente")}
+                ${photoCaptureCard("Mala", "entradaFotoMala", "entradaPreviewMala")}
+                ${photoCaptureCard("Lateral esquerda", "entradaFotoLatEsq", "entradaPreviewLatEsq")}
+                ${photoCaptureCard("Lateral direita", "entradaFotoLatDir", "entradaPreviewLatDir")}
               </div>
 
               <div class="actions" style="margin-top:12px;">
-                <button class="btn btn-light" id="btnAddExtraFoto">Fotografar mais partes</button>
+                <button class="btn btn-light" id="entradaBtnAddExtraFoto">Fotografar mais partes</button>
               </div>
-              <div class="subtle">Você pode adicionar fotos extras (detalhes, riscos, acessórios, etc.).</div>
+              <div class="photo-grid" id="entradaPhotoGridExtras"></div>
             </div>
 
             <div class="form-group full">
-              <div class="label-row"><label for="entradaObs">Observação</label></div>
-              <textarea class="textarea" id="entradaObs" maxlength="300" placeholder="(opcional)"></textarea>
+              <label for="entradaObs">Observações</label>
+              <textarea class="textarea" id="entradaObs" maxlength="300" placeholder="Opcional"></textarea>
             </div>
           </div>
 
@@ -1261,16 +1323,10 @@
 
       attachInputMasks();
 
-      // camera buttons + previews
-      wireCameraButton("btnCamFrente", "fotoFrente");
-      wireCameraButton("btnCamMala", "fotoMala");
-      wireCameraButton("btnCamLatEsq", "fotoLatEsq");
-      wireCameraButton("btnCamLatDir", "fotoLatDir");
-
-      wirePhotoPreview("fotoFrente", "previewFrente");
-      wirePhotoPreview("fotoMala", "previewMala");
-      wirePhotoPreview("fotoLatEsq", "previewLatEsq");
-      wirePhotoPreview("fotoLatDir", "previewLatDir");
+      wirePhotoPreview("entradaFotoFrente", "entradaPreviewFrente");
+      wirePhotoPreview("entradaFotoMala", "entradaPreviewMala");
+      wirePhotoPreview("entradaFotoLatEsq", "entradaPreviewLatEsq");
+      wirePhotoPreview("entradaFotoLatDir", "entradaPreviewLatDir");
 
       document.getElementById("btnSalvarEntrada").addEventListener("click", salvarEntrada);
       document.getElementById("btnLimparEntrada").addEventListener("click", renderEntrada);
@@ -1278,90 +1334,35 @@
       document.getElementById("entradaMotivo").addEventListener("change", () => toggleMotivoOutro("entrada"));
       toggleMotivoOutro("entrada");
 
-      document.getElementById("entradaDano").addEventListener("change", updateEntradaFotosHint);
-      updateEntradaFotosHint();
-
-      document.getElementById("btnAddExtraFoto").addEventListener("click", addExtraPhotoInput);
+      document.getElementById("entradaBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("entrada"));
     }
 
-    function photoCardHTML(title, hint, inputId, previewId, btnId){
-      return `
-        <div class="photo-card">
-          <strong>${title}</strong>
-          <div class="photo-preview" id="${previewId}"><div class="photo-hint">${hint}</div></div>
-          <button type="button" class="btn-camera" id="${btnId}">Abrir câmera</button>
-          <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
-        </div>
-      `;
-    }
-
-    function updateEntradaFotosHint(){
-      const dano = document.getElementById("entradaDano")?.value || "";
-      const hint = document.getElementById("entradaFotosHint");
-      if(!hint) return;
-
-      if(dano === "sim"){
-        hint.textContent = "Como há dano, as 4 fotos principais são obrigatórias. Toque em “Abrir câmera”.";
-      }else if(dano === "nao"){
-        hint.textContent = "Sem dano: fotos são opcionais, mas recomendadas para registro.";
-      }else{
-        hint.textContent = "No tablet, toque em “Abrir câmera” para fotografar. Preview aparece na hora.";
-      }
-    }
-
-    function addExtraPhotoInput(){
-      const grid = document.getElementById("entradaPhotoGrid");
+    function addExtraPhotoInput(prefix){
+      const grid = document.getElementById(`${prefix}PhotoGridExtras`);
       if(!grid) return;
 
       const index = grid.querySelectorAll("[data-extra='1']").length + 1;
-      const inputId = `fotoExtra_${index}`;
-      const previewId = `previewExtra_${index}`;
-      const btnId = `btnCamExtra_${index}`;
+      const inputId = `${prefix}fotoExtra_${index}`;
+      const previewId = `${prefix}previewExtra_${index}`;
 
       const card = document.createElement("div");
       card.className = "photo-card";
       card.setAttribute("data-extra", "1");
       card.innerHTML = `
         <strong>Extra ${index}</strong>
-        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Fotografe um detalhe</div></div>
-        <button type="button" class="btn-camera" id="${btnId}">Abrir câmera</button>
+        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
         <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+        <label class="btn-cam" for="${inputId}">Abrir câmera</label>
       `;
-
       grid.appendChild(card);
-      wireCameraButton(btnId, inputId);
       wirePhotoPreview(inputId, previewId);
-    }
-
-    async function collectExtraPhotosData(){
-      const extraInputs = Array.from(document.querySelectorAll("input[id^='fotoExtra_']"));
-      const data = [];
-      for(const input of extraInputs){
-        const file = input?.files?.[0];
-        if(!file) continue;
-        if(!file.type?.startsWith("image/")) continue;
-        try{
-          const url = await readFileAsDataURL(file);
-          if(url) data.push(url);
-        }catch(e){}
-      }
-      return data;
-    }
-
-    function validatePhotoRequired(inputId, label, required){
-      if(!required) return "";
-      const input = document.getElementById(inputId);
-      const file = input?.files?.[0];
-      if(!file) return `${label} é obrigatória.`;
-      if(!file.type?.startsWith("image/")) return `${label} deve ser uma imagem.`;
-      return "";
     }
 
     async function salvarEntrada(){
       const notice = document.getElementById("entradaNotice");
       clearNotice(notice);
 
-      const lojaId = userIsGeneral()
+      const lojaId = userIsGeneralManager()
         ? (document.getElementById("entradaLoja")?.value || "")
         : currentUserStoreId();
 
@@ -1371,46 +1372,31 @@
       const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
       const condutor = document.getElementById("entradaCondutor")?.value || "";
       const autorizador = document.getElementById("entradaAutorizador")?.value || "";
-      const dano = document.getElementById("entradaDano")?.value || "";
       const observacao = (document.getElementById("entradaObs")?.value || "").trim();
 
       if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
-      if(!validateRequired(veiculo)){ showNotice(notice, "Informe o veículo."); return; }
-      if(!motivo){ showNotice(notice, "Selecione o motivo da entrada."); return; }
-      if(motivo === "Outro" && !validateRequired(motivoOutro)){ showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”)."); return; }
+      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
+      if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
+      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
       if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
-      if(!dano){ showNotice(notice, "Selecione a condição do veículo."); return; }
 
-      const requiredPhotos = (dano === "sim");
-      const errFrente = validatePhotoRequired("fotoFrente", "Foto da frente", requiredPhotos);
-      const errMala = validatePhotoRequired("fotoMala", "Foto da mala", requiredPhotos);
-      const errLatEsq = validatePhotoRequired("fotoLatEsq", "Foto da lateral esquerda", requiredPhotos);
-      const errLatDir = validatePhotoRequired("fotoLatDir", "Foto da lateral direita", requiredPhotos);
-      const photoErrors = [errFrente, errMala, errLatEsq, errLatDir].filter(Boolean);
-      if(photoErrors.length){ showNotice(notice, photoErrors[0]); return; }
+      const [frente, mala, latEsq, latDir] = await Promise.all([
+        getImageDataFromInput("entradaFotoFrente"),
+        getImageDataFromInput("entradaFotoMala"),
+        getImageDataFromInput("entradaFotoLatEsq"),
+        getImageDataFromInput("entradaFotoLatDir")
+      ]);
 
-      if(dano === "nao"){
-        const ok = window.confirm("Tem certeza que este veículo NÃO possui danos?");
-        if(!ok){
-          showNotice(notice, "Revise a condição do veículo e, se necessário, selecione “Com dano” e fotografe.", "warn");
-          return;
-        }
+      if(!frente || !mala || !latEsq || !latDir){
+        showNotice(notice, "As 4 fotos principais são obrigatórias.");
+        return;
       }
 
       try{
-        const [fotoFrente, fotoMala, fotoLateralEsq, fotoLateralDir] = await Promise.all([
-          getImageDataFromInput("fotoFrente"),
-          getImageDataFromInput("fotoMala"),
-          getImageDataFromInput("fotoLatEsq"),
-          getImageDataFromInput("fotoLatDir")
-        ]);
-
-        const fotosExtras = await collectExtraPhotosData();
-
-        // salva como dado (base64), mas só exibe em consulta individual
-        const payload = {
+        const extras = await collectExtraPhotosData("entrada");
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "entrada",
           lojaId,
           placa,
@@ -1419,90 +1405,95 @@
           motivoOutro: motivo === "Outro" ? motivoOutro : "",
           condutor,
           autorizador,
-          dano,
           observacao,
-          fotos: {
-            frente: fotoFrente || "",
-            mala: fotoMala || "",
-            lateralEsq: fotoLateralEsq || "",
-            lateralDir: fotoLateralDir || "",
-            extras: fotosExtras || []
-          },
+          fotos: { frente, mala, lateralEsq: latEsq, lateralDir: latDir, extras: extras || [] },
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
-        };
-
-        // ID determinístico para evitar duplicação? aqui deixei auto (movimentos é histórico)
-        // Usando setDoc com id aleatório é ok, mas aqui vamos criar doc novo via setDoc com id timestamp.
-        const id = `mov_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-        await setDoc(doc(db, Collections.MOVIMENTOS, id), payload);
+        });
 
         await refreshAfterWrite();
         showNotice(notice, "Entrada registrada com sucesso.", "success");
         renderEntrada();
-      }catch(error){
-        debugError("Erro ao salvar entrada:", error);
-        showNotice(notice, `Não foi possível salvar. (${error?.code || "erro"})`);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar a entrada. (${e?.code || "erro"})`);
       }
     }
 
+    // ✅ SAÍDA (AGORA COM FOTOS IGUAL ENTRADA)
     function renderSaida(){
-      const lojaField = userIsGeneral()
+      const lojaField = userIsGeneralManager()
         ? `
           <div class="form-group">
-            <div class="label-row"><label for="saidaLoja">Loja</label><span class="req">*</span></div>
-            <select class="select" id="saidaLoja">${buildStoreOptions(true)}</select>
+            <label for="saidaLoja">Loja <span class="req">*</span></label>
+            <select class="select" id="saidaLoja">
+              ${state.lojas.map(l => `<option value="${l.id}">${l.id} - ${l.nome || l.id}</option>`).join("")}
+            </select>
           </div>
         `
         : `
           <div class="form-group">
-            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
+            <label>Loja</label>
             <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
           </div>
         `;
 
       renderPanel(
-        "Saída",
-        "Registre a saída de um veículo. Campos com * são obrigatórios.",
+        "Saída de veículo",
+        "Campos com * são obrigatórios. Observação é opcional. Fotos são obrigatórias.",
         `
           <div class="grid">
             ${lojaField}
 
             <div class="form-group">
-              <div class="label-row"><label for="saidaPlaca">Placa</label><span class="req">*</span></div>
+              <label for="saidaPlaca">Placa <span class="req">*</span></label>
               <input class="input" id="saidaPlaca" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="saidaVeiculo">Veículo</label><span class="req">*</span></div>
+              <label for="saidaVeiculo">Veículo <span class="req">*</span></label>
               <input class="input" id="saidaVeiculo" maxlength="60" placeholder="Ex.: Onix branco">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="saidaMotivo">Motivo da saída</label><span class="req">*</span></div>
+              <label for="saidaMotivo">Motivo <span class="req">*</span></label>
               <select class="select" id="saidaMotivo">${buildMotivoOptions(MOTIVOS_SAIDA)}</select>
               <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
             </div>
 
             <div class="form-group hidden" id="saidaMotivoOutroWrap">
-              <div class="label-row"><label for="saidaMotivoOutro">Descreva o motivo</label><span class="req">*</span></div>
-              <input class="input" id="saidaMotivoOutro" maxlength="60" placeholder="Ex.: Saída para vistoria extra">
+              <label for="saidaMotivoOutro">Descreva o motivo <span class="req">*</span></label>
+              <input class="input" id="saidaMotivoOutro" maxlength="60">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="saidaCondutor">Condutor</label><span class="req">*</span></div>
-              <select class="select" id="saidaCondutor">${buildPeopleOptions(state.condutores)}</select>
+              <label for="saidaCondutor">Condutor <span class="req">*</span></label>
+              <select class="select" id="saidaCondutor">${buildCondutorOptions()}</select>
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="saidaAutorizador">Autorizador</label><span class="req">*</span></div>
-              <select class="select" id="saidaAutorizador">${buildPeopleOptions(state.autorizadores)}</select>
+              <label for="saidaAutorizador">Autorizador <span class="req">*</span></label>
+              <select class="select" id="saidaAutorizador">${buildAutorizadorOptions()}</select>
             </div>
 
             <div class="form-group full">
-              <div class="label-row"><label for="saidaObs">Observação</label></div>
-              <textarea class="textarea" id="saidaObs" maxlength="300" placeholder="(opcional)"></textarea>
+              <label>Fotos (4 obrigatórias) <span class="req">*</span></label>
+              <div class="photo-grid">
+                ${photoCaptureCard("Frente", "saidaFotoFrente", "saidaPreviewFrente")}
+                ${photoCaptureCard("Mala", "saidaFotoMala", "saidaPreviewMala")}
+                ${photoCaptureCard("Lateral esquerda", "saidaFotoLatEsq", "saidaPreviewLatEsq")}
+                ${photoCaptureCard("Lateral direita", "saidaFotoLatDir", "saidaPreviewLatDir")}
+              </div>
+
+              <div class="actions" style="margin-top:12px;">
+                <button class="btn btn-light" id="saidaBtnAddExtraFoto">Fotografar mais partes</button>
+              </div>
+              <div class="photo-grid" id="saidaPhotoGridExtras"></div>
+            </div>
+
+            <div class="form-group full">
+              <label for="saidaObs">Observações</label>
+              <textarea class="textarea" id="saidaObs" maxlength="300" placeholder="Opcional"></textarea>
             </div>
           </div>
 
@@ -1517,18 +1508,25 @@
 
       attachInputMasks();
 
+      wirePhotoPreview("saidaFotoFrente", "saidaPreviewFrente");
+      wirePhotoPreview("saidaFotoMala", "saidaPreviewMala");
+      wirePhotoPreview("saidaFotoLatEsq", "saidaPreviewLatEsq");
+      wirePhotoPreview("saidaFotoLatDir", "saidaPreviewLatDir");
+
       document.getElementById("btnSalvarSaida").addEventListener("click", salvarSaida);
       document.getElementById("btnLimparSaida").addEventListener("click", renderSaida);
 
       document.getElementById("saidaMotivo").addEventListener("change", () => toggleMotivoOutro("saida"));
       toggleMotivoOutro("saida");
+
+      document.getElementById("saidaBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("saida"));
     }
 
     async function salvarSaida(){
       const notice = document.getElementById("saidaNotice");
       clearNotice(notice);
 
-      const lojaId = userIsGeneral()
+      const lojaId = userIsGeneralManager()
         ? (document.getElementById("saidaLoja")?.value || "")
         : currentUserStoreId();
 
@@ -1541,15 +1539,28 @@
       const observacao = (document.getElementById("saidaObs")?.value || "").trim();
 
       if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida (ABC-1234 ou ABC1D23)."); return; }
-      if(!validateRequired(veiculo)){ showNotice(notice, "Informe o veículo."); return; }
-      if(!motivo){ showNotice(notice, "Selecione o motivo da saída."); return; }
-      if(motivo === "Outro" && !validateRequired(motivoOutro)){ showNotice(notice, "Descreva o motivo (campo obrigatório em “Outro”)."); return; }
+      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
+      if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
+      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
       if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
+      const [frente, mala, latEsq, latDir] = await Promise.all([
+        getImageDataFromInput("saidaFotoFrente"),
+        getImageDataFromInput("saidaFotoMala"),
+        getImageDataFromInput("saidaFotoLatEsq"),
+        getImageDataFromInput("saidaFotoLatDir")
+      ]);
+
+      if(!frente || !mala || !latEsq || !latDir){
+        showNotice(notice, "As 4 fotos principais são obrigatórias.");
+        return;
+      }
+
       try{
-        const payload = {
+        const extras = await collectExtraPhotosData("saida");
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
           tipo: "saida",
           lojaId,
           placa,
@@ -1558,65 +1569,54 @@
           motivoOutro: motivo === "Outro" ? motivoOutro : "",
           condutor,
           autorizador,
-          dano: "",
           observacao,
-          fotos: { frente:"", mala:"", lateralEsq:"", lateralDir:"", extras: [] }, // mantém padrão (dados)
+          fotos: { frente, mala, lateralEsq: latEsq, lateralDir: latDir, extras: extras || [] },
           criadoPorUid: state.authUser.uid,
           criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
           data: new Date()
-        };
-
-        const id = `mov_${Date.now()}_${Math.random().toString(16).slice(2)}`;
-        await setDoc(doc(db, Collections.MOVIMENTOS, id), payload);
+        });
 
         await refreshAfterWrite();
         showNotice(notice, "Saída registrada com sucesso.", "success");
         renderSaida();
-      }catch(error){
-        debugError("Erro ao salvar saída:", error);
-        showNotice(notice, `Não foi possível salvar. (${error?.code || "erro"})`);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar a saída. (${e?.code || "erro"})`);
       }
     }
 
-    // ========= CONSULTA (lista) + DETALHE (modal) + EXPORT INDIVIDUAL =========
+    // ✅ CONSULTA (mantida simples; clique abre modal)
     function renderConsulta(){
-      const storeFilterHTML = userIsGeneral()
+      const storeFilterHTML = userIsGeneralManager()
         ? `
           <div class="form-group">
-            <div class="label-row"><label for="filtroLojaConsulta">Loja</label></div>
+            <label for="filtroLojaConsulta">Loja</label>
             <select class="select" id="filtroLojaConsulta">
-              <option value="">Todas as lojas</option>
-              ${state.lojas.map(loja => `<option value="${loja.id}">${loja.nome || loja.id}</option>`).join("")}
+              <option value="__ALL__">Todas as lojas</option>
+              ${state.lojas.map(loja => `<option value="${loja.id}">${loja.id} - ${loja.nome || loja.id}</option>`).join("")}
             </select>
           </div>
         `
         : `
           <div class="form-group">
-            <div class="label-row"><label>Loja</label></div>
+            <label>Loja</label>
             <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
           </div>
         `;
 
       renderPanel(
         "Consulta",
-        "Toque em um registro para abrir os detalhes e visualizar fotos. (Fotos apenas na consulta individual.)",
+        "Toque em uma linha para abrir o detalhe individual (com fotos), exportar e agora editar.",
         `
           <div class="grid">
             ${storeFilterHTML}
 
             <div class="form-group">
-              <div class="label-row"><label for="filtroDataConsulta">Data</label></div>
-              <input class="input" id="filtroDataConsulta" type="date">
-              <div class="subtle">Filtra registros do dia selecionado.</div>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="filtroPlacaConsulta">Placa</label></div>
+              <label for="filtroPlacaConsulta">Placa</label>
               <input class="input" id="filtroPlacaConsulta" data-mask="plate" maxlength="8" placeholder="ABC-1234 ou ABC1D23">
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="filtroTipoConsulta">Tipo</label></div>
+              <label for="filtroTipoConsulta">Tipo</label>
               <select class="select" id="filtroTipoConsulta">
                 <option value="">Todos</option>
                 <option value="entrada">Entrada</option>
@@ -1625,7 +1625,17 @@
             </div>
 
             <div class="form-group">
-              <div class="label-row"><label for="filtroTextoConsulta">Busca geral</label></div>
+              <label for="filtroDataIni">Data inicial</label>
+              <input class="input" id="filtroDataIni" type="date">
+            </div>
+
+            <div class="form-group">
+              <label for="filtroDataFim">Data final</label>
+              <input class="input" id="filtroDataFim" type="date">
+            </div>
+
+            <div class="form-group full">
+              <label for="filtroTextoConsulta">Busca geral</label>
               <input class="input" id="filtroTextoConsulta" maxlength="80" placeholder="Condutor, veículo, autorizador, motivo...">
             </div>
           </div>
@@ -1647,8 +1657,7 @@
                   <th>Motivo</th>
                   <th>Condutor</th>
                   <th>Autorizador</th>
-                  <th>Dano</th>
-                  <th>Obs.</th>
+                  <th>Observação</th>
                   <th>Fotos</th>
                   <th>Registrado por</th>
                 </tr>
@@ -1665,13 +1674,22 @@
       document.getElementById("btnFiltrarConsulta").addEventListener("click", applyConsultaFilter);
       document.getElementById("btnLimparConsulta").addEventListener("click", renderConsulta);
 
-      // filtro rápido ao mudar data/tipo
-      ["filtroTipoConsulta","filtroLojaConsulta","filtroDataConsulta"].forEach(id=>{
-        const node = document.getElementById(id);
-        if(node) node.addEventListener("change", applyConsultaFilter);
-      });
-
       applyConsultaFilter();
+    }
+
+    function dateToRangeStart(dStr){
+      if(!dStr) return null;
+      return new Date(dStr + "T00:00:00").getTime();
+    }
+    function dateToRangeEnd(dStr){
+      if(!dStr) return null;
+      return new Date(dStr + "T23:59:59").getTime();
+    }
+    function dateValueToMillis(value){
+      if(!value) return null;
+      if(value.seconds) return value.seconds * 1000;
+      const t = new Date(value).getTime();
+      return isNaN(t) ? null : t;
     }
 
     function applyConsultaFilter(){
@@ -1679,56 +1697,51 @@
       const empty = document.getElementById("consultaEmpty");
       if(!body || !empty) return;
 
-      const lojaId = userIsGeneral()
-        ? (document.getElementById("filtroLojaConsulta")?.value || "")
+      const lojaId = userIsGeneralManager()
+        ? (document.getElementById("filtroLojaConsulta")?.value || "__ALL__")
         : currentUserStoreId();
-
-      const dateStr = document.getElementById("filtroDataConsulta")?.value || "";
-      const dateRange = parseDateInputToRange(dateStr);
 
       const placa = normalizePlate(document.getElementById("filtroPlacaConsulta")?.value || "");
       const tipo = (document.getElementById("filtroTipoConsulta")?.value || "").toLowerCase();
       const texto = (document.getElementById("filtroTextoConsulta")?.value || "").trim().toLowerCase();
 
+      const di = document.getElementById("filtroDataIni")?.value || "";
+      const df = document.getElementById("filtroDataFim")?.value || "";
+      const tIni = dateToRangeStart(di);
+      const tFim = dateToRangeEnd(df);
+
       let items = [...state.movimentos];
+      if(lojaId && lojaId !== "__ALL__") items = items.filter(i => i.lojaId === lojaId);
+      if(placa) items = items.filter(i => normalizePlate(i.placa).includes(placa));
+      if(tipo) items = items.filter(i => String(i.tipo || "").toLowerCase() === tipo);
 
-      if(lojaId) items = items.filter(item => item.lojaId === lojaId);
-      if(tipo) items = items.filter(item => String(item.tipo || "").toLowerCase() === tipo);
-      if(placa) items = items.filter(item => normalizePlate(item.placa).includes(placa));
-
-      if(dateRange){
-        items = items.filter(item => {
-          const ms = getDateMs(item.data);
-          return ms >= dateRange.startMs && ms <= dateRange.endMs;
+      if(tIni || tFim){
+        items = items.filter(i => {
+          const t = dateValueToMillis(i.data);
+          if(t == null) return false;
+          if(tIni && t < tIni) return false;
+          if(tFim && t > tFim) return false;
+          return true;
         });
       }
 
       if(texto){
-        items = items.filter(item => {
-          const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "");
+        items = items.filter(i => {
+          const motivoFinal = i.motivo === "Outro" && i.motivoOutro ? `Outro: ${i.motivoOutro}` : (i.motivo || "");
           const haystack = [
-            item.veiculo,
-            motivoFinal,
-            item.condutor,
-            item.autorizador,
-            item.observacao,
-            item.criadoPorNome,
-            item.lojaNome,
-            getStoreNameFromItem(item),
-            item.placa
+            i.veiculo, motivoFinal, i.condutor, i.autorizador, i.observacao, i.criadoPorNome, getStoreNameFromItem(i)
           ].join(" ").toLowerCase();
           return haystack.includes(texto);
         });
       }
 
-      items.sort((a,b) => getDateMs(b.data) - getDateMs(a.data));
+      items.sort((a,b) => dateValueToMillis(b.data) - dateValueToMillis(a.data));
 
       body.innerHTML = items.map(item => {
         const fotos = item?.fotos || {};
         const extrasCount = Array.isArray(fotos.extras) ? fotos.extras.length : 0;
         const baseCount = [fotos.frente, fotos.mala, fotos.lateralEsq, fotos.lateralDir].filter(Boolean).length;
         const totalFotos = baseCount + extrasCount;
-
         const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
 
         return `
@@ -1741,8 +1754,7 @@
             <td>${motivoFinal}</td>
             <td>${item.condutor || "-"}</td>
             <td>${item.autorizador || "-"}</td>
-            <td>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</td>
-            <td>${item.observacao ? item.observacao : "-"}</td>
+            <td>${item.observacao || "-"}</td>
             <td>${totalFotos ? `${totalFotos} foto(s)` : "-"}</td>
             <td>${item.criadoPorNome || "-"}</td>
           </tr>
@@ -1760,9 +1772,20 @@
       });
     }
 
+    // ✅ MODAL: VER + EDITAR
     function openDetailModal(item){
       state.selectedMovimento = item;
+      state.editMode = false;
+      el.btnSaveRegistro.classList.add("hidden");
+      el.btnEditRegistro.classList.remove("hidden");
 
+      renderDetailView(item);
+
+      el.detailModal.classList.add("show");
+      el.detailModal.setAttribute("aria-hidden", "false");
+    }
+
+    function renderDetailView(item){
       const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
       const fotos = item?.fotos || {};
       const thumbs = [];
@@ -1771,10 +1794,7 @@
       if(fotos.mala) thumbs.push({ url: fotos.mala, cap: "Mala" });
       if(fotos.lateralEsq) thumbs.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
       if(fotos.lateralDir) thumbs.push({ url: fotos.lateralDir, cap: "Lateral direita" });
-
-      if(Array.isArray(fotos.extras)){
-        fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` }); });
-      }
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) thumbs.push({ url: u, cap: `Extra ${idx+1}` }); });
 
       el.detailTitle.textContent = `Registro: ${item.tipo === "entrada" ? "Entrada" : "Saída"} — ${item.placa || ""}`;
       el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
@@ -1793,16 +1813,11 @@
           <div class="detail-item"><small>Condutor</small><div>${item.condutor || "-"}</div></div>
           <div class="detail-item"><small>Autorizador</small><div>${item.autorizador || "-"}</div></div>
 
-          <div class="detail-item"><small>Condição</small><div>${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
+          <div class="detail-item"><small>Observação</small><div>${item.observacao || "-"}</div></div>
           <div class="detail-item"><small>Registrado por</small><div>${item.criadoPorNome || "-"}</div></div>
-
-          <div class="detail-item" style="grid-column:1/-1;">
-            <small>Observação</small>
-            <div>${item.observacao ? item.observacao : "-"}</div>
-          </div>
         </div>
 
-        <div class="section-title" style="margin-top:6px;">Fotos (somente neste detalhe)</div>
+        <div class="section-title" style="margin-top:6px;">Fotos</div>
         ${thumbs.length ? `
           <div class="thumbs">
             ${thumbs.map(t => `
@@ -1814,15 +1829,242 @@
           </div>
         ` : `<div class="empty">Este registro não possui fotos.</div>`}
       `;
+    }
 
-      el.detailModal.classList.add("show");
-      el.detailModal.setAttribute("aria-hidden", "false");
+    function renderDetailEdit(item){
+      el.detailTitle.textContent = `Editar registro — ${item.placa || ""}`;
+      el.detailSub.textContent = `Unidade: ${getStoreNameFromItem(item)} • Data/hora: ${formatDate(item.data)}`;
+
+      const isEntrada = item.tipo === "entrada";
+      const motivoList = isEntrada ? MOTIVOS_ENTRADA : MOTIVOS_SAIDA;
+      const fotos = item?.fotos || {};
+
+      el.detailBody.innerHTML = `
+        <div class="grid">
+          <div class="form-group">
+            <label>Tipo</label>
+            <input class="input" value="${isEntrada ? "Entrada" : "Saída"}" disabled>
+          </div>
+
+          <div class="form-group">
+            <label>Loja</label>
+            <input class="input" value="${getStoreNameFromItem(item)}" disabled>
+          </div>
+
+          <div class="form-group">
+            <label for="editPlaca">Placa <span class="req">*</span></label>
+            <input class="input" id="editPlaca" data-mask="plate" maxlength="8" value="${item.placa || ""}">
+          </div>
+
+          <div class="form-group">
+            <label for="editVeiculo">Veículo <span class="req">*</span></label>
+            <input class="input" id="editVeiculo" maxlength="60" value="${item.veiculo || ""}">
+          </div>
+
+          <div class="form-group">
+            <label for="editMotivo">Motivo <span class="req">*</span></label>
+            <select class="select" id="editMotivo">
+              ${buildMotivoOptions(motivoList)}
+            </select>
+          </div>
+
+          <div class="form-group hidden" id="editMotivoOutroWrap">
+            <label for="editMotivoOutro">Descreva o motivo <span class="req">*</span></label>
+            <input class="input" id="editMotivoOutro" maxlength="60" value="${item.motivoOutro || ""}">
+          </div>
+
+          <div class="form-group">
+            <label for="editCondutor">Condutor <span class="req">*</span></label>
+            <select class="select" id="editCondutor">${buildCondutorOptions()}</select>
+          </div>
+
+          <div class="form-group">
+            <label for="editAutorizador">Autorizador <span class="req">*</span></label>
+            <select class="select" id="editAutorizador">${buildAutorizadorOptions()}</select>
+          </div>
+
+          <div class="form-group full">
+            <label for="editObs">Observações</label>
+            <textarea class="textarea" id="editObs" maxlength="300">${item.observacao || ""}</textarea>
+          </div>
+
+          <div class="form-group full">
+            <label>Fotos (4 obrigatórias) <span class="req">*</span></label>
+            <div class="subtle">Se não tirar nova foto, será mantida a foto atual do registro.</div>
+
+            <div class="photo-grid">
+              ${photoCaptureCard("Frente", "editFotoFrente", "editPreviewFrente")}
+              ${photoCaptureCard("Mala", "editFotoMala", "editPreviewMala")}
+              ${photoCaptureCard("Lateral esquerda", "editFotoLatEsq", "editPreviewLatEsq")}
+              ${photoCaptureCard("Lateral direita", "editFotoLatDir", "editPreviewLatDir")}
+            </div>
+
+            <div class="subtle" style="margin-top:10px;">Fotos atuais (pré-visualização):</div>
+            <div class="thumbs" style="margin-top:10px;">
+              ${fotos.frente ? `<div class="thumb"><img src="${fotos.frente}" alt="Frente"><div class="cap">Atual: Frente</div></div>` : ""}
+              ${fotos.mala ? `<div class="thumb"><img src="${fotos.mala}" alt="Mala"><div class="cap">Atual: Mala</div></div>` : ""}
+              ${fotos.lateralEsq ? `<div class="thumb"><img src="${fotos.lateralEsq}" alt="Lateral esquerda"><div class="cap">Atual: Lateral esquerda</div></div>` : ""}
+              ${fotos.lateralDir ? `<div class="thumb"><img src="${fotos.lateralDir}" alt="Lateral direita"><div class="cap">Atual: Lateral direita</div></div>` : ""}
+            </div>
+
+            <div class="actions" style="margin-top:12px;">
+              <button class="btn btn-light" id="editBtnAddExtraFoto">Fotografar mais partes</button>
+            </div>
+            <div class="photo-grid" id="editPhotoGridExtras"></div>
+          </div>
+        </div>
+
+        <div id="editNotice" class="notice"></div>
+      `;
+
+      // set selects
+      document.getElementById("editMotivo").value = item.motivo || "";
+      document.getElementById("editCondutor").value = item.condutor || "";
+      document.getElementById("editAutorizador").value = item.autorizador || "";
+
+      // motivo outro
+      const toggleEditOutro = () => {
+        const motivo = document.getElementById("editMotivo")?.value || "";
+        const wrap = document.getElementById("editMotivoOutroWrap");
+        if(!wrap) return;
+        if(motivo === "Outro"){
+          wrap.classList.remove("hidden");
+        }else{
+          wrap.classList.add("hidden");
+          const i = document.getElementById("editMotivoOutro");
+          if(i) i.value = "";
+        }
+      };
+      document.getElementById("editMotivo").addEventListener("change", toggleEditOutro);
+      toggleEditOutro();
+
+      // masks & previews
+      attachInputMasks();
+      wirePhotoPreview("editFotoFrente", "editPreviewFrente");
+      wirePhotoPreview("editFotoMala", "editPreviewMala");
+      wirePhotoPreview("editFotoLatEsq", "editPreviewLatEsq");
+      wirePhotoPreview("editFotoLatDir", "editPreviewLatDir");
+
+      document.getElementById("editBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInputForEdit());
+    }
+
+    function addExtraPhotoInputForEdit(){
+      const grid = document.getElementById("editPhotoGridExtras");
+      if(!grid) return;
+
+      const index = grid.querySelectorAll("[data-extra='1']").length + 1;
+      const inputId = `editFotoExtra_${index}`;
+      const previewId = `editPreviewExtra_${index}`;
+
+      const card = document.createElement("div");
+      card.className = "photo-card";
+      card.setAttribute("data-extra", "1");
+      card.innerHTML = `
+        <strong>Extra ${index}</strong>
+        <div class="photo-preview" id="${previewId}"><div class="photo-hint">Sem foto</div></div>
+        <input class="file-input" id="${inputId}" type="file" accept="image/*" capture="environment">
+        <label class="btn-cam" for="${inputId}">Abrir câmera</label>
+      `;
+      grid.appendChild(card);
+      wirePhotoPreview(inputId, previewId);
+    }
+
+    async function saveEditedRegistro(){
+      const item = state.selectedMovimento;
+      if(!item) return;
+
+      const notice = document.getElementById("editNotice");
+      clearNotice(notice);
+
+      const placa = formatPlate(document.getElementById("editPlaca")?.value || "");
+      const veiculo = (document.getElementById("editVeiculo")?.value || "").trim();
+      const motivo = document.getElementById("editMotivo")?.value || "";
+      const motivoOutro = (document.getElementById("editMotivoOutro")?.value || "").trim();
+      const condutor = document.getElementById("editCondutor")?.value || "";
+      const autorizador = document.getElementById("editAutorizador")?.value || "";
+      const observacao = (document.getElementById("editObs")?.value || "").trim();
+
+      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
+      if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
+      if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
+      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
+      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
+      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
+
+      // fotos: se não tirar nova, mantém as atuais
+      const currentFotos = item.fotos || {};
+      const [newFrente, newMala, newLatEsq, newLatDir] = await Promise.all([
+        getImageDataFromInput("editFotoFrente"),
+        getImageDataFromInput("editFotoMala"),
+        getImageDataFromInput("editFotoLatEsq"),
+        getImageDataFromInput("editFotoLatDir")
+      ]);
+
+      const frente = newFrente || currentFotos.frente || "";
+      const mala = newMala || currentFotos.mala || "";
+      const lateralEsq = newLatEsq || currentFotos.lateralEsq || "";
+      const lateralDir = newLatDir || currentFotos.lateralDir || "";
+
+      // ainda exigimos as 4 obrigatórias (entre novo ou antigo)
+      if(!frente || !mala || !lateralEsq || !lateralDir){
+        showNotice(notice, "As 4 fotos principais são obrigatórias (pode manter as antigas ou tirar novas).");
+        return;
+      }
+
+      // extras: mantém as antigas + adiciona as novas extras tiradas no edit
+      const extrasOld = Array.isArray(currentFotos.extras) ? currentFotos.extras : [];
+      const extrasNew = [];
+      const extraInputs = Array.from(document.querySelectorAll("input[id^='editFotoExtra_']"));
+      for(const input of extraInputs){
+        const file = input?.files?.[0];
+        if(!file) continue;
+        if(!file.type?.startsWith("image/")) continue;
+        try{
+          const url = await readFileAsDataURL(file);
+          if(url) extrasNew.push(url);
+        }catch(e){}
+      }
+
+      try{
+        await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
+          placa,
+          veiculo,
+          motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
+          condutor,
+          autorizador,
+          observacao,
+          fotos: {
+            frente, mala, lateralEsq, lateralDir,
+            extras: [...extrasOld, ...extrasNew]
+          },
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        });
+
+        await refreshAfterWrite();
+        // atualiza item em memória
+        const refreshed = state.movimentos.find(m => m.id === item.id);
+        if(refreshed) state.selectedMovimento = refreshed;
+
+        showNotice(notice, "Registro atualizado com sucesso.", "success");
+
+        // volta para visualização
+        state.editMode = false;
+        el.btnSaveRegistro.classList.add("hidden");
+        el.btnEditRegistro.classList.remove("hidden");
+        renderDetailView(state.selectedMovimento);
+      }catch(e){
+        showNotice(notice, `Não foi possível salvar alterações. (${e?.code || "erro"})`);
+      }
     }
 
     function closeDetailModal(){
       el.detailModal.classList.remove("show");
       el.detailModal.setAttribute("aria-hidden", "true");
       state.selectedMovimento = null;
+      state.editMode = false;
     }
 
     function exportSelectedRegistro(){
@@ -1830,6 +2072,14 @@
       if(!item) return;
 
       const motivoFinal = item.motivo === "Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo || "-");
+      const fotos = item?.fotos || {};
+      const imagens = [];
+
+      if(fotos.frente) imagens.push({ url: fotos.frente, cap: "Frente" });
+      if(fotos.mala) imagens.push({ url: fotos.mala, cap: "Mala" });
+      if(fotos.lateralEsq) imagens.push({ url: fotos.lateralEsq, cap: "Lateral esquerda" });
+      if(fotos.lateralDir) imagens.push({ url: fotos.lateralDir, cap: "Lateral direita" });
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u, idx) => { if(u) imagens.push({ url: u, cap: `Extra ${idx+1}` }); });
 
       const html = `
 <!doctype html>
@@ -1847,6 +2097,11 @@
   .k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; margin-bottom:4px; font-weight:700; }
   .v{ font-size:14px; font-weight:700; color:#0f172a; }
   .full{ grid-column:1/-1; }
+  .imgs{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+  .img{ border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+  .img img{ width:100%; height:260px; object-fit:cover; display:block; }
+  .cap{ padding:10px 12px; font-size:12px; font-weight:700; color:#334155; border-top:1px solid #eef2f7; }
+  @media print{ body{ margin:0; } .box{ page-break-inside: avoid; } .img{ page-break-inside: avoid; } }
 </style>
 </head>
 <body>
@@ -1871,14 +2126,28 @@
       <div><div class="k">Condutor</div><div class="v">${item.condutor || "-"}</div></div>
       <div><div class="k">Autorizador</div><div class="v">${item.autorizador || "-"}</div></div>
 
-      <div><div class="k">Condição</div><div class="v">${item.dano === "sim" ? "Com dano" : item.dano === "nao" ? "Sem dano" : "-"}</div></div>
-      <div><div class="k">Registrado por</div><div class="v">${item.criadoPorNome || "-"}</div></div>
-
       <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao || "-"}</div></div>
     </div>
   </div>
+
+  <div class="box">
+    <div class="k" style="margin-bottom:10px;">Fotos</div>
+    ${
+      imagens.length ? `
+        <div class="imgs">
+          ${imagens.map(im => `
+            <div class="img">
+              <img src="${im.url}" alt="${im.cap}">
+              <div class="cap">${im.cap}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="v" style="font-weight:600;">Sem fotos</div>`
+    }
+  </div>
 </body>
-</html>`;
+</html>
+      `;
 
       const w = window.open("", "_blank");
       if(!w){
@@ -1891,782 +2160,26 @@
       w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
-    // ========= CONDUTORES / AUTORIZADORES (CPF consulta, ativa/inativa, salva) =========
-    function makePeopleDocId(lojaId, cpfDigits){
-      // ✅ evita índice e permite getDoc direto
-      return `${lojaId}__${cpfDigits}`;
-    }
-
-    function renderCondutores(){
-      if(!userCanManageCondutores()){
-        renderPanel("Acesso restrito", "Você não tem permissão para gerenciar condutores.", `<div class="empty">Sem acesso.</div>`);
-        return;
-      }
-
-      const lojaField = userIsGeneral()
-        ? `
-          <div class="form-group">
-            <div class="label-row"><label for="condLoja">Loja</label><span class="req">*</span></div>
-            <select class="select" id="condLoja">${buildStoreOptions(true)}</select>
-          </div>
-        `
-        : `
-          <div class="form-group">
-            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-            <input type="hidden" id="condLoja" value="${currentUserStoreId() || ""}">
-          </div>
-        `;
-
-      renderPanel(
-        "Condutores",
-        "CPF consulta. Se existir, edita. Lista abaixo permite ativar/inativar.",
-        `
-          <div class="grid">
-            ${lojaField}
-
-            <div class="form-group">
-              <div class="label-row"><label for="condCPF">CPF</label><span class="req">*</span></div>
-              <input class="input" id="condCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
-              <div class="subtle" id="condCpfStatus">Digite o CPF para consultar.</div>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="condNome">Nome</label><span class="req">*</span></div>
-              <input class="input" id="condNome" maxlength="80" placeholder="Nome do condutor">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="condCargo">Cargo</label><span class="req">*</span></div>
-              <input class="input" id="condCargo" maxlength="60" placeholder="Cargo do condutor">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="condAtivo">Status</label><span class="req">*</span></div>
-              <select class="select" id="condAtivo">
-                <option value="true">Ativo</option>
-                <option value="false">Inativo</option>
-              </select>
-              <div class="subtle">Inativo aparece nas seleções como “- INATIVO” e não pode ser selecionado.</div>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn btn-success" id="btnSalvarCondutor">Salvar</button>
-            <button class="btn btn-light" id="btnLimparCondutor">Limpar</button>
-          </div>
-
-          <div id="condNotice" class="notice"></div>
-
-          <div class="section-title">Lista de condutores</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Loja</th>
-                  <th>CPF</th>
-                  <th>Nome</th>
-                  <th>Cargo</th>
-                  <th>Status</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody id="condListBody"></tbody>
-            </table>
-          </div>
-          <div class="empty" id="condListEmpty"></div>
-        `
-      );
-
-      attachInputMasks();
-
-      document.getElementById("btnSalvarCondutor").addEventListener("click", salvarCondutor);
-      document.getElementById("btnLimparCondutor").addEventListener("click", renderCondutores);
-
-      document.getElementById("condCPF").addEventListener("input", debounce(async () => {
-        await consultarCondutorPorCPF();
-      }, 250));
-
-      const lojaSelect = document.getElementById("condLoja");
-      if(lojaSelect){
-        lojaSelect.addEventListener("change", async () => {
-          await consultarCondutorPorCPF(true);
-          renderCondutoresList();
-        });
-      }
-
-      renderCondutoresList();
-    }
-
-    async function consultarCondutorPorCPF(clearIfNotFound=false){
-      const status = document.getElementById("condCpfStatus");
-      const cpfRaw = document.getElementById("condCPF")?.value || "";
-      const cpf = onlyDigits(cpfRaw);
-      const lojaId = document.getElementById("condLoja")?.value || "";
-
-      if(!status) return;
-
-      if(!lojaId){
-        status.textContent = "Selecione a loja primeiro.";
-        return;
-      }
-      if(cpf.length < 11){
-        status.textContent = "Digite o CPF completo para consultar.";
-        if(clearIfNotFound){
-          document.getElementById("condNome").value = "";
-          document.getElementById("condCargo").value = "";
-          document.getElementById("condAtivo").value = "true";
-        }
-        return;
-      }
-      if(!isValidCPF(cpf)){
-        status.textContent = "CPF inválido.";
-        return;
-      }
-
-      const id = makePeopleDocId(lojaId, cpf);
-      try{
-        const snap = await getDoc(doc(db, Collections.CONDUTORES, id));
-        if(snap.exists()){
-          const data = snap.data();
-          status.textContent = "CPF já cadastrado — editando dados.";
-          document.getElementById("condNome").value = data.nome || "";
-          document.getElementById("condCargo").value = data.cargo || "";
-          document.getElementById("condAtivo").value = (data.ativo === false) ? "false" : "true";
-        }else{
-          status.textContent = "CPF não cadastrado.";
-          document.getElementById("condNome").value = "";
-          document.getElementById("condCargo").value = "";
-          document.getElementById("condAtivo").value = "true";
-        }
-      }catch(e){
-        status.textContent = `Falha ao consultar. (${e?.code || "erro"})`;
-      }
-    }
-
-    async function salvarCondutor(){
-      const notice = document.getElementById("condNotice");
-      clearNotice(notice);
-
-      const lojaId = document.getElementById("condLoja")?.value || "";
-      const cpfRaw = document.getElementById("condCPF")?.value || "";
-      const cpf = onlyDigits(cpfRaw);
-      const nome = (document.getElementById("condNome")?.value || "").trim();
-      const cargo = (document.getElementById("condCargo")?.value || "").trim();
-      const ativo = (document.getElementById("condAtivo")?.value || "true") === "true";
-
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!isValidCPF(cpf)){ showNotice(notice, "Informe um CPF válido."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome."); return; }
-      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
-
-      try{
-        const id = makePeopleDocId(lojaId, cpf);
-
-        const payload = {
-          lojaId,
-          cpf,
-          nome,
-          cargo,
-          ativo,
-          atualizadoEm: new Date(),
-          atualizadoPorUid: state.authUser.uid,
-          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        };
-
-        // se não existir, cria com criadoEm
-        const existing = await getDoc(doc(db, Collections.CONDUTORES, id));
-        if(!existing.exists()){
-          payload.criadoEm = new Date();
-          payload.criadoPorUid = state.authUser.uid;
-          payload.criadoPorNome = state.userProfile?.nome || state.authUser?.email || "";
-        }
-
-        await setDoc(doc(db, Collections.CONDUTORES, id), payload, { merge: true });
-
-        await refreshAfterWrite();
-        showNotice(notice, "Condutor salvo com sucesso.", "success");
-        renderCondutores();
-      }catch(e){
-        debugError("Erro salvar condutor:", e);
-        showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-      }
-    }
-
-    function renderCondutoresList(){
-      const body = document.getElementById("condListBody");
-      const empty = document.getElementById("condListEmpty");
-      if(!body || !empty) return;
-
-      const lojaSel = document.getElementById("condLoja")?.value || "";
-      let items = [...state.condutores];
-      if(userIsGeneral() && lojaSel) items = items.filter(x => x.lojaId === lojaSel);
-      if(!userIsGeneral()) items = items.filter(x => x.lojaId === currentUserStoreId());
-
-      body.innerHTML = items.map(item => {
-        const ativo = item.ativo !== false;
-        const status = ativo ? `<span class="badge badge-green">Ativo</span>` : `<span class="badge badge-gray">Inativo</span>`;
-        return `
-          <tr>
-            <td>${getStoreName(item.lojaId || "")}</td>
-            <td>${formatCPF(item.cpf || "")}</td>
-            <td>${item.nome || "-"}</td>
-            <td>${item.cargo || "-"}</td>
-            <td>${status}</td>
-            <td>
-              <button class="btn btn-light" data-toggle-cond="${item.id}">${ativo ? "Inativar" : "Ativar"}</button>
-            </td>
-          </tr>
-        `;
-      }).join("");
-
-      empty.textContent = items.length ? "" : "Nenhum condutor encontrado.";
-
-      Array.from(body.querySelectorAll("[data-toggle-cond]")).forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-toggle-cond");
-          const found = state.condutores.find(x => x.id === id);
-          if(!found) return;
-          try{
-            await updateDoc(doc(db, Collections.CONDUTORES, id), {
-              ativo: !(found.ativo !== false),
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            });
-            await refreshAfterWrite();
-            renderCondutores();
-          }catch(e){
-            alert(`Falha ao alterar status. (${e?.code || "erro"})`);
-          }
-        });
-      });
-    }
-
-    function renderAutorizadores(){
-      if(!userCanManageAutorizadores()){
-        renderPanel("Acesso restrito", "Você não tem permissão para gerenciar autorizadores.", `<div class="empty">Sem acesso.</div>`);
-        return;
-      }
-
-      const lojaField = userIsGeneral()
-        ? `
-          <div class="form-group">
-            <div class="label-row"><label for="autLoja">Loja</label><span class="req">*</span></div>
-            <select class="select" id="autLoja">${buildStoreOptions(true)}</select>
-          </div>
-        `
-        : `
-          <div class="form-group">
-            <div class="label-row"><label>Loja</label><span class="req">*</span></div>
-            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
-            <input type="hidden" id="autLoja" value="${currentUserStoreId() || ""}">
-          </div>
-        `;
-
-      renderPanel(
-        "Autorizadores",
-        "CPF consulta. Se existir, edita. Lista abaixo permite ativar/inativar.",
-        `
-          <div class="grid">
-            ${lojaField}
-
-            <div class="form-group">
-              <div class="label-row"><label for="autCPF">CPF</label><span class="req">*</span></div>
-              <input class="input" id="autCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
-              <div class="subtle" id="autCpfStatus">Digite o CPF para consultar.</div>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="autNome">Nome</label><span class="req">*</span></div>
-              <input class="input" id="autNome" maxlength="80" placeholder="Nome do autorizador">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="autCargo">Cargo</label><span class="req">*</span></div>
-              <input class="input" id="autCargo" maxlength="60" placeholder="Cargo do autorizador">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="autAtivo">Status</label><span class="req">*</span></div>
-              <select class="select" id="autAtivo">
-                <option value="true">Ativo</option>
-                <option value="false">Inativo</option>
-              </select>
-              <div class="subtle">Inativo aparece nas seleções como “- INATIVO” e não pode ser selecionado.</div>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn btn-success" id="btnSalvarAutorizador">Salvar</button>
-            <button class="btn btn-light" id="btnLimparAutorizador">Limpar</button>
-          </div>
-
-          <div id="autNotice" class="notice"></div>
-
-          <div class="section-title">Lista de autorizadores</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Loja</th>
-                  <th>CPF</th>
-                  <th>Nome</th>
-                  <th>Cargo</th>
-                  <th>Status</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody id="autListBody"></tbody>
-            </table>
-          </div>
-          <div class="empty" id="autListEmpty"></div>
-        `
-      );
-
-      attachInputMasks();
-
-      document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
-      document.getElementById("btnLimparAutorizador").addEventListener("click", renderAutorizadores);
-
-      document.getElementById("autCPF").addEventListener("input", debounce(async () => {
-        await consultarAutorizadorPorCPF();
-      }, 250));
-
-      const lojaSelect = document.getElementById("autLoja");
-      if(lojaSelect){
-        lojaSelect.addEventListener("change", async () => {
-          await consultarAutorizadorPorCPF(true);
-          renderAutorizadoresList();
-        });
-      }
-
-      renderAutorizadoresList();
-    }
-
-    async function consultarAutorizadorPorCPF(clearIfNotFound=false){
-      const status = document.getElementById("autCpfStatus");
-      const cpfRaw = document.getElementById("autCPF")?.value || "";
-      const cpf = onlyDigits(cpfRaw);
-      const lojaId = document.getElementById("autLoja")?.value || "";
-
-      if(!status) return;
-
-      if(!lojaId){
-        status.textContent = "Selecione a loja primeiro.";
-        return;
-      }
-      if(cpf.length < 11){
-        status.textContent = "Digite o CPF completo para consultar.";
-        if(clearIfNotFound){
-          document.getElementById("autNome").value = "";
-          document.getElementById("autCargo").value = "";
-          document.getElementById("autAtivo").value = "true";
-        }
-        return;
-      }
-      if(!isValidCPF(cpf)){
-        status.textContent = "CPF inválido.";
-        return;
-      }
-
-      const id = makePeopleDocId(lojaId, cpf);
-      try{
-        const snap = await getDoc(doc(db, Collections.AUTORIZADORES, id));
-        if(snap.exists()){
-          const data = snap.data();
-          status.textContent = "CPF já cadastrado — editando dados.";
-          document.getElementById("autNome").value = data.nome || "";
-          document.getElementById("autCargo").value = data.cargo || "";
-          document.getElementById("autAtivo").value = (data.ativo === false) ? "false" : "true";
-        }else{
-          status.textContent = "CPF não cadastrado.";
-          document.getElementById("autNome").value = "";
-          document.getElementById("autCargo").value = "";
-          document.getElementById("autAtivo").value = "true";
-        }
-      }catch(e){
-        status.textContent = `Falha ao consultar. (${e?.code || "erro"})`;
-      }
-    }
-
-    async function salvarAutorizador(){
-      const notice = document.getElementById("autNotice");
-      clearNotice(notice);
-
-      const lojaId = document.getElementById("autLoja")?.value || "";
-      const cpfRaw = document.getElementById("autCPF")?.value || "";
-      const cpf = onlyDigits(cpfRaw);
-      const nome = (document.getElementById("autNome")?.value || "").trim();
-      const cargo = (document.getElementById("autCargo")?.value || "").trim();
-      const ativo = (document.getElementById("autAtivo")?.value || "true") === "true";
-
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
-      if(!isValidCPF(cpf)){ showNotice(notice, "Informe um CPF válido."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome."); return; }
-      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
-
-      try{
-        const id = makePeopleDocId(lojaId, cpf);
-
-        const payload = {
-          lojaId,
-          cpf,
-          nome,
-          cargo,
-          ativo,
-          atualizadoEm: new Date(),
-          atualizadoPorUid: state.authUser.uid,
-          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        };
-
-        const existing = await getDoc(doc(db, Collections.AUTORIZADORES, id));
-        if(!existing.exists()){
-          payload.criadoEm = new Date();
-          payload.criadoPorUid = state.authUser.uid;
-          payload.criadoPorNome = state.userProfile?.nome || state.authUser?.email || "";
-        }
-
-        await setDoc(doc(db, Collections.AUTORIZADORES, id), payload, { merge: true });
-
-        await refreshAfterWrite();
-        showNotice(notice, "Autorizador salvo com sucesso.", "success");
-        renderAutorizadores();
-      }catch(e){
-        debugError("Erro salvar autorizador:", e);
-        showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-      }
-    }
-
-    function renderAutorizadoresList(){
-      const body = document.getElementById("autListBody");
-      const empty = document.getElementById("autListEmpty");
-      if(!body || !empty) return;
-
-      const lojaSel = document.getElementById("autLoja")?.value || "";
-      let items = [...state.autorizadores];
-      if(userIsGeneral() && lojaSel) items = items.filter(x => x.lojaId === lojaSel);
-      if(!userIsGeneral()) items = items.filter(x => x.lojaId === currentUserStoreId());
-
-      body.innerHTML = items.map(item => {
-        const ativo = item.ativo !== false;
-        const status = ativo ? `<span class="badge badge-green">Ativo</span>` : `<span class="badge badge-gray">Inativo</span>`;
-        return `
-          <tr>
-            <td>${getStoreName(item.lojaId || "")}</td>
-            <td>${formatCPF(item.cpf || "")}</td>
-            <td>${item.nome || "-"}</td>
-            <td>${item.cargo || "-"}</td>
-            <td>${status}</td>
-            <td>
-              <button class="btn btn-light" data-toggle-aut="${item.id}">${ativo ? "Inativar" : "Ativar"}</button>
-            </td>
-          </tr>
-        `;
-      }).join("");
-
-      empty.textContent = items.length ? "" : "Nenhum autorizador encontrado.";
-
-      Array.from(body.querySelectorAll("[data-toggle-aut]")).forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const id = btn.getAttribute("data-toggle-aut");
-          const found = state.autorizadores.find(x => x.id === id);
-          if(!found) return;
-          try{
-            await updateDoc(doc(db, Collections.AUTORIZADORES, id), {
-              ativo: !(found.ativo !== false),
-              atualizadoEm: new Date(),
-              atualizadoPorUid: state.authUser.uid,
-              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-            });
-            await refreshAfterWrite();
-            renderAutorizadores();
-          }catch(e){
-            alert(`Falha ao alterar status. (${e?.code || "erro"})`);
-          }
-        });
-      });
-    }
-
-    // ========= EXTRATO (GERENTE GERAL) =========
-    function renderExtrato(){
-      if(!userCanExtrato()){
-        renderPanel("Acesso restrito", "Somente gerente geral pode gerar extrato.", `<div class="empty">Sem acesso.</div>`);
-        return;
-      }
-
-      renderPanel(
-        "Extrato (PDF básico)",
-        "Selecione loja (ou todas) e período. Gera PDF (via imprimir). Sem fotos.",
-        `
-          <div class="grid">
-            <div class="form-group">
-              <div class="label-row"><label for="extLoja">Loja</label></div>
-              <select class="select" id="extLoja">
-                <option value="">Todas as lojas</option>
-                ${state.lojas.map(loja => `<option value="${loja.id}">${loja.nome || loja.id}</option>`).join("")}
-              </select>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="extInicio">Data início</label><span class="req">*</span></div>
-              <input class="input" id="extInicio" type="date">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="extFim">Data fim</label><span class="req">*</span></div>
-              <input class="input" id="extFim" type="date">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="extTipo">Tipo</label></div>
-              <select class="select" id="extTipo">
-                <option value="">Todos</option>
-                <option value="entrada">Entrada</option>
-                <option value="saida">Saída</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button class="btn btn-primary" id="btnGerarExtrato">Gerar PDF</button>
-          </div>
-
-          <div id="extNotice" class="notice"></div>
-        `
-      );
-
-      document.getElementById("btnGerarExtrato").addEventListener("click", gerarExtratoPDF);
-    }
-
-    function gerarExtratoPDF(){
-      const notice = document.getElementById("extNotice");
-      clearNotice(notice);
-
-      const lojaId = document.getElementById("extLoja")?.value || "";
-      const ini = document.getElementById("extInicio")?.value || "";
-      const fim = document.getElementById("extFim")?.value || "";
-      const tipo = document.getElementById("extTipo")?.value || "";
-
-      if(!ini || !fim){
-        showNotice(notice, "Informe data início e fim.");
-        return;
-      }
-
-      const iniMs = new Date(ini + "T00:00:00").getTime();
-      const fimMs = new Date(fim + "T23:59:59.999").getTime();
-      if(fimMs < iniMs){
-        showNotice(notice, "Data fim deve ser maior ou igual à data início.");
-        return;
-      }
-
-      let items = [...state.movimentos];
-      if(lojaId) items = items.filter(x => x.lojaId === lojaId);
-      if(tipo) items = items.filter(x => x.tipo === tipo);
-      items = items.filter(x => {
-        const ms = getDateMs(x.data);
-        return ms >= iniMs && ms <= fimMs;
-      });
-      items.sort((a,b) => getDateMs(a.data) - getDateMs(b.data));
-
-      const titleLoja = lojaId ? getStoreName(lojaId) : "Todas as lojas";
-      const rows = items.map(x => `
-        <tr>
-          <td>${formatDate(x.data)}</td>
-          <td>${x.tipo === "entrada" ? "Entrada" : "Saída"}</td>
-          <td>${getStoreNameFromItem(x)}</td>
-          <td>${x.placa || "-"}</td>
-          <td>${x.veiculo || "-"}</td>
-          <td>${x.motivo === "Outro" && x.motivoOutro ? ("Outro: " + x.motivoOutro) : (x.motivo || "-")}</td>
-          <td>${x.condutor || "-"}</td>
-          <td>${x.autorizador || "-"}</td>
-          <td>${x.dano === "sim" ? "Com dano" : x.dano === "nao" ? "Sem dano" : "-"}</td>
-          <td>${x.observacao || "-"}</td>
-        </tr>
-      `).join("");
-
-      const html = `
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Extrato</title>
-<style>
-  body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
-  h1{ font-size:20px; margin:0 0 6px 0; }
-  .sub{ color:#475569; margin:0 0 18px 0; font-size:13px; }
-  table{ width:100%; border-collapse:collapse; }
-  th,td{ border:1px solid #e5e7eb; padding:8px 10px; font-size:12px; vertical-align:top; }
-  th{ background:#f8fafc; text-transform:uppercase; letter-spacing:.05em; font-size:11px; }
-  @media print{ body{ margin:0; } }
-</style>
-</head>
-<body>
-  <h1>Extrato de movimentações</h1>
-  <div class="sub">
-    Loja: <b>${titleLoja}</b> • Período: <b>${ini}</b> a <b>${fim}</b> • Tipo: <b>${tipo || "Todos"}</b><br/>
-    Gerado em: ${new Date().toLocaleString("pt-BR")} • Total: ${items.length}
-  </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th>Data/Hora</th>
-        <th>Tipo</th>
-        <th>Loja</th>
-        <th>Placa</th>
-        <th>Veículo</th>
-        <th>Motivo</th>
-        <th>Condutor</th>
-        <th>Autorizador</th>
-        <th>Dano</th>
-        <th>Obs.</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rows || `<tr><td colspan="10">Nenhum registro no período.</td></tr>`}
-    </tbody>
-  </table>
-</body>
-</html>
-      `;
-
-      const w = window.open("", "_blank");
-      if(!w){
-        alert("Bloqueio de pop-up: permita pop-ups para exportar o extrato.");
-        return;
-      }
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-      w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
-    }
-
-    // ========= GERENCIAR LOJAS (criar/editar) =========
-    function renderGerenciarLojas(){
-      if(!userCanGerenciarLojas()){
-        renderPanel("Acesso restrito", "Somente gerente geral pode gerenciar lojas.", `<div class="empty">Sem acesso.</div>`);
-        return;
-      }
-
-      const rows = state.lojas.map(l => `
-        <tr>
-          <td>${l.id}</td>
-          <td>${l.nome || "-"}</td>
-          <td>${l.ativo === false ? "Não" : "Sim"}</td>
-        </tr>
-      `).join("");
-
-      renderPanel(
-        "Gerenciar lojas",
-        "Crie/atualize lojas (lojas/{lojaId}).",
-        `
-          <div class="grid">
-            <div class="form-group">
-              <div class="label-row"><label for="lojaIdNovo">ID da loja</label><span class="req">*</span></div>
-              <input class="input" id="lojaIdNovo" maxlength="40" placeholder="Ex.: nissan-guarulhos">
-              <div class="subtle">Use apenas letras/números/_/-. (sem espaços)</div>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="lojaNomeNovo">Nome da loja</label><span class="req">*</span></div>
-              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: NISSAN - GUARULHOS">
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label for="lojaAtivaNovo">Ativa</label><span class="req">*</span></div>
-              <select class="select" id="lojaAtivaNovo">
-                <option value="true">Sim</option>
-                <option value="false">Não</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <div class="label-row"><label>&nbsp;</label></div>
-              <button class="btn btn-success" id="btnCriarLoja">Salvar loja</button>
-            </div>
-          </div>
-
-          <div id="lojasNotice" class="notice"></div>
-
-          <div class="section-title">Lojas cadastradas</div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Nome</th>
-                  <th>Ativa</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
-              </tbody>
-            </table>
-          </div>
-        `
-      );
-
-      document.getElementById("btnCriarLoja").addEventListener("click", salvarLojaAdmin);
-    }
-
-    async function salvarLojaAdmin(){
-      const notice = document.getElementById("lojasNotice");
-      clearNotice(notice);
-
-      const lojaId = (document.getElementById("lojaIdNovo")?.value || "").trim();
-      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
-      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
-
-      if(!lojaId){ showNotice(notice, "Informe o ID da loja."); return; }
-      if(!/^[a-zA-Z0-9_-]+$/.test(lojaId)){ showNotice(notice, "ID inválido. Use apenas letras, números, _ ou -."); return; }
-      if(!nome){ showNotice(notice, "Informe o nome da loja."); return; }
-
-      try{
-        await setDoc(doc(db, Collections.LOJAS, lojaId), {
-          nome,
-          ativo,
-          atualizadoEm: new Date(),
-          atualizadoPorUid: state.authUser.uid,
-          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-        }, { merge: true });
-
-        await refreshAfterWrite();
-        showNotice(notice, "Loja salva com sucesso.", "success");
-        renderGerenciarLojas();
-      }catch(e){
-        debugError("Erro salvar loja:", e);
-        showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
-      }
-    }
-
-    // ========= REFRESH =========
     async function refreshAfterWrite(){
       await loadLojas();
       await loadOperationalCollections();
       renderShellInfo();
       renderDashboard();
-      buildMenu();
+      // se está na consulta, manter os dados novos (não muda tela)
     }
 
-    // ========= AUTH =========
     async function login(){
       clearNotice(el.loginNotice);
-
       const email = el.loginEmail.value.trim();
       const senha = el.loginSenha.value;
-
       if(!email || !senha){
         showNotice(el.loginNotice, "Preencha e-mail e senha.");
         return;
       }
-
       el.btnLogin.disabled = true;
       try{
         await signInWithEmailAndPassword(auth, email, senha);
       }catch(error){
-        debugError("Erro no login:", error);
         showNotice(el.loginNotice, `Não foi possível entrar. (${error?.code || "erro"})`);
       }finally{
         el.btnLogin.disabled = false;
@@ -2687,9 +2200,6 @@
           <div class="notice show error">
             <strong>Falha:</strong> ${code}<br/>
             <div style="margin-top:6px;">${msg}</div>
-            <div style="margin-top:10px; color:#7f1d1d;">
-              Se este erro for <b>permission-denied</b>, revise as rules e os campos obrigatórios (ex.: lojaId, ativo).
-            </div>
           </div>
           <div class="actions">
             <button class="btn btn-light" id="btnRetryLoad">Tentar novamente</button>
@@ -2715,7 +2225,6 @@
     async function initializeAuthenticatedUser(user){
       state.authUser = user;
 
-      // abre shell
       el.loginView.style.display = "none";
       el.topbar.style.display = "flex";
       el.footerbar.style.display = "block";
@@ -2731,7 +2240,6 @@
         buildMenu();
         renderDashboardHome();
       }catch(err){
-        debugError("Falha ao inicializar:", err);
         showFatalAppError(err);
       }
     }
@@ -2745,6 +2253,7 @@
       state.condutores = [];
       state.autorizadores = [];
       state.selectedMovimento = null;
+      state.editMode = false;
 
       el.topbar.style.display = "none";
       el.footerbar.style.display = "none";
@@ -2764,16 +2273,7 @@
       closeDetailModal();
     }
 
-    // ========= DEBOUNCE =========
-    function debounce(fn, wait=250){
-      let t = null;
-      return (...args) => {
-        if(t) clearTimeout(t);
-        t = setTimeout(() => fn(...args), wait);
-      };
-    }
-
-    // ========= EVENTOS =========
+    // Eventos
     el.btnLogin.addEventListener("click", login);
     el.btnLogout.addEventListener("click", logout);
 
@@ -2789,6 +2289,18 @@
 
     el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
 
+    // ✅ editar/salvar (todos os perfis podem)
+    el.btnEditRegistro.addEventListener("click", () => {
+      const item = state.selectedMovimento;
+      if(!item) return;
+      state.editMode = true;
+      el.btnEditRegistro.classList.add("hidden");
+      el.btnSaveRegistro.classList.remove("hidden");
+      renderDetailEdit(item);
+    });
+
+    el.btnSaveRegistro.addEventListener("click", saveEditedRegistro);
+
     onAuthStateChanged(auth, async (user) => {
       if(!user){
         resetAppState();
@@ -2797,7 +2309,7 @@
       await initializeAuthenticatedUser(user);
     });
 
-    debugLog("Sistema carregado.");
+    console.log("Sistema carregado.");
   </script>
 </body>
 </html>

@@ -551,7 +551,6 @@
       background:#fff;
     }
 
-    /* ====== BLOQUEIO / LOADING ====== */
     .ui-blocker{
       position:fixed;
       inset:0;
@@ -598,7 +597,6 @@
       line-height:1.35;
     }
 
-    /* ====== TOAST ====== */
     .toast{
       position:fixed;
       left:16px;
@@ -824,6 +822,74 @@
     </div>
   </div>
 
+  <!-- MODAL EDITAR USUÁRIO -->
+  <div class="modal" id="userEditModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div>
+          <h4>Editar usuário</h4>
+          <p>Altere os dados e salve.</p>
+        </div>
+        <button class="btn btn-light" id="btnCloseUserEdit" style="min-width:120px;">Fechar</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="grid">
+          <div class="form-group full">
+            <label for="ueEmail">E-mail</label>
+            <input class="input" id="ueEmail" disabled>
+          </div>
+
+          <div class="form-group">
+            <label for="ueNome">Nome <span class="req">*</span></label>
+            <input class="input" id="ueNome" maxlength="80" placeholder="Nome completo">
+          </div>
+
+          <div class="form-group">
+            <label for="ueCpf">CPF <span class="req">*</span></label>
+            <input class="input" id="ueCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+          </div>
+
+          <div class="form-group">
+            <label for="ueWhats">WhatsApp <span class="req">*</span></label>
+            <input class="input" id="ueWhats" maxlength="20" placeholder="(11) 9 9999-9999">
+          </div>
+
+          <div class="form-group">
+            <label for="ueCargo">Cargo <span class="req">*</span></label>
+            <input class="input" id="ueCargo" maxlength="60" placeholder="Cargo">
+          </div>
+
+          <div class="form-group">
+            <label for="ueRole">Perfil <span class="req">*</span></label>
+            <select class="select" id="ueRole"></select>
+          </div>
+
+          <div class="form-group">
+            <label for="ueLoja">Loja</label>
+            <select class="select" id="ueLoja"></select>
+            <div class="subtle">Para gerente_geral, a loja fica desabilitada.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="ueAtivo">Status</label>
+            <select class="select" id="ueAtivo">
+              <option value="true">Ativo</option>
+              <option value="false">Inativo</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="ueNotice" class="notice"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-success" id="btnSaveUserEdit">Salvar alterações</button>
+        <button class="btn btn-light" id="btnCloseUserEdit2">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- BLOQUEIO -->
   <div class="ui-blocker" id="uiBlocker" aria-hidden="true">
     <div class="box">
@@ -884,7 +950,6 @@
     const auth = getAuth(appFirebase);
     const db = getFirestore(appFirebase);
 
-    // ✅ NÃO salvar sessão (nada de auto-login ao reabrir)
     await setPersistence(auth, inMemoryPersistence);
 
     const el = {
@@ -933,7 +998,6 @@
 
       brandLogo: document.getElementById("brandLogo"),
 
-      // reset senha
       btnOpenResetPass: document.getElementById("btnOpenResetPass"),
       resetPassModal: document.getElementById("resetPassModal"),
       btnCloseResetPass: document.getElementById("btnCloseResetPass"),
@@ -942,7 +1006,6 @@
       rpEmail: document.getElementById("rpEmail"),
       rpNotice: document.getElementById("rpNotice"),
 
-      // invite signup
       inviteSignupModal: document.getElementById("inviteSignupModal"),
       btnCloseInviteSignup: document.getElementById("btnCloseInviteSignup"),
       btnCloseInviteSignup2: document.getElementById("btnCloseInviteSignup2"),
@@ -957,6 +1020,20 @@
       isPass2: document.getElementById("isPass2"),
       isNotice: document.getElementById("isNotice"),
       btnInviteSignupCreate: document.getElementById("btnInviteSignupCreate"),
+
+      userEditModal: document.getElementById("userEditModal"),
+      btnCloseUserEdit: document.getElementById("btnCloseUserEdit"),
+      btnCloseUserEdit2: document.getElementById("btnCloseUserEdit2"),
+      btnSaveUserEdit: document.getElementById("btnSaveUserEdit"),
+      ueEmail: document.getElementById("ueEmail"),
+      ueNome: document.getElementById("ueNome"),
+      ueCpf: document.getElementById("ueCpf"),
+      ueWhats: document.getElementById("ueWhats"),
+      ueCargo: document.getElementById("ueCargo"),
+      ueRole: document.getElementById("ueRole"),
+      ueLoja: document.getElementById("ueLoja"),
+      ueAtivo: document.getElementById("ueAtivo"),
+      ueNotice: document.getElementById("ueNotice")
     };
 
     const Collections = {
@@ -965,7 +1042,8 @@
       MOVIMENTOS: "movimentos",
       CONDUTORES: "condutores",
       AUTORIZADORES: "autorizadores",
-      INVITES: "invites"
+      INVITES: "invites",
+      PARAMETROS: "parametros"
     };
 
     const Roles = {
@@ -984,10 +1062,16 @@
       autorizadores: [],
       selectedMovimento: null,
       editMode: false,
+      editingUser: null,
 
       invite: {
         token: "",
         data: null
+      },
+
+      parametros: {
+        motivosEntrada: [],
+        motivosSaida: []
       },
 
       lock: { busy:false, busyKey:"" }
@@ -1004,6 +1088,25 @@
       "Saída para abastecimento","Saída para vistoria / laudo","Saída para emplacamento","Saída para entrega ao cliente",
       "Saída para despachante","Saída para logística / transporte","Saída para pátio externo","Saída por recolhimento","Outro"
     ];
+
+    function getMotivosEntrada(){
+      return Array.isArray(state.parametros?.motivosEntrada) && state.parametros.motivosEntrada.length
+        ? state.parametros.motivosEntrada
+        : MOTIVOS_ENTRADA;
+    }
+
+    function getMotivosSaida(){
+      return Array.isArray(state.parametros?.motivosSaida) && state.parametros.motivosSaida.length
+        ? state.parametros.motivosSaida
+        : MOTIVOS_SAIDA;
+    }
+
+    function normalizeListFromTextarea(text){
+      return String(text || "")
+        .split("\n")
+        .map(x => x.trim())
+        .filter(Boolean);
+    }
 
     function clearNotice(target){ target.className = "notice"; target.textContent = ""; }
     function showNotice(target, message, type="error"){ target.className = `notice show ${type}`; target.textContent = message; }
@@ -1148,7 +1251,6 @@
     function canManageUsers(){ return userIsGeneralManager() || userIsStoreManager(); }
 
     function userHasAllStoresAccess(){ return userIsGeneralManager(); }
-
     function currentUserStoreId(){ return state.userProfile?.lojaId || null; }
 
     function getStoreLabel(lojaId){
@@ -1195,6 +1297,25 @@
         state.lojasMap[item.id] = item;
       });
       state.lojas.sort((a,b) => String(a.id).localeCompare(String(b.id),"pt-BR"));
+    }
+
+    async function loadSystemParameters(){
+      const ref = doc(db, Collections.PARAMETROS, "motivos");
+      const snap = await getDoc(ref);
+
+      if(!snap.exists()){
+        state.parametros = {
+          motivosEntrada: [...MOTIVOS_ENTRADA],
+          motivosSaida: [...MOTIVOS_SAIDA]
+        };
+        return;
+      }
+
+      const data = snap.data() || {};
+      state.parametros = {
+        motivosEntrada: Array.isArray(data.motivosEntrada) && data.motivosEntrada.length ? data.motivosEntrada : [...MOTIVOS_ENTRADA],
+        motivosSaida: Array.isArray(data.motivosSaida) && data.motivosSaida.length ? data.motivosSaida : [...MOTIVOS_SAIDA]
+      };
     }
 
     async function loadUserProfile(uid){
@@ -1277,7 +1398,7 @@
       const patioMap = {};
       movimentos
         .slice()
-        .sort((a,b) => (dateValueToMillis(a.data)||0) - (dateValueToMillis(a.data)||0))
+        .sort((a,b) => (dateValueToMillis(a.data)||0) - (dateValueToMillis(b.data)||0))
         .forEach(item => {
           const plate = normalizePlate(item.placa);
           if(!plate) return;
@@ -1305,7 +1426,6 @@
       return inside;
     }
 
-    // ===== ALERTA SAÍDA FORA PADRÃO =====
     function userCanResolveAlert(){ return userIsGeneralManager() || userIsStoreManager(); }
     function itemIsOpenAlert(item){
       return !!item
@@ -1362,7 +1482,6 @@
       }
     }
 
-    // ===== ALERTA DANO + CIÊNCIA =====
     function canAcknowledgeDamage(){ return userIsGeneralManager() || userIsStoreManager(); }
     function itemHasDamageAlert(item){
       return !!item && item.danoAlerta === true && item.danoCiente !== true;
@@ -1503,6 +1622,9 @@
       if(canManageUsers()){
         items.push({ id:"menu-usuarios", label:"Usuários", action:renderUsuarios });
       }
+      if(userIsGeneralManager()){
+        items.push({ id:"menu-parametros", label:"Parâmetros", action:renderParametros });
+      }
 
       el.menuBar.innerHTML = "";
       items.forEach(item=>{
@@ -1631,7 +1753,6 @@
       }
     }
 
-    /* ========= FOTO (Firestore-only) ========= */
     const PHOTO_MAX_W = 900;
     const PHOTO_MAX_H = 900;
     const PHOTO_QUALITY = 0.55;
@@ -1766,7 +1887,6 @@
       }
     }
 
-    /* ========= Entrada / Saída ========= */
     function toggleMotivoOutro(prefix){
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
@@ -1896,7 +2016,7 @@
 
             <div class="form-group">
               <label for="entradaMotivo">Motivo <span class="req">*</span></label>
-              <select class="select" id="entradaMotivo">${buildMotivoOptions(MOTIVOS_ENTRADA)}</select>
+              <select class="select" id="entradaMotivo">${buildMotivoOptions(getMotivosEntrada())}</select>
               <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
             </div>
 
@@ -2082,7 +2202,7 @@
 
             <div class="form-group">
               <label for="saidaMotivo">Motivo <span class="req">*</span></label>
-              <select class="select" id="saidaMotivo">${buildMotivoOptions(MOTIVOS_SAIDA)}</select>
+              <select class="select" id="saidaMotivo">${buildMotivoOptions(getMotivosSaida())}</select>
               <div class="subtle">Se selecionar “Outro”, será obrigatório descrever.</div>
             </div>
 
@@ -2265,7 +2385,6 @@
       }
     }
 
-    /* ========= Consulta ========= */
     function renderConsulta(){
       const storeFilterHTML = userIsGeneralManager()
         ? `
@@ -2446,7 +2565,6 @@
       });
     }
 
-    /* ========= Modal detalhe/editar ========= */
     function openDetailModal(item){
       state.selectedMovimento = item;
       state.editMode = false;
@@ -2531,7 +2649,7 @@
 
     function renderDetailEdit(item){
       const isEntrada = item.tipo==="entrada";
-      const motivoList = isEntrada ? MOTIVOS_ENTRADA : MOTIVOS_SAIDA;
+      const motivoList = isEntrada ? getMotivosEntrada() : getMotivosSaida();
       const fotos = item?.fotos || {};
 
       el.detailTitle.textContent = `Editar registro — ${item.placa||""}`;
@@ -2843,7 +2961,6 @@
       w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
-    /* ========= Condutores ========= */
     function buildLojaSelectWithAll(id){
       const options = [];
       if(userIsGeneralManager()){
@@ -3073,7 +3190,6 @@
       }
     }
 
-    /* ========= ✅ AUTORIZADORES (RETORNADO COMPLETO) ========= */
     function renderAutorizadores(){
       if(!canManageAutorizadores()){
         renderPanel("Acesso restrito", "Controlador não acessa Autorizadores.", `<div class="empty">Acesso negado.</div>`);
@@ -3283,7 +3399,6 @@
       });
     }
 
-    /* ========= Gestão de lojas (ID = CNPJ) ========= */
     function renderGestaoLojas(){
       if(!canManageLojas()){
         renderPanel("Acesso restrito","Somente gerente geral.",`<div class="empty">Acesso negado.</div>`);
@@ -3436,7 +3551,6 @@
       }
     }
 
-    /* ========= Usuários + Convites por LINK (1 uso / 24h) ========= */
     function genToken(len=28){
       const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
       let out = "";
@@ -3452,19 +3566,16 @@
           { v:Roles.GERENTE_GERAL, label:"gerente_geral" },
         ];
       }
-      // gerente loja só cria controlador
       return [{ v:Roles.CONTROLADOR, label:"controlador" }];
     }
 
     function lojaOptionsForInvite(role){
-      // gerente_geral não precisa loja
       if(role === Roles.GERENTE_GERAL){
         return `<option value="">(sem loja - gerente geral)</option>`;
       }
       if(userIsGeneralManager()){
         return state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`).join("");
       }
-      // gerente loja: fixa na loja dele
       const lojaId = currentUserStoreId();
       return `<option value="${lojaId}">${getStoreLabel(lojaId)}</option>`;
     }
@@ -3472,6 +3583,148 @@
     function inviteLink(token){
       const base = window.location.origin + window.location.pathname;
       return `${base}?invite=${encodeURIComponent(token)}`;
+    }
+
+    function buildUserEditRoleOptions(){
+      if(userIsGeneralManager()){
+        return [
+          { v:Roles.CONTROLADOR, label:"controlador" },
+          { v:Roles.GERENTE_LOJA, label:"gerente_loja" },
+          { v:Roles.GERENTE_GERAL, label:"gerente_geral" }
+        ];
+      }
+      return [
+        { v:Roles.CONTROLADOR, label:"controlador" }
+      ];
+    }
+
+    function fillUserEditRoleOptions(selectedRole){
+      const ops = buildUserEditRoleOptions();
+      el.ueRole.innerHTML = ops.map(r => `<option value="${r.v}">${r.label}</option>`).join("");
+      el.ueRole.value = selectedRole || ops[0].v;
+    }
+
+    function fillUserEditLojaOptions(selectedLojaId){
+      const role = el.ueRole.value;
+      if(role === Roles.GERENTE_GERAL){
+        el.ueLoja.innerHTML = `<option value="">(sem loja - gerente geral)</option>`;
+        el.ueLoja.disabled = true;
+        el.ueLoja.value = "";
+        return;
+      }
+
+      if(userIsGeneralManager()){
+        el.ueLoja.innerHTML = state.lojas.map(l => `<option value="${l.id}">${getStoreLabel(l.id)}</option>`).join("");
+        el.ueLoja.disabled = false;
+        if(selectedLojaId) el.ueLoja.value = selectedLojaId;
+      }else{
+        const lojaId = currentUserStoreId();
+        el.ueLoja.innerHTML = `<option value="${lojaId}">${getStoreLabel(lojaId)}</option>`;
+        el.ueLoja.disabled = true;
+        el.ueLoja.value = lojaId;
+      }
+    }
+
+    function openUserEditModal(userData){
+      state.editingUser = userData;
+      clearNotice(el.ueNotice);
+
+      el.ueEmail.value = userData.email || "";
+      el.ueNome.value = userData.nome || "";
+      el.ueCpf.value = userData.cpf ? formatCPF(userData.cpf) : "";
+      el.ueWhats.value = userData.whats || "";
+      el.ueCargo.value = userData.cargo || "";
+      el.ueAtivo.value = userData.ativo === false ? "false" : "true";
+
+      const initialRole = userIsStoreManager() ? Roles.CONTROLADOR : (userData.role || Roles.CONTROLADOR);
+      fillUserEditRoleOptions(initialRole);
+      fillUserEditLojaOptions(userData.lojaId || "");
+
+      attachInputMasks();
+
+      el.ueRole.onchange = () => {
+        fillUserEditLojaOptions(state.editingUser?.lojaId || "");
+      };
+
+      openModal(el.userEditModal);
+    }
+
+    function closeUserEditModal(){
+      state.editingUser = null;
+      closeModal(el.userEditModal);
+    }
+
+    async function saveUserEditModal(){
+      clearNotice(el.ueNotice);
+
+      const userData = state.editingUser;
+      if(!userData || !userData.id){
+        showNotice(el.ueNotice, "Usuário inválido.", "error");
+        return;
+      }
+
+      const nome = (el.ueNome.value || "").trim();
+      const cpfDigits = onlyDigits(el.ueCpf.value || "");
+      const whats = (el.ueWhats.value || "").trim();
+      const cargo = (el.ueCargo.value || "").trim();
+      let role = (el.ueRole.value || "").trim();
+      let lojaId = (el.ueLoja.value || "").trim();
+      const ativo = (el.ueAtivo.value || "true") === "true";
+
+      if(!nome) return showNotice(el.ueNotice, "Nome é obrigatório.", "error");
+      if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)) return showNotice(el.ueNotice, "CPF inválido.", "error");
+      if(!whats) return showNotice(el.ueNotice, "WhatsApp é obrigatório.", "error");
+      if(!cargo) return showNotice(el.ueNotice, "Cargo é obrigatório.", "error");
+
+      if(userIsStoreManager()){
+        role = Roles.CONTROLADOR;
+        lojaId = currentUserStoreId();
+      }
+
+      if(role !== Roles.GERENTE_GERAL && !lojaId){
+        return showNotice(el.ueNotice, "Loja é obrigatória para este perfil.", "error");
+      }
+      if(role === Roles.GERENTE_GERAL){
+        lojaId = "";
+      }
+
+      try{
+        if(!lockUI("edit_user_modal", "Salvando…", "Atualizando cadastro do usuário.")) return;
+
+        if(cpfDigits !== (userData.cpf || "")){
+          const qCpf = query(collection(db, Collections.USUARIOS), where("cpf","==",cpfDigits), limit(1));
+          const snap = await getDocs(qCpf);
+          if(!snap.empty){
+            const existing = snap.docs[0];
+            if(existing.id !== userData.id){
+              throw new Error("CPF já existe na base.");
+            }
+          }
+        }
+
+        await updateDoc(doc(db, Collections.USUARIOS, userData.id), {
+          nome,
+          cpf: cpfDigits,
+          whats,
+          cargo,
+          role,
+          lojaId,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        });
+
+        await refreshAfterWrite();
+        closeUserEditModal();
+        toast("Usuário atualizado com sucesso.", "success", 2400);
+        renderUsuarios();
+      }catch(e){
+        console.error(e);
+        showNotice(el.ueNotice, `Não foi possível salvar. (${e?.message || e?.code || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
     }
 
     async function renderUsuarios(){
@@ -3596,7 +3849,6 @@
         if(!role) return toast("Selecione o perfil.", "warn", 2400);
         if(!cargo) return toast("Cargo é obrigatório.", "warn", 2400);
 
-        // regras
         if(userIsStoreManager() && role !== Roles.CONTROLADOR){
           return toast("Gerente de loja só pode criar CONTROLADOR.", "warn", 3200);
         }
@@ -3642,7 +3894,6 @@
         catch(e){ toast("Não foi possível copiar.", "warn", 2000); }
       });
 
-      // render users table + search
       function drawUsers(list){
         const body = document.getElementById("usersBody");
         if(!body) return;
@@ -3668,7 +3919,6 @@
           `;
         }).join("");
 
-        // toggle
         document.querySelectorAll("[data-toggle-user]").forEach(btn=>{
           btn.addEventListener("click", async ()=>{
             const uid = btn.getAttribute("data-toggle-user");
@@ -3705,9 +3955,8 @@
           });
         });
 
-        // edit
         document.querySelectorAll("[data-edit-user]").forEach(btn=>{
-          btn.addEventListener("click", async ()=>{
+          btn.addEventListener("click", ()=>{
             const uid = btn.getAttribute("data-edit-user");
             const u = list.find(x=>x.id===uid);
             if(!u) return;
@@ -3721,82 +3970,11 @@
               return;
             }
 
-            const nome = prompt("Nome:", u.nome || "") || "";
-            if(!nome.trim()){ toast("Nome é obrigatório.", "warn", 2200); return; }
-
-            const cpf = prompt("CPF (somente números ou formatado):", u.cpf ? formatCPF(u.cpf) : "") || "";
-            const cpfDigits = onlyDigits(cpf);
-            if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){ toast("CPF inválido.", "warn", 2400); return; }
-
-            const whats = prompt("WhatsApp:", u.whats || "") || "";
-            if(!whats.trim()){ toast("WhatsApp é obrigatório.", "warn", 2200); return; }
-
-            const cargo = prompt("Cargo:", u.cargo || "") || "";
-            if(!cargo.trim()){ toast("Cargo é obrigatório.", "warn", 2200); return; }
-
-            let role = u.role || Roles.CONTROLADOR;
-            if(userIsGeneralManager()){
-              role = (prompt("Role (controlador | gerente_loja | gerente_geral):", role) || role).trim();
-            }else{
-              role = Roles.CONTROLADOR;
-            }
-
-            let lojaId = u.lojaId || "";
-            if(role !== Roles.GERENTE_GERAL){
-              if(userIsStoreManager()){
-                lojaId = currentUserStoreId();
-              }else{
-                lojaId = (prompt("LojaId (CNPJ somente números):", lojaId) || lojaId).trim();
-              }
-              if(!lojaId){ toast("LojaId é obrigatório para este perfil.", "warn", 2400); return; }
-            }else{
-              lojaId = "";
-            }
-
-            if(userIsStoreManager() && role !== Roles.CONTROLADOR){
-              toast("Gerente de loja só pode definir CONTROLADOR.", "warn", 2800);
-              return;
-            }
-
-            try{
-              if(!lockUI("edit_user", "Salvando…", "Atualizando cadastro do usuário.")) return;
-
-              // valida CPF duplicado (se mudou)
-              if(cpfDigits !== (u.cpf || "")){
-                const qCpf = query(collection(db, Collections.USUARIOS), where("cpf","==",cpfDigits), limit(1));
-                const snap = await getDocs(qCpf);
-                if(!snap.empty){
-                  throw new Error("CPF já existe na base.");
-                }
-              }
-
-              await updateDoc(doc(db, Collections.USUARIOS, uid), {
-                nome: nome.trim(),
-                cpf: cpfDigits,
-                whats: whats.trim(),
-                cargo: cargo.trim(),
-                role,
-                lojaId,
-                atualizadoEm: new Date(),
-                atualizadoPorUid: state.authUser.uid,
-                atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
-              });
-
-              await refreshAfterWrite();
-              unlockUI();
-              toast("Cadastro atualizado.", "success", 2000);
-              renderUsuarios();
-            }catch(e){
-              console.error(e);
-              toast(`Falha ao salvar. (${e?.message || e?.code || "erro"})`, "error", 3600);
-            }finally{
-              unlockUI();
-            }
+            openUserEditModal(u);
           });
         });
       }
 
-      // initial
       drawUsers(users.sort((a,b)=>String(a.email||"").localeCompare(String(b.email||""),"pt-BR")));
 
       document.getElementById("btnApplyUserSearch").addEventListener("click", ()=>{
@@ -3829,8 +4007,90 @@
       });
     }
 
+    function renderParametros(){
+      if(!userIsGeneralManager()){
+        renderPanel("Acesso restrito", "Somente gerente geral pode alterar parâmetros.", `<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      const entrada = getMotivosEntrada().join("\n");
+      const saida = getMotivosSaida().join("\n");
+
+      renderPanel(
+        "Parâmetros",
+        "Cadastre os motivos de entrada e saída. Use uma linha para cada motivo.",
+        `
+          <div class="grid">
+            <div class="form-group full">
+              <label for="paramMotivosEntrada">Motivos de entrada <span class="req">*</span></label>
+              <textarea class="textarea" id="paramMotivosEntrada" style="min-height:220px;">${entrada}</textarea>
+              <div class="subtle">Um motivo por linha.</div>
+            </div>
+
+            <div class="form-group full">
+              <label for="paramMotivosSaida">Motivos de saída <span class="req">*</span></label>
+              <textarea class="textarea" id="paramMotivosSaida" style="min-height:220px;">${saida}</textarea>
+              <div class="subtle">Um motivo por linha.</div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-success" id="btnSalvarParametros">Salvar parâmetros</button>
+            <button class="btn btn-light" id="btnRestaurarPadraoParametros">Restaurar padrão</button>
+          </div>
+
+          <div id="paramNotice" class="notice"></div>
+        `
+      );
+
+      document.getElementById("btnSalvarParametros").addEventListener("click", salvarParametros);
+      document.getElementById("btnRestaurarPadraoParametros").addEventListener("click", ()=>{
+        document.getElementById("paramMotivosEntrada").value = MOTIVOS_ENTRADA.join("\n");
+        document.getElementById("paramMotivosSaida").value = MOTIVOS_SAIDA.join("\n");
+        toast("Listas padrão restauradas na tela.", "info", 2000);
+      });
+    }
+
+    async function salvarParametros(){
+      const notice = document.getElementById("paramNotice");
+      clearNotice(notice);
+
+      const motivosEntrada = normalizeListFromTextarea(document.getElementById("paramMotivosEntrada")?.value || "");
+      const motivosSaida = normalizeListFromTextarea(document.getElementById("paramMotivosSaida")?.value || "");
+
+      if(!motivosEntrada.length){
+        showNotice(notice, "Informe ao menos um motivo de entrada.", "error");
+        return;
+      }
+      if(!motivosSaida.length){
+        showNotice(notice, "Informe ao menos um motivo de saída.", "error");
+        return;
+      }
+
+      try{
+        if(!lockUI("save_params", "Salvando…", "Atualizando parâmetros do sistema.")) return;
+
+        await setDoc(doc(db, Collections.PARAMETROS, "motivos"), {
+          motivosEntrada,
+          motivosSaida,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        }, { merge:true });
+
+        await loadSystemParameters();
+
+        showNotice(notice, "Parâmetros salvos com sucesso.", "success");
+        toast("Parâmetros atualizados.", "success", 2200);
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Falha ao salvar. (${e?.code || e?.message || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
+    }
+
     function exportUsersXls(users){
-      // ✅ "XLS" simples (HTML table) compatível com Excel
       const rows = users.map(u=>{
         const loja = u.role===Roles.GERENTE_GERAL ? "Todas" : (u.lojaId || "");
         const ativo = u.ativo===false ? "Inativo" : "Ativo";
@@ -3880,7 +4140,6 @@
         .replaceAll("'","&#039;");
     }
 
-    /* ========= Invite signup (link único / 24h / 1 uso) ========= */
     function getInviteTokenFromUrl(){
       const p = new URLSearchParams(window.location.search);
       return (p.get("invite") || "").trim();
@@ -3899,7 +4158,6 @@
       const data = snap.data() || {};
       const exp = data.expiraEm?.seconds ? data.expiraEm.seconds*1000 : (data.expiraEm ? new Date(data.expiraEm).getTime() : 0);
       if(!exp || Date.now() > exp){
-        // expirou: apaga pra não ficar lixo
         try{ await deleteDoc(ref); }catch(e){}
         return null;
       }
@@ -3972,7 +4230,6 @@
       try{
         if(!lockUI("invite_signup", "Criando conta…", "Aguarde.")) return;
 
-        // valida CPF já existe antes de criar auth
         const cpfExists = await cpfExistsInUsers(cpfDigits);
         if(cpfExists){
           unlockUI();
@@ -3998,7 +4255,6 @@
           const lojaId = role===Roles.GERENTE_GERAL ? "" : (data.lojaId || "");
           if(role !== Roles.GERENTE_GERAL && !lojaId) throw new Error("Convite sem loja.");
 
-          // cria usuario já ATIVO (sem aprovação)
           const userRef = doc(db, Collections.USUARIOS, uid);
           tx.set(userRef, {
             uid,
@@ -4015,7 +4271,6 @@
             criadoPorNome: data.criadoPorNome || ""
           }, { merge:true });
 
-          // convite 1 uso: apaga
           tx.delete(inviteRef);
         });
 
@@ -4026,11 +4281,8 @@
 
         toast("Conta criada com sucesso. Faça login normalmente.", "success", 3200);
 
-        // ✅ segurança: força logout após cadastro para não “entrar direto”
-        // (evita troca de plantão usando conta anterior)
         try{ await signOut(auth); }catch(e){}
 
-        // volta pro login padrão
         resetAppState();
       }catch(e){
         console.error(e);
@@ -4041,7 +4293,6 @@
       }
     }
 
-    /* ========= Auto-cadastro gerente loja como autorizador ========= */
     async function ensureStoreManagerIsAutorizador(){
       try{
         if(!state.userProfile) return;
@@ -4065,9 +4316,9 @@
       }catch(e){}
     }
 
-    /* ========= refresh / auth ========= */
     async function refreshAfterWrite(){
       await loadLojas();
+      await loadSystemParameters();
       await loadOperationalCollections();
       renderShellInfo();
       renderDashboard();
@@ -4145,11 +4396,11 @@
 
         await loadUserProfile(user.uid);
         await loadLojas();
+        await loadSystemParameters();
         await loadOperationalCollections();
 
-        // ✅ gerente loja vira autorizador automaticamente
         await ensureStoreManagerIsAutorizador();
-        await loadOperationalCollections(); // recarrega pra já aparecer
+        await loadOperationalCollections();
 
         renderShellInfo();
         renderDashboard();
@@ -4172,10 +4423,15 @@
       state.autorizadores = [];
       state.selectedMovimento = null;
       state.editMode = false;
+      state.editingUser = null;
       state.lock.busy = false;
       state.lock.busyKey = "";
       state.invite.token = "";
       state.invite.data = null;
+      state.parametros = {
+        motivosEntrada: [],
+        motivosSaida: []
+      };
 
       el.topbar.style.display = "none";
       el.footerbar.style.display = "none";
@@ -4193,10 +4449,10 @@
         </div>
       `;
       closeDetailModal();
+      closeUserEditModal();
       unlockUI();
     }
 
-    /* ========= Reset senha ========= */
     async function sendReset(){
       clearNotice(el.rpNotice);
       const email = (el.rpEmail.value || "").trim();
@@ -4216,7 +4472,6 @@
       }
     }
 
-    /* ========= Eventos ========= */
     el.btnLogin.addEventListener("click", login);
     el.btnLogout.addEventListener("click", logout);
 
@@ -4248,27 +4503,28 @@
       el.btnAckDamage.addEventListener("click", acknowledgeSelectedDamage);
     }
 
-    // clique no logo => dashboard
     if(el.brandLogo){
       el.brandLogo.addEventListener("click", ()=>{
         if(state.userProfile) renderDashboardHome();
       });
     }
 
-    // reset senha modal
     el.btnOpenResetPass.addEventListener("click", ()=> openModal(el.resetPassModal));
     el.btnCloseResetPass.addEventListener("click", ()=> closeModal(el.resetPassModal));
     el.btnCloseResetPass2.addEventListener("click", ()=> closeModal(el.resetPassModal));
     el.resetPassModal.addEventListener("click", (e)=>{ if(e.target===el.resetPassModal) closeModal(el.resetPassModal); });
     el.btnSendReset.addEventListener("click", sendReset);
 
-    // invite modal
     el.btnCloseInviteSignup.addEventListener("click", ()=>{ closeModal(el.inviteSignupModal); removeInviteFromUrl(); });
     el.btnCloseInviteSignup2.addEventListener("click", ()=>{ closeModal(el.inviteSignupModal); removeInviteFromUrl(); });
     el.inviteSignupModal.addEventListener("click", (e)=>{ if(e.target===el.inviteSignupModal){ closeModal(el.inviteSignupModal); removeInviteFromUrl(); } });
     el.btnInviteSignupCreate.addEventListener("click", inviteSignupCreate);
 
-    // auth state
+    el.btnCloseUserEdit.addEventListener("click", closeUserEditModal);
+    el.btnCloseUserEdit2.addEventListener("click", closeUserEditModal);
+    el.userEditModal.addEventListener("click", (e)=>{ if(e.target===el.userEditModal) closeUserEditModal(); });
+    el.btnSaveUserEdit.addEventListener("click", saveUserEditModal);
+
     onAuthStateChanged(auth, async (user) => {
       if(!user){
         resetAppState();
@@ -4277,7 +4533,6 @@
       await initializeAuthenticatedUser(user);
     });
 
-    // ✅ se abrir com ?invite=..., abre cadastro (sem aparecer no login)
     await handleInviteFlowOnLoad();
 
     console.log("Sistema carregado.");

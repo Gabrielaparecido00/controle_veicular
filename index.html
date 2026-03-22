@@ -58,7 +58,6 @@
 
     .brand{ display:flex; align-items:center; gap:14px; min-width:0; }
 
-    /* apenas logo */
     .brand-logo{
       height:46px;
       width:auto;
@@ -397,7 +396,6 @@
       line-height:1.35;
     }
 
-    /* input invisível */
     .file-input{
       position:absolute;
       left:-99999px;
@@ -553,49 +551,82 @@
       background:#fff;
     }
 
-    /* ✅ NOVO: BLOQUEIO DE TELA (CARREGANDO) */
-    .blocker{
+    /* ====== BLOQUEIO / LOADING ====== */
+    .ui-blocker{
       position:fixed;
       inset:0;
       z-index:9999;
-      background:rgba(15,23,42,.62);
       display:none;
       align-items:center;
       justify-content:center;
+      background:rgba(15,23,42,.55);
       padding:18px;
     }
-    .blocker.show{ display:flex; }
-    .blocker-card{
-      width:min(460px, 94vw);
-      background:#fff;
+    .ui-blocker.show{ display:flex; }
+    .ui-blocker .box{
+      width:100%;
+      max-width:520px;
+      background:#0f172a;
+      color:#fff;
       border-radius:18px;
-      border:1px solid #e5edf5;
-      box-shadow:0 30px 80px rgba(0,0,0,.28);
-      padding:18px;
-      text-align:center;
+      padding:18px 18px;
+      box-shadow:0 22px 60px rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.08);
     }
-    .blocker-title{
-      font-size:16px;
-      font-weight:900;
-      color:#0f172a;
-      margin-bottom:8px;
-    }
-    .blocker-sub{
-      font-size:13px;
-      color:#64748b;
-      line-height:1.4;
-      margin-bottom:14px;
+    .ui-blocker .row{
+      display:flex;
+      align-items:center;
+      gap:12px;
     }
     .spinner{
-      width:44px;
-      height:44px;
-      border-radius:999px;
-      border:5px solid #e5edf5;
-      border-top-color:#2563eb;
-      margin:0 auto;
-      animation:spin 0.9s linear infinite;
+      width:22px;height:22px;
+      border-radius:50%;
+      border:3px solid rgba(255,255,255,.28);
+      border-top-color:#fff;
+      animation:spin .9s linear infinite;
+      flex:0 0 auto;
     }
-    @keyframes spin{ to { transform: rotate(360deg); } }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+    .ui-blocker .title{
+      font-weight:900;
+      font-size:15px;
+      margin-bottom:2px;
+    }
+    .ui-blocker .sub{
+      color:#cbd5e1;
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    /* ====== TOAST ====== */
+    .toast{
+      position:fixed;
+      left:16px;
+      right:16px;
+      bottom:calc(92px + env(safe-area-inset-bottom));
+      z-index:10000;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      pointer-events:none;
+    }
+    .toast.show{ display:flex; }
+    .toast .pill{
+      width:100%;
+      max-width:980px;
+      border-radius:16px;
+      padding:14px 16px;
+      font-weight:900;
+      box-shadow:0 18px 50px rgba(15,23,42,.20);
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      color:#0f172a;
+      pointer-events:none;
+    }
+    .toast .pill.success{ background:#dcfce7; color:#166534; border-color:#bbf7d0; }
+    .toast .pill.error{ background:#fee2e2; color:#991b1b; border-color:#fecaca; }
+    .toast .pill.warn{ background:#ffedd5; color:#9a3412; border-color:#fed7aa; }
+    .toast .pill.info{ background:#dbeafe; color:#1e40af; border-color:#bfdbfe; }
 
     @media (max-width:900px){
       .grid{ grid-template-columns:1fr; }
@@ -688,7 +719,6 @@
         <button class="btn btn-primary" id="btnEditRegistro">Editar</button>
         <button class="btn btn-success hidden" id="btnSaveRegistro">Salvar alterações</button>
 
-        <!-- ✅ NOVO: Marcar alerta como resolvido (somente gerência e só quando houver alerta pendente) -->
         <button class="btn btn-success hidden" id="btnResolveAlert">Marcar alerta como resolvido</button>
 
         <button class="btn btn-light" id="btnExportRegistro">Exportar registro</button>
@@ -697,13 +727,22 @@
     </div>
   </div>
 
-  <!-- ✅ NOVO: BLOQUEIO DE TELA (CARREGANDO) -->
-  <div class="blocker" id="blocker" aria-hidden="true">
-    <div class="blocker-card">
-      <div class="spinner"></div>
-      <div class="blocker-title" id="blockerTitle">Processando...</div>
-      <div class="blocker-sub" id="blockerSub">Aguarde alguns segundos.</div>
+  <!-- BLOQUEIO -->
+  <div class="ui-blocker" id="uiBlocker" aria-hidden="true">
+    <div class="box">
+      <div class="row">
+        <div class="spinner"></div>
+        <div>
+          <div class="title" id="uiBlockerTitle">Processando…</div>
+          <div class="sub" id="uiBlockerSub">Aguarde.</div>
+        </div>
+      </div>
     </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast">
+    <div class="pill" id="toastPill">Mensagem</div>
   </div>
 
   <script type="module">
@@ -770,14 +809,14 @@
       btnExportRegistro: document.getElementById("btnExportRegistro"),
       btnEditRegistro: document.getElementById("btnEditRegistro"),
       btnSaveRegistro: document.getElementById("btnSaveRegistro"),
-
-      // ✅ NOVO
       btnResolveAlert: document.getElementById("btnResolveAlert"),
 
-      // ✅ NOVO
-      blocker: document.getElementById("blocker"),
-      blockerTitle: document.getElementById("blockerTitle"),
-      blockerSub: document.getElementById("blockerSub"),
+      uiBlocker: document.getElementById("uiBlocker"),
+      uiBlockerTitle: document.getElementById("uiBlockerTitle"),
+      uiBlockerSub: document.getElementById("uiBlockerSub"),
+
+      toast: document.getElementById("toast"),
+      toastPill: document.getElementById("toastPill"),
     };
 
     const Collections = {
@@ -805,8 +844,11 @@
       selectedMovimento: null,
       editMode: false,
 
-      // ✅ NOVO: trava anti clique múltiplo
-      isBusy: false
+      // trava para não cadastrar várias vezes
+      lock: {
+        busy: false,
+        busyKey: ""
+      }
     };
 
     const MOTIVOS_ENTRADA = [
@@ -821,8 +863,40 @@
       "Saída para despachante","Saída para logística / transporte","Saída para pátio externo","Saída por recolhimento","Outro"
     ];
 
+    function sleep(ms){ return new Promise(r=>setTimeout(r, ms)); }
+
     function clearNotice(target){ target.className = "notice"; target.textContent = ""; }
     function showNotice(target, message, type="error"){ target.className = `notice show ${type}`; target.textContent = message; }
+
+    // TOAST fixo (não some quando a tela re-renderiza)
+    let toastTimer = null;
+    function toast(message, type="info", ms=2800){
+      if(!el.toast || !el.toastPill) return;
+      el.toastPill.className = `pill ${type}`;
+      el.toastPill.textContent = message;
+      el.toast.classList.add("show");
+      if(toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>{ el.toast.classList.remove("show"); }, ms);
+    }
+
+    function lockUI(key, title="Processando…", sub="Aguarde."){
+      // se já estiver ocupado, bloqueia
+      if(state.lock.busy) return false;
+      state.lock.busy = true;
+      state.lock.busyKey = key || "busy";
+      el.uiBlockerTitle.textContent = title;
+      el.uiBlockerSub.textContent = sub;
+      el.uiBlocker.classList.add("show");
+      el.uiBlocker.setAttribute("aria-hidden","false");
+      return true;
+    }
+
+    function unlockUI(){
+      state.lock.busy = false;
+      state.lock.busyKey = "";
+      el.uiBlocker.classList.remove("show");
+      el.uiBlocker.setAttribute("aria-hidden","true");
+    }
 
     function onlyDigits(v){ return String(v||"").replace(/\D/g,""); }
     function formatCPF(v){
@@ -892,12 +966,6 @@
     function getStoreLabel(lojaId){
       const nome = state.lojasMap[lojaId]?.nome || lojaId;
       return `${lojaId} - ${nome}`;
-    }
-
-    function getStoreNameFromItem(item){
-      const lojaId = item?.lojaId || "";
-      if(lojaId && state.lojasMap[lojaId]?.nome) return state.lojasMap[lojaId].nome;
-      return lojaId || "-";
     }
 
     function buildMotivoOptions(list){
@@ -1040,7 +1108,6 @@
       return Object.keys(patioMap).length;
     }
 
-    // ✅ checar se placa está no pátio antes de salvar SAÍDA (para alerta)
     function isPlateCurrentlyInPatioForStore(lojaId, placa){
       const plate = normalizePlate(placa);
       if(!lojaId || !plate) return false;
@@ -1058,10 +1125,7 @@
       return inside;
     }
 
-    // ✅ helpers do alerta e do botão "Marcar como resolvido"
-    function userCanResolveAlert(){
-      return userIsGeneralManager() || userIsStoreManager();
-    }
+    function userCanResolveAlert(){ return userIsGeneralManager() || userIsStoreManager(); }
     function itemIsOpenAlert(item){
       return !!item
         && item.alerta === true
@@ -1070,7 +1134,7 @@
     }
     function syncResolveAlertButton(){
       if(!el.btnResolveAlert) return;
-      const show = userCanResolveAlert() && itemIsOpenAlert(state.selectedMovimento);
+      const show = userCanResolveAlert() && itemIsOpenAlert(state.selectedMovimento) && !state.editMode;
       if(show) el.btnResolveAlert.classList.remove("hidden");
       else el.btnResolveAlert.classList.add("hidden");
     }
@@ -1079,11 +1143,11 @@
       if(!item) return;
 
       if(!userCanResolveAlert()){
-        alert("Apenas gerentes podem marcar alerta como resolvido.");
+        toast("Apenas gerentes podem marcar alerta como resolvido.", "warn");
         return;
       }
       if(!itemIsOpenAlert(item)){
-        alert("Este registro não possui alerta pendente.");
+        toast("Este registro não possui alerta pendente.", "info");
         return;
       }
 
@@ -1091,6 +1155,8 @@
       if(!ok) return;
 
       try{
+        if(!lockUI("resolve_alert", "Salvando…", "Marcando alerta como resolvido.")) return;
+
         await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
           alertaResolvido: true,
           alertaResolvidoEm: new Date(),
@@ -1104,47 +1170,13 @@
         if(refreshed) state.selectedMovimento = refreshed;
 
         renderDetailView(state.selectedMovimento);
-        syncResolveAlertButton();
-        alert("Alerta marcado como resolvido.");
+        toast("Alerta marcado como resolvido.", "success");
       }catch(e){
         console.error(e);
-        alert(`Falha ao marcar como resolvido. (${e?.code || "erro"})`);
-      }
-    }
-
-    /* ✅ NOVO: BLOQUEIO DE TELA + ANTI DUPLO CLIQUE */
-    function showBlock(title="Processando...", sub="Aguarde alguns segundos."){
-      if(!el.blocker) return;
-      el.blockerTitle.textContent = title;
-      el.blockerSub.textContent = sub;
-      el.blocker.classList.add("show");
-      el.blocker.setAttribute("aria-hidden","false");
-    }
-    function hideBlock(){
-      if(!el.blocker) return;
-      el.blocker.classList.remove("show");
-      el.blocker.setAttribute("aria-hidden","true");
-    }
-    function disableButtons(ids, disabled){
-      ids.forEach(id=>{
-        const b = document.getElementById(id);
-        if(b) b.disabled = !!disabled;
-      });
-    }
-    async function runBusy(title, sub, fn, minMs=2300){
-      if(state.isBusy) return { skipped:true };
-      state.isBusy = true;
-      showBlock(title, sub);
-      const delay = new Promise(r => setTimeout(r, Math.max(0, minMs)));
-
-      try{
-        const out = await Promise.all([Promise.resolve().then(fn), delay]);
-        return { ok:true, result: out[0] };
-      }catch(e){
-        return { ok:false, error:e };
+        toast(`Falha ao marcar como resolvido. (${e?.code || e?.message || "erro"})`, "error", 3800);
       }finally{
-        hideBlock();
-        state.isBusy = false;
+        unlockUI();
+        syncResolveAlertButton();
       }
     }
 
@@ -1339,8 +1371,7 @@
       }
     }
 
-    // ========= FOTO (Firestore-only) =========
-    // Compressão para não estourar 1MB no Firestore.
+    /* ========= FOTO (Firestore-only) ========= */
     const PHOTO_MAX_W = 900;
     const PHOTO_MAX_H = 900;
     const PHOTO_QUALITY = 0.55;
@@ -1395,9 +1426,25 @@
     }
 
     async function compressImageToDataURL(file){
-      const img = await createImageBitmap(file);
-      let w = img.width;
-      let h = img.height;
+      // iOS pode falhar com createImageBitmap em alguns casos
+      let imgBitmap = null;
+      try{
+        imgBitmap = await createImageBitmap(file);
+      }catch(e){
+        // fallback: usa Image + canvas
+        const url = URL.createObjectURL(file);
+        const img = await new Promise((resolve, reject)=>{
+          const im = new Image();
+          im.onload = ()=>resolve(im);
+          im.onerror = ()=>reject(new Error("Falha ao abrir imagem"));
+          im.src = url;
+        });
+        URL.revokeObjectURL(url);
+        imgBitmap = img;
+      }
+
+      let w = imgBitmap.width;
+      let h = imgBitmap.height;
 
       const ratio = Math.min(PHOTO_MAX_W / w, PHOTO_MAX_H / h, 1);
       const nw = Math.max(1, Math.round(w * ratio));
@@ -1408,7 +1455,7 @@
       canvas.height = nh;
 
       const ctx = canvas.getContext("2d", { alpha:false });
-      ctx.drawImage(img, 0, 0, nw, nh);
+      ctx.drawImage(imgBitmap, 0, 0, nw, nh);
 
       let q = PHOTO_QUALITY;
       let out = canvas.toDataURL("image/jpeg", q);
@@ -1464,7 +1511,7 @@
       }
     }
 
-    // ========= Entrada / Saída =========
+    /* ========= Entrada / Saída ========= */
     function toggleMotivoOutro(prefix){
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
@@ -1518,60 +1565,42 @@
       `;
     }
 
-    /* ✅ NOVO: resetar formulário sem recriar a tela (para não perder o aviso de sucesso) */
-    function clearInput(id){
-      const x = document.getElementById(id);
-      if(x) x.value = "";
-    }
-    function clearSelect(id){
-      const x = document.getElementById(id);
-      if(x) x.value = "";
-    }
-    function clearFile(id){
-      const x = document.getElementById(id);
-      if(x) x.value = "";
-    }
-    function resetPreview(previewId){
-      const p = document.getElementById(previewId);
-      if(p) p.innerHTML = `<div class="photo-hint">Sem foto</div>`;
-    }
-    function resetExtras(gridId){
-      const g = document.getElementById(gridId);
-      if(g) g.innerHTML = "";
-    }
-
-    function resetEntradaForm(){
-      clearInput("entradaPlaca");
-      clearInput("entradaVeiculo");
-      clearSelect("entradaMotivo");
-      clearInput("entradaMotivoOutro");
-      clearSelect("entradaCondutor");
-      clearSelect("entradaAutorizador");
-      clearInput("entradaObs");
+    function clearEntradaForm(){
+      const ids = ["entradaPlaca","entradaVeiculo","entradaMotivoOutro","entradaObs"];
+      ids.forEach(id=>{ const i=document.getElementById(id); if(i) i.value=""; });
+      const s1=document.getElementById("entradaMotivo"); if(s1) s1.value="";
+      const s2=document.getElementById("entradaCondutor"); if(s2) s2.value="";
+      const s3=document.getElementById("entradaAutorizador"); if(s3) s3.value="";
+      // limpa previews principais
+      ["entradaPreviewFrente","entradaPreviewMala","entradaPreviewLatEsq","entradaPreviewLatDir"].forEach(pid=>{
+        const p=document.getElementById(pid); if(p) p.innerHTML=`<div class="photo-hint">Sem foto</div>`;
+      });
+      // limpa inputs file
+      ["entradaFotoFrente","entradaFotoMala","entradaFotoLatEsq","entradaFotoLatDir"].forEach(fid=>{
+        const f=document.getElementById(fid); if(f) f.value="";
+      });
+      // limpa extras
+      const grid=document.getElementById("entradaPhotoGridExtras");
+      if(grid) grid.innerHTML="";
+      // reset outro
       toggleMotivoOutro("entrada");
-
-      clearFile("entradaFotoFrente"); resetPreview("entradaPreviewFrente");
-      clearFile("entradaFotoMala"); resetPreview("entradaPreviewMala");
-      clearFile("entradaFotoLatEsq"); resetPreview("entradaPreviewLatEsq");
-      clearFile("entradaFotoLatDir"); resetPreview("entradaPreviewLatDir");
-      resetExtras("entradaPhotoGridExtras");
     }
 
-    function resetSaidaForm(){
-      clearInput("saidaPlaca");
-      clearInput("saidaVeiculo");
-      clearSelect("saidaMotivo");
-      clearInput("saidaMotivoOutro");
-      clearSelect("saidaCondutor");
-      clearSelect("saidaAutorizador");
-      clearInput("saidaObs");
+    function clearSaidaForm(){
+      const ids = ["saidaPlaca","saidaVeiculo","saidaMotivoOutro","saidaObs"];
+      ids.forEach(id=>{ const i=document.getElementById(id); if(i) i.value=""; });
+      const s1=document.getElementById("saidaMotivo"); if(s1) s1.value="";
+      const s2=document.getElementById("saidaCondutor"); if(s2) s2.value="";
+      const s3=document.getElementById("saidaAutorizador"); if(s3) s3.value="";
+      ["saidaPreviewFrente","saidaPreviewMala","saidaPreviewLatEsq","saidaPreviewLatDir"].forEach(pid=>{
+        const p=document.getElementById(pid); if(p) p.innerHTML=`<div class="photo-hint">Sem foto</div>`;
+      });
+      ["saidaFotoFrente","saidaFotoMala","saidaFotoLatEsq","saidaFotoLatDir"].forEach(fid=>{
+        const f=document.getElementById(fid); if(f) f.value="";
+      });
+      const grid=document.getElementById("saidaPhotoGridExtras");
+      if(grid) grid.innerHTML="";
       toggleMotivoOutro("saida");
-
-      clearFile("saidaFotoFrente"); resetPreview("saidaPreviewFrente");
-      clearFile("saidaFotoMala"); resetPreview("saidaPreviewMala");
-      clearFile("saidaFotoLatEsq"); resetPreview("saidaPreviewLatEsq");
-      clearFile("saidaFotoLatDir"); resetPreview("saidaPreviewLatDir");
-      resetExtras("saidaPhotoGridExtras");
     }
 
     function renderEntrada(){
@@ -1653,13 +1682,7 @@
       wirePhotoPreview("entradaFotoLatDir", "entradaPreviewLatDir");
 
       document.getElementById("btnSalvarEntrada").addEventListener("click", salvarEntrada);
-
-      // ✅ trocado: limpar sem recriar tela
-      document.getElementById("btnLimparEntrada").addEventListener("click", () => {
-        const notice = document.getElementById("entradaNotice");
-        clearNotice(notice);
-        resetEntradaForm();
-      });
+      document.getElementById("btnLimparEntrada").addEventListener("click", () => { clearEntradaForm(); toast("Formulário limpo.", "info", 1600); });
 
       document.getElementById("entradaMotivo").addEventListener("change", () => toggleMotivoOutro("entrada"));
       toggleMotivoOutro("entrada");
@@ -1671,14 +1694,14 @@
       const notice = document.getElementById("entradaNotice");
       clearNotice(notice);
 
-      // ✅ trava se já estiver salvando
-      if(state.isBusy){
-        showNotice(notice, "Aguarde: salvando registro...", "info");
+      const btn = document.getElementById("btnSalvarEntrada");
+      if(btn) btn.disabled = true;
+
+      // trava para não clicar várias vezes
+      if(!lockUI("entrada", "Salvando entrada…", "Não feche a tela. Aguarde o retorno.")){
+        if(btn) btn.disabled = false;
         return;
       }
-
-      // ✅ desabilita botões para não clicar 10x
-      disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], true);
 
       const lojaId = userIsGeneralManager()
         ? (document.getElementById("entradaLoja")?.value || "")
@@ -1692,67 +1715,61 @@
       const autorizador = document.getElementById("entradaAutorizador")?.value || "";
       const observacao = (document.getElementById("entradaObs")?.value || "").trim();
 
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
-      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
-      if(!veiculo){ showNotice(notice, "Informe o veículo."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
-      if(!motivo){ showNotice(notice, "Selecione o motivo."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
-      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
-      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false); return; }
+      try{
+        if(!lojaId) throw new Error("Selecione a loja.");
+        if(!placa || !isValidPlate(placa)) throw new Error("Informe uma placa válida.");
+        if(!veiculo) throw new Error("Informe o veículo.");
+        if(!motivo) throw new Error("Selecione o motivo.");
+        if(motivo === "Outro" && !motivoOutro) throw new Error("Descreva o motivo (Outro).");
+        if(!condutor) throw new Error("Selecione o condutor.");
+        if(!autorizador) throw new Error("Selecione o autorizador.");
 
-      const res = await runBusy(
-        "Registrando entrada...",
-        "Aguarde 2 a 3 segundos. Não clique novamente.",
-        async () => {
-          const [frente, mala, lateralEsq, lateralDir] = await Promise.all([
-            getCompressedDataURLFromInput("entradaFotoFrente"),
-            getCompressedDataURLFromInput("entradaFotoMala"),
-            getCompressedDataURLFromInput("entradaFotoLatEsq"),
-            getCompressedDataURLFromInput("entradaFotoLatDir")
-          ]);
+        // dá um “respiro” (se quiser 2-3 segundos fixo)
+        // await sleep(600);
 
-          const extras = await collectExtraPhotosData("entrada");
-          const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
+        const [frente, mala, lateralEsq, lateralDir] = await Promise.all([
+          getCompressedDataURLFromInput("entradaFotoFrente"),
+          getCompressedDataURLFromInput("entradaFotoMala"),
+          getCompressedDataURLFromInput("entradaFotoLatEsq"),
+          getCompressedDataURLFromInput("entradaFotoLatDir")
+        ]);
 
-          if(!fotosRequiredOk(fotos)){
-            throw new Error("As 4 fotos principais são obrigatórias.");
-          }
+        const extras = await collectExtraPhotosData("entrada");
+        const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
 
-          docSizeGuardOrThrow(fotos);
+        if(!fotosRequiredOk(fotos)) throw new Error("As 4 fotos principais são obrigatórias.");
+        docSizeGuardOrThrow(fotos);
 
-          await addDoc(collection(db, Collections.MOVIMENTOS), {
-            tipo: "entrada",
-            lojaId,
-            placa,
-            veiculo,
-            motivo,
-            motivoOutro: motivo === "Outro" ? motivoOutro : "",
-            condutor,
-            autorizador,
-            observacao,
-            fotos,
-            criadoPorUid: state.authUser.uid,
-            criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
-            data: new Date()
-          });
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
+          tipo: "entrada",
+          lojaId,
+          placa,
+          veiculo,
+          motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
+          condutor,
+          autorizador,
+          observacao,
+          fotos,
+          criadoPorUid: state.authUser.uid,
+          criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
+          data: new Date()
+        });
 
-          await refreshAfterWrite();
-        },
-        2300
-      );
+        await refreshAfterWrite();
 
-      disableButtons(["btnSalvarEntrada","btnLimparEntrada","entradaBtnAddExtraFoto"], false);
-
-      if(!res.ok){
-        console.error(res.error);
-        showNotice(notice, `Não foi possível salvar a entrada. (${res.error?.message || res.error?.code || "erro"})`, "error");
-        return;
+        // sucesso visível SEM re-render (evita sumir)
+        clearEntradaForm();
+        toast("Entrada efetuada com sucesso.", "success", 2600);
+      }catch(e){
+        console.error(e);
+        const msg = e?.message || e?.code || "erro";
+        showNotice(notice, `Não foi possível salvar a entrada. (${msg})`, "error");
+        toast(`Falha ao salvar entrada. (${msg})`, "error", 3600);
+      }finally{
+        unlockUI();
+        if(btn) btn.disabled = false;
       }
-
-      // ✅ mensagem clara e mantém na tela
-      showNotice(notice, "Entrada efetuada com sucesso.", "success");
-      resetEntradaForm();
-      try{ notice.scrollIntoView({ behavior:"smooth", block:"start" }); }catch(e){}
     }
 
     function renderSaida(){
@@ -1834,13 +1851,7 @@
       wirePhotoPreview("saidaFotoLatDir", "saidaPreviewLatDir");
 
       document.getElementById("btnSalvarSaida").addEventListener("click", salvarSaida);
-
-      // ✅ trocado: limpar sem recriar tela
-      document.getElementById("btnLimparSaida").addEventListener("click", () => {
-        const notice = document.getElementById("saidaNotice");
-        clearNotice(notice);
-        resetSaidaForm();
-      });
+      document.getElementById("btnLimparSaida").addEventListener("click", () => { clearSaidaForm(); toast("Formulário limpo.", "info", 1600); });
 
       document.getElementById("saidaMotivo").addEventListener("change", () => toggleMotivoOutro("saida"));
       toggleMotivoOutro("saida");
@@ -1852,12 +1863,13 @@
       const notice = document.getElementById("saidaNotice");
       clearNotice(notice);
 
-      if(state.isBusy){
-        showNotice(notice, "Aguarde: salvando registro...", "info");
+      const btn = document.getElementById("btnSalvarSaida");
+      if(btn) btn.disabled = true;
+
+      if(!lockUI("saida", "Salvando saída…", "Não feche a tela. Aguarde o retorno.")){
+        if(btn) btn.disabled = false;
         return;
       }
-
-      disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], true);
 
       const lojaId = userIsGeneralManager()
         ? (document.getElementById("saidaLoja")?.value || "")
@@ -1871,84 +1883,75 @@
       const autorizador = document.getElementById("saidaAutorizador")?.value || "";
       const observacao = (document.getElementById("saidaObs")?.value || "").trim();
 
-      if(!lojaId){ showNotice(notice, "Selecione a loja."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
-      if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
-      if(!veiculo){ showNotice(notice, "Informe o veículo."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
-      if(!motivo){ showNotice(notice, "Selecione o motivo."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
-      if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
-      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false); return; }
+      try{
+        if(!lojaId) throw new Error("Selecione a loja.");
+        if(!placa || !isValidPlate(placa)) throw new Error("Informe uma placa válida.");
+        if(!veiculo) throw new Error("Informe o veículo.");
+        if(!motivo) throw new Error("Selecione o motivo.");
+        if(motivo === "Outro" && !motivoOutro) throw new Error("Descreva o motivo (Outro).");
+        if(!condutor) throw new Error("Selecione o condutor.");
+        if(!autorizador) throw new Error("Selecione o autorizador.");
 
-      let isAlert = false;
+        const [frente, mala, lateralEsq, lateralDir] = await Promise.all([
+          getCompressedDataURLFromInput("saidaFotoFrente"),
+          getCompressedDataURLFromInput("saidaFotoMala"),
+          getCompressedDataURLFromInput("saidaFotoLatEsq"),
+          getCompressedDataURLFromInput("saidaFotoLatDir")
+        ]);
 
-      const res = await runBusy(
-        "Registrando saída...",
-        "Aguarde 2 a 3 segundos. Não clique novamente.",
-        async () => {
-          const [frente, mala, lateralEsq, lateralDir] = await Promise.all([
-            getCompressedDataURLFromInput("saidaFotoFrente"),
-            getCompressedDataURLFromInput("saidaFotoMala"),
-            getCompressedDataURLFromInput("saidaFotoLatEsq"),
-            getCompressedDataURLFromInput("saidaFotoLatDir")
-          ]);
+        const extras = await collectExtraPhotosData("saida");
+        const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
 
-          const extras = await collectExtraPhotosData("saida");
-          const fotos = { frente, mala, lateralEsq, lateralDir, extras: extras || [] };
+        if(!fotosRequiredOk(fotos)) throw new Error("As 4 fotos principais são obrigatórias.");
+        docSizeGuardOrThrow(fotos);
 
-          if(!fotosRequiredOk(fotos)){
-            throw new Error("As 4 fotos principais são obrigatórias.");
-          }
+        const inPatioNow = isPlateCurrentlyInPatioForStore(lojaId, placa);
+        const isAlert = !inPatioNow;
 
-          docSizeGuardOrThrow(fotos);
+        await addDoc(collection(db, Collections.MOVIMENTOS), {
+          tipo: "saida",
+          lojaId,
+          placa,
+          veiculo,
+          motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
+          condutor,
+          autorizador,
+          observacao,
+          fotos,
 
-          const inPatioNow = isPlateCurrentlyInPatioForStore(lojaId, placa);
-          isAlert = !inPatioNow;
+          alerta: isAlert,
+          alertaTipo: isAlert ? "saida_fora_padrao" : "",
+          alertaMensagem: isAlert ? "Saída registrada sem entrada anterior (fora do padrão)." : "",
+          alertaResolvido: false,
 
-          await addDoc(collection(db, Collections.MOVIMENTOS), {
-            tipo: "saida",
-            lojaId,
-            placa,
-            veiculo,
-            motivo,
-            motivoOutro: motivo === "Outro" ? motivoOutro : "",
-            condutor,
-            autorizador,
-            observacao,
-            fotos,
+          criadoPorUid: state.authUser.uid,
+          criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
+          data: new Date()
+        });
 
-            alerta: isAlert,
-            alertaTipo: isAlert ? "saida_fora_padrao" : "",
-            alertaMensagem: isAlert ? "Saída registrada sem entrada anterior (fora do padrão)." : "",
-            alertaResolvido: false,
+        await refreshAfterWrite();
 
-            criadoPorUid: state.authUser.uid,
-            criadoPorNome: state.userProfile?.nome || state.authUser?.email || "",
-            data: new Date()
-          });
+        clearSaidaForm();
 
-          await refreshAfterWrite();
-        },
-        2300
-      );
-
-      disableButtons(["btnSalvarSaida","btnLimparSaida","saidaBtnAddExtraFoto"], false);
-
-      if(!res.ok){
-        console.error(res.error);
-        showNotice(notice, `Não foi possível salvar a saída. (${res.error?.message || res.error?.code || "erro"})`, "error");
-        return;
+        if(isAlert){
+          toast("Saída registrada com ALERTA (fora do padrão).", "warn", 3200);
+          showNotice(notice, "Saída registrada com ALERTA (fora do padrão). Gerência verá no painel.", "warn");
+        }else{
+          toast("Saída efetuada com sucesso.", "success", 2600);
+        }
+      }catch(e){
+        console.error(e);
+        const msg = e?.message || e?.code || "erro";
+        showNotice(notice, `Não foi possível salvar a saída. (${msg})`, "error");
+        toast(`Falha ao salvar saída. (${msg})`, "error", 3600);
+      }finally{
+        unlockUI();
+        if(btn) btn.disabled = false;
       }
-
-      if(isAlert){
-        showNotice(notice, "Saída efetuada com ALERTA (fora do padrão).", "warn");
-      }else{
-        showNotice(notice, "Saída efetuada com sucesso.", "success");
-      }
-      resetSaidaForm();
-      try{ notice.scrollIntoView({ behavior:"smooth", block:"start" }); }catch(e){}
     }
 
-    // ========= Consulta =========
+    /* ========= Consulta ========= */
     function renderConsulta(){
       const storeFilterHTML = userIsGeneralManager()
         ? `
@@ -2123,16 +2126,14 @@
       });
     }
 
-    // ========= Modal detalhe/editar =========
+    /* ========= Modal detalhe/editar ========= */
     function openDetailModal(item){
       state.selectedMovimento = item;
       state.editMode = false;
       el.btnSaveRegistro.classList.add("hidden");
       el.btnEditRegistro.classList.remove("hidden");
       renderDetailView(item);
-
       syncResolveAlertButton();
-
       el.detailModal.classList.add("show");
       el.detailModal.setAttribute("aria-hidden","false");
     }
@@ -2197,31 +2198,314 @@
       syncResolveAlertButton();
     }
 
-    /* ========= (RESTO DO SEU CÓDIGO) =========
-       Mantive tudo como estava e apenas corrigi o fluxo de salvar Entrada/Saída:
-       - Bloqueio de tela (2-3s)
-       - Anti clique múltiplo
-       - Mensagem de sucesso/erro SEM recriar a tela (para não sumir)
-       - Reset do formulário depois de salvar
-    */
+    function renderDetailEdit(item){
+      const isEntrada = item.tipo==="entrada";
+      const motivoList = isEntrada ? MOTIVOS_ENTRADA : MOTIVOS_SAIDA;
+      const fotos = item?.fotos || {};
+
+      el.detailTitle.textContent = `Editar registro — ${item.placa||""}`;
+      el.detailSub.textContent = `Loja: ${getStoreLabel(item.lojaId)} • Data/hora: ${formatDate(item.data)}`;
+
+      el.detailBody.innerHTML = `
+        <div class="grid">
+          <div class="form-group">
+            <label>Tipo</label>
+            <input class="input" value="${isEntrada ? "Entrada" : "Saída"}" disabled>
+          </div>
+
+          <div class="form-group">
+            <label>Loja</label>
+            <input class="input" value="${getStoreLabel(item.lojaId)}" disabled>
+          </div>
+
+          <div class="form-group">
+            <label for="editPlaca">Placa <span class="req">*</span></label>
+            <input class="input" id="editPlaca" data-mask="plate" maxlength="8" value="${item.placa||""}">
+          </div>
+
+          <div class="form-group">
+            <label for="editVeiculo">Veículo <span class="req">*</span></label>
+            <input class="input" id="editVeiculo" maxlength="60" value="${item.veiculo||""}">
+          </div>
+
+          <div class="form-group">
+            <label for="editMotivo">Motivo <span class="req">*</span></label>
+            <select class="select" id="editMotivo">${buildMotivoOptions(motivoList)}</select>
+          </div>
+
+          <div class="form-group hidden" id="editMotivoOutroWrap">
+            <label for="editMotivoOutro">Descreva o motivo <span class="req">*</span></label>
+            <input class="input" id="editMotivoOutro" maxlength="60" value="${item.motivoOutro||""}">
+          </div>
+
+          <div class="form-group">
+            <label for="editCondutor">Condutor <span class="req">*</span></label>
+            <select class="select" id="editCondutor">${buildCondutorOptions()}</select>
+          </div>
+
+          <div class="form-group">
+            <label for="editAutorizador">Autorizador <span class="req">*</span></label>
+            <select class="select" id="editAutorizador">${buildAutorizadorOptions()}</select>
+          </div>
+
+          <div class="form-group full">
+            <label for="editObs">Observações</label>
+            <textarea class="textarea" id="editObs" maxlength="300">${item.observacao||""}</textarea>
+          </div>
+
+          <div class="form-group full">
+            <label>Fotos (4 obrigatórias) <span class="req">*</span></label>
+            <div class="subtle">Se não tirar nova foto, será mantida a atual.</div>
+
+            <div class="photo-grid">
+              ${photoCaptureCard("Frente", "editFotoFrente", "editPreviewFrente")}
+              ${photoCaptureCard("Mala", "editFotoMala", "editPreviewMala")}
+              ${photoCaptureCard("Lateral esquerda", "editFotoLatEsq", "editPreviewLatEsq")}
+              ${photoCaptureCard("Lateral direita", "editFotoLatDir", "editPreviewLatDir")}
+            </div>
+
+            <div class="subtle" style="margin-top:10px;">Fotos atuais:</div>
+            <div class="thumbs" style="margin-top:10px;">
+              ${fotos.frente ? `<div class="thumb"><img src="${fotos.frente}"><div class="cap">Atual: Frente</div></div>` : ""}
+              ${fotos.mala ? `<div class="thumb"><img src="${fotos.mala}"><div class="cap">Atual: Mala</div></div>` : ""}
+              ${fotos.lateralEsq ? `<div class="thumb"><img src="${fotos.lateralEsq}"><div class="cap">Atual: Lateral esquerda</div></div>` : ""}
+              ${fotos.lateralDir ? `<div class="thumb"><img src="${fotos.lateralDir}"><div class="cap">Atual: Lateral direita</div></div>` : ""}
+            </div>
+
+            <div class="actions" style="margin-top:12px;">
+              <button class="btn btn-light" id="editBtnAddExtraFoto">Fotografar mais partes</button>
+            </div>
+            <div class="photo-grid" id="editPhotoGridExtras"></div>
+          </div>
+        </div>
+
+        <div id="editNotice" class="notice"></div>
+      `;
+
+      document.getElementById("editMotivo").value = item.motivo || "";
+      document.getElementById("editCondutor").value = item.condutor || "";
+      document.getElementById("editAutorizador").value = item.autorizador || "";
+
+      const toggleEditOutro = () => {
+        const m = document.getElementById("editMotivo")?.value || "";
+        const wrap = document.getElementById("editMotivoOutroWrap");
+        if(!wrap) return;
+        if(m === "Outro") wrap.classList.remove("hidden");
+        else{
+          wrap.classList.add("hidden");
+          const i = document.getElementById("editMotivoOutro");
+          if(i) i.value = "";
+        }
+      };
+      document.getElementById("editMotivo").addEventListener("change", toggleEditOutro);
+      toggleEditOutro();
+
+      attachInputMasks();
+      wirePhotoPreview("editFotoFrente", "editPreviewFrente");
+      wirePhotoPreview("editFotoMala", "editPreviewMala");
+      wirePhotoPreview("editFotoLatEsq", "editPreviewLatEsq");
+      wirePhotoPreview("editFotoLatDir", "editPreviewLatDir");
+
+      document.getElementById("editBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("edit"));
+
+      syncResolveAlertButton();
+    }
+
+    async function saveEditedRegistro(){
+      const item = state.selectedMovimento;
+      if(!item || !item.id){
+        toast("Registro inválido para edição.", "error", 2800);
+        return;
+      }
+
+      const notice = document.getElementById("editNotice");
+      clearNotice(notice);
+
+      const btn = el.btnSaveRegistro;
+      if(btn) btn.disabled = true;
+
+      if(!lockUI("editar", "Salvando alterações…", "Aguarde.")){
+        if(btn) btn.disabled = false;
+        return;
+      }
+
+      const placa = formatPlate(document.getElementById("editPlaca")?.value || "");
+      const veiculo = (document.getElementById("editVeiculo")?.value || "").trim();
+      const motivo = document.getElementById("editMotivo")?.value || "";
+      const motivoOutro = (document.getElementById("editMotivoOutro")?.value || "").trim();
+      const condutor = document.getElementById("editCondutor")?.value || "";
+      const autorizador = document.getElementById("editAutorizador")?.value || "";
+      const observacao = (document.getElementById("editObs")?.value || "").trim();
+
+      try{
+        if(!placa || !isValidPlate(placa)) throw new Error("Informe uma placa válida.");
+        if(!veiculo) throw new Error("Informe o veículo.");
+        if(!motivo) throw new Error("Selecione o motivo.");
+        if(motivo === "Outro" && !motivoOutro) throw new Error("Descreva o motivo (Outro).");
+        if(!condutor) throw new Error("Selecione o condutor.");
+        if(!autorizador) throw new Error("Selecione o autorizador.");
+
+        const cur = item.fotos || {};
+        const [newFrente, newMala, newEsq, newDir] = await Promise.all([
+          getCompressedDataURLFromInput("editFotoFrente"),
+          getCompressedDataURLFromInput("editFotoMala"),
+          getCompressedDataURLFromInput("editFotoLatEsq"),
+          getCompressedDataURLFromInput("editFotoLatDir"),
+        ]);
+
+        const extrasNew = await collectExtraPhotosData("edit");
+        const extrasOld = Array.isArray(cur.extras) ? cur.extras : [];
+
+        const fotos = {
+          frente: newFrente || cur.frente || "",
+          mala: newMala || cur.mala || "",
+          lateralEsq: newEsq || cur.lateralEsq || "",
+          lateralDir: newDir || cur.lateralDir || "",
+          extras: [...extrasOld, ...(extrasNew || [])]
+        };
+
+        if(!fotosRequiredOk(fotos)) throw new Error("As 4 fotos principais são obrigatórias (pode manter as antigas).");
+        docSizeGuardOrThrow(fotos);
+
+        await updateDoc(doc(db, Collections.MOVIMENTOS, item.id), {
+          placa,
+          veiculo,
+          motivo,
+          motivoOutro: motivo === "Outro" ? motivoOutro : "",
+          condutor,
+          autorizador,
+          observacao,
+          fotos,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser.uid,
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        });
+
+        await refreshAfterWrite();
+
+        const refreshed = state.movimentos.find(m=>m.id===item.id);
+        if(refreshed) state.selectedMovimento = refreshed;
+
+        toast("Alterações salvas com sucesso.", "success", 2600);
+
+        state.editMode = false;
+        el.btnSaveRegistro.classList.add("hidden");
+        el.btnEditRegistro.classList.remove("hidden");
+        renderDetailView(state.selectedMovimento);
+      }catch(e){
+        console.error(e);
+        const msg = e?.message || e?.code || "erro";
+        showNotice(notice, `Não foi possível salvar alterações. (${msg})`, "error");
+        toast(`Falha ao salvar alterações. (${msg})`, "error", 3600);
+      }finally{
+        unlockUI();
+        if(btn) btn.disabled = false;
+        syncResolveAlertButton();
+      }
+    }
 
     function closeDetailModal(){
       el.detailModal.classList.remove("show");
       el.detailModal.setAttribute("aria-hidden","true");
       state.selectedMovimento = null;
       state.editMode = false;
+      syncResolveAlertButton();
     }
 
     function exportSelectedRegistro(){
-      // (mantido como no seu código original)
       const item = state.selectedMovimento;
       if(!item) return;
-      alert("Exportação está no seu código original (mantive a função como estava antes).");
+
+      const motivoFinal = item.motivo==="Outro" && item.motivoOutro ? `Outro: ${item.motivoOutro}` : (item.motivo||"-");
+      const fotos = item?.fotos || {};
+      const imagens = [];
+
+      if(fotos.frente) imagens.push({ url:fotos.frente, cap:"Frente" });
+      if(fotos.mala) imagens.push({ url:fotos.mala, cap:"Mala" });
+      if(fotos.lateralEsq) imagens.push({ url:fotos.lateralEsq, cap:"Lateral esquerda" });
+      if(fotos.lateralDir) imagens.push({ url:fotos.lateralDir, cap:"Lateral direita" });
+      if(Array.isArray(fotos.extras)) fotos.extras.forEach((u,idx)=>{ if(u) imagens.push({ url:u, cap:`Extra ${idx+1}` }); });
+
+      const html = `
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Registro - ${item.placa||""}</title>
+<style>
+  body{ font-family: Arial, Helvetica, sans-serif; color:#111827; margin:24px; }
+  h1{ font-size:20px; margin:0 0 6px 0; }
+  .sub{ color:#475569; margin:0 0 18px 0; font-size:13px; }
+  .box{ border:1px solid #e5e7eb; border-radius:12px; padding:14px; margin-bottom:12px; }
+  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+  .k{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#64748b; margin-bottom:4px; font-weight:700; }
+  .v{ font-size:14px; font-weight:700; color:#0f172a; }
+  .full{ grid-column:1/-1; }
+  .imgs{ display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:10px; }
+  .img{ border:1px solid #e5e7eb; border-radius:12px; overflow:hidden; }
+  .img img{ width:100%; height:260px; object-fit:cover; display:block; }
+  .cap{ padding:10px 12px; font-size:12px; font-weight:700; color:#334155; border-top:1px solid #eef2f7; }
+  @media print{ body{ margin:0; } .box{ page-break-inside: avoid; } .img{ page-break-inside: avoid; } }
+</style>
+</head>
+<body>
+  <h1>Registro de ${item.tipo==="entrada"?"Entrada":"Saída"} — ${item.placa||""}</h1>
+  <p class="sub">
+    Loja: ${getStoreLabel(item.lojaId)} •
+    Data/Hora: ${formatDate(item.data)} •
+    Exportado em: ${new Date().toLocaleString("pt-BR")}
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div><div class="k">Tipo</div><div class="v">${item.tipo==="entrada"?"Entrada":"Saída"}</div></div>
+      <div><div class="k">Data/Hora</div><div class="v">${formatDate(item.data)}</div></div>
+
+      <div><div class="k">Loja</div><div class="v">${getStoreLabel(item.lojaId)}</div></div>
+      <div><div class="k">Placa</div><div class="v">${item.placa||"-"}</div></div>
+
+      <div><div class="k">Veículo</div><div class="v">${item.veiculo||"-"}</div></div>
+      <div><div class="k">Motivo</div><div class="v">${motivoFinal}</div></div>
+
+      <div><div class="k">Condutor</div><div class="v">${item.condutor||"-"}</div></div>
+      <div><div class="k">Autorizador</div><div class="v">${item.autorizador||"-"}</div></div>
+
+      <div class="full"><div class="k">Observação</div><div class="v" style="font-weight:600;">${item.observacao||"-"}</div></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <div class="k" style="margin-bottom:10px;">Fotos</div>
+    ${
+      imagens.length ? `
+        <div class="imgs">
+          ${imagens.map(im=>`
+            <div class="img">
+              <img src="${im.url}" alt="${im.cap}">
+              <div class="cap">${im.cap}</div>
+            </div>
+          `).join("")}
+        </div>
+      ` : `<div class="v" style="font-weight:600;">Sem fotos</div>`
+    }
+  </div>
+</body>
+</html>
+      `;
+
+      const w = window.open("", "_blank");
+      if(!w){
+        alert("Bloqueio de pop-up: permita pop-ups para exportar o registro.");
+        return;
+      }
+      w.document.open();
+      w.document.write(html);
+      w.document.close();
+      w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
-    /* ========= Condutores / Autorizadores / Lojas =========
-       (mantido do seu index original — não alterei essa parte)
-    */
+    /* ========= Condutores / Autorizadores / Lojas ========= */
     function buildLojaSelectWithAll(id){
       const options = [];
       if(userIsGeneralManager()){
@@ -2249,11 +2533,518 @@
       return { id:d.id, ...d.data() };
     }
 
-    function renderCondutores(){ renderPanel("Condutores","(mantido do seu código original)", `<div class="empty">Use seu bloco completo de Condutores aqui (sem alterações).</div>`); }
-    function renderAutorizadores(){ renderPanel("Autorizadores","(mantido do seu código original)", `<div class="empty">Use seu bloco completo de Autorizadores aqui (sem alterações).</div>`); }
-    function renderGestaoLojas(){ renderPanel("Gestão de lojas","(mantido do seu código original)", `<div class="empty">Use seu bloco completo de Gestão de lojas aqui (sem alterações).</div>`); }
+    function renderCondutores(){
+      renderPanel(
+        "Condutores",
+        userIsGeneralManager()
+          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+          : "Cadastro e ativação/inativação de condutores da sua loja.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="condLoja">Loja <span class="req">*</span></label>
+              ${buildLojaSelectWithAll("condLoja")}
+              <div class="subtle">Se escolher “Todas as lojas”, o cadastro será replicado para cada loja.</div>
+            </div>
 
-    // ========= refresh / auth =========
+            <div class="form-group">
+              <label for="condCpf">CPF <span class="req">*</span></label>
+              <input class="input" id="condCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle" id="condCpfStatus"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="condNome">Nome <span class="req">*</span></label>
+              <input class="input" id="condNome" maxlength="80" placeholder="Nome completo">
+            </div>
+
+            <div class="form-group">
+              <label for="condCargo">Cargo <span class="req">*</span></label>
+              <input class="input" id="condCargo" maxlength="60" placeholder="Ex.: Motorista">
+            </div>
+
+            <div class="form-group">
+              <label for="condAtivo">Ativo</label>
+              <select class="select" id="condAtivo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarCondutor">Salvar condutor</button>
+            </div>
+          </div>
+
+          <div id="condNotice" class="notice"></div>
+
+          <div class="section-title">Lista</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Cargo</th>
+                  <th>Ativo</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="condListBody"></tbody>
+            </table>
+          </div>
+        `
+      );
+
+      attachInputMasks();
+      document.getElementById("btnSalvarCondutor").addEventListener("click", salvarCondutor);
+      document.getElementById("condCpf").addEventListener("blur", lookupCondutorByCpf);
+      document.getElementById("condLoja").addEventListener("change", () => {
+        document.getElementById("condCpfStatus").textContent = "";
+        document.getElementById("condNome").value = "";
+        document.getElementById("condCargo").value = "";
+        document.getElementById("condAtivo").value = "true";
+      });
+
+      renderCondutoresList();
+    }
+
+    function renderCondutoresList(){
+      const body = document.getElementById("condListBody");
+      if(!body) return;
+
+      let items = [...state.condutores];
+      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
+
+      items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
+
+      body.innerHTML = items.map(i => `
+        <tr>
+          <td>${getStoreLabel(i.lojaId||"-")}</td>
+          <td>${i.nome||"-"}</td>
+          <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
+          <td>${i.cargo||"-"}</td>
+          <td>${i.ativo===false ? "Não" : "Sim"}</td>
+          <td>
+            <button class="btn btn-light" data-toggle-cond="${i.id}">
+              ${i.ativo===false ? "Ativar" : "Inativar"}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      Array.from(body.querySelectorAll("[data-toggle-cond]")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-cond");
+          const found = state.condutores.find(x => x.id === id);
+          if(!found) return;
+          try{
+            if(!lockUI("toggle_cond", "Atualizando…", "Salvando status do condutor.")) return;
+            await updateDoc(doc(db, Collections.CONDUTORES, id), {
+              ativo: found.ativo===false ? true : false,
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+            await refreshAfterWrite();
+            renderCondutores();
+            toast("Atualizado com sucesso.", "success", 1800);
+          }catch(e){
+            console.error(e);
+            toast(`Falha ao atualizar. (${e?.code || e?.message || "erro"})`, "error", 3200);
+          }finally{
+            unlockUI();
+          }
+        });
+      });
+    }
+
+    async function lookupCondutorByCpf(){
+      const lojaId = document.getElementById("condLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("condCpf")?.value || "");
+      const status = document.getElementById("condCpfStatus");
+
+      status.textContent = "";
+      if(!cpfDigits || cpfDigits.length !== 11){ status.textContent = "Digite um CPF completo."; return; }
+      if(!isValidCPF(cpfDigits)){ status.textContent = "CPF inválido."; return; }
+      if(lojaId === "__ALL__"){ status.textContent = "Lookup desativado em “Todas as lojas”. Selecione uma loja."; return; }
+
+      try{
+        const existing = await findByCpf(Collections.CONDUTORES, lojaId, cpfDigits);
+        if(existing){
+          status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
+          document.getElementById("condNome").value = existing.nome || "";
+          document.getElementById("condCargo").value = existing.cargo || "";
+          document.getElementById("condAtivo").value = (existing.ativo===false) ? "false" : "true";
+        }else{
+          status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
+          document.getElementById("condNome").value = "";
+          document.getElementById("condCargo").value = "";
+          document.getElementById("condAtivo").value = "true";
+        }
+      }catch(e){
+        console.error(e);
+        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
+      }
+    }
+
+    async function salvarCondutor(){
+      const notice = document.getElementById("condNotice");
+      clearNotice(notice);
+
+      const lojaSel = document.getElementById("condLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("condCpf")?.value || "");
+      const nome = (document.getElementById("condNome")?.value || "").trim();
+      const cargo = (document.getElementById("condCargo")?.value || "").trim();
+      const ativo = (document.getElementById("condAtivo")?.value || "true") === "true";
+
+      if(!lojaSel){ showNotice(notice, "Selecione a loja."); return; }
+      if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){ showNotice(notice, "Informe um CPF válido."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome."); return; }
+      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
+
+      try{
+        if(!lockUI("save_cond", "Salvando…", "Cadastrando/atualizando condutor.")) return;
+        const lojasAlvo = (lojaSel==="__ALL__") ? state.lojas.map(l=>l.id) : [lojaSel];
+
+        for(const lojaId of lojasAlvo){
+          const id = condutorDocId(lojaId, cpfDigits);
+          await setDoc(doc(db, Collections.CONDUTORES, id), {
+            lojaId,
+            cpf: cpfDigits,
+            nome,
+            cargo,
+            ativo,
+            atualizadoEm: new Date(),
+            atualizadoPorUid: state.authUser.uid,
+            atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+          }, { merge:true });
+        }
+
+        await refreshAfterWrite();
+        showNotice(notice, "Condutor salvo com sucesso.", "success");
+        toast("Condutor salvo com sucesso.", "success", 2200);
+        renderCondutores();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Falha ao salvar. (${e?.code || e?.message || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
+    }
+
+    function renderAutorizadores(){
+      if(!canManageAutorizadores()){
+        renderPanel("Acesso restrito", "Controlador não acessa Autorizadores.", `<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      renderPanel(
+        "Autorizadores",
+        userIsGeneralManager()
+          ? "Gerente geral pode cadastrar para uma loja ou para TODAS as lojas."
+          : "Cadastro e ativação/inativação de autorizadores da sua loja.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="autLoja">Loja <span class="req">*</span></label>
+              ${buildLojaSelectWithAll("autLoja")}
+              <div class="subtle">Se escolher “Todas as lojas”, o cadastro será replicado para cada loja.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="autCpf">CPF <span class="req">*</span></label>
+              <input class="input" id="autCpf" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle" id="autCpfStatus"></div>
+            </div>
+
+            <div class="form-group">
+              <label for="autNome">Nome <span class="req">*</span></label>
+              <input class="input" id="autNome" maxlength="80" placeholder="Nome completo">
+            </div>
+
+            <div class="form-group">
+              <label for="autCargo">Cargo <span class="req">*</span></label>
+              <input class="input" id="autCargo" maxlength="60" placeholder="Ex.: Gerente">
+            </div>
+
+            <div class="form-group">
+              <label for="autAtivo">Ativo</label>
+              <select class="select" id="autAtivo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarAutorizador">Salvar autorizador</button>
+            </div>
+          </div>
+
+          <div id="autNotice" class="notice"></div>
+
+          <div class="section-title">Lista</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Loja</th>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Cargo</th>
+                  <th>Ativo</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="autListBody"></tbody>
+            </table>
+          </div>
+        `
+      );
+
+      attachInputMasks();
+      document.getElementById("btnSalvarAutorizador").addEventListener("click", salvarAutorizador);
+      document.getElementById("autCpf").addEventListener("blur", lookupAutorizadorByCpf);
+      document.getElementById("autLoja").addEventListener("change", () => {
+        document.getElementById("autCpfStatus").textContent = "";
+        document.getElementById("autNome").value = "";
+        document.getElementById("autCargo").value = "";
+        document.getElementById("autAtivo").value = "true";
+      });
+
+      renderAutorizadoresList();
+    }
+
+    function renderAutorizadoresList(){
+      const body = document.getElementById("autListBody");
+      if(!body) return;
+
+      let items = [...state.autorizadores];
+      if(!userIsGeneralManager()) items = items.filter(i => i.lojaId === currentUserStoreId());
+
+      items.sort((a,b) => `${a.lojaId||""} ${a.nome||""}`.localeCompare(`${b.lojaId||""} ${b.nome||""}`,"pt-BR"));
+
+      body.innerHTML = items.map(i => `
+        <tr>
+          <td>${getStoreLabel(i.lojaId||"-")}</td>
+          <td>${i.nome||"-"}</td>
+          <td>${i.cpf ? formatCPF(i.cpf) : "-"}</td>
+          <td>${i.cargo||"-"}</td>
+          <td>${i.ativo===false ? "Não" : "Sim"}</td>
+          <td>
+            <button class="btn btn-light" data-toggle-aut="${i.id}">
+              ${i.ativo===false ? "Ativar" : "Inativar"}
+            </button>
+          </td>
+        </tr>
+      `).join("");
+
+      Array.from(body.querySelectorAll("[data-toggle-aut]")).forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const id = btn.getAttribute("data-toggle-aut");
+          const found = state.autorizadores.find(x => x.id === id);
+          if(!found) return;
+          try{
+            if(!lockUI("toggle_aut", "Atualizando…", "Salvando status do autorizador.")) return;
+            await updateDoc(doc(db, Collections.AUTORIZADORES, id), {
+              ativo: found.ativo===false ? true : false,
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+            await refreshAfterWrite();
+            renderAutorizadores();
+            toast("Atualizado com sucesso.", "success", 1800);
+          }catch(e){
+            console.error(e);
+            toast(`Falha ao atualizar. (${e?.code || e?.message || "erro"})`, "error", 3200);
+          }finally{
+            unlockUI();
+          }
+        });
+      });
+    }
+
+    async function lookupAutorizadorByCpf(){
+      const lojaId = document.getElementById("autLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("autCpf")?.value || "");
+      const status = document.getElementById("autCpfStatus");
+
+      status.textContent = "";
+      if(!cpfDigits || cpfDigits.length !== 11){ status.textContent = "Digite um CPF completo."; return; }
+      if(!isValidCPF(cpfDigits)){ status.textContent = "CPF inválido."; return; }
+      if(lojaId === "__ALL__"){ status.textContent = "Lookup desativado em “Todas as lojas”. Selecione uma loja."; return; }
+
+      try{
+        const existing = await findByCpf(Collections.AUTORIZADORES, lojaId, cpfDigits);
+        if(existing){
+          status.innerHTML = `<span class="badge badge-blue">Encontrado</span> Você pode editar e salvar.`;
+          document.getElementById("autNome").value = existing.nome || "";
+          document.getElementById("autCargo").value = existing.cargo || "";
+          document.getElementById("autAtivo").value = (existing.ativo===false) ? "false" : "true";
+        }else{
+          status.innerHTML = `<span class="badge badge-green">Novo</span> CPF não encontrado nesta loja.`;
+          document.getElementById("autNome").value = "";
+          document.getElementById("autCargo").value = "";
+          document.getElementById("autAtivo").value = "true";
+        }
+      }catch(e){
+        console.error(e);
+        status.textContent = `Erro no lookup: ${e?.code || "erro"}`;
+      }
+    }
+
+    async function salvarAutorizador(){
+      const notice = document.getElementById("autNotice");
+      clearNotice(notice);
+
+      const lojaSel = document.getElementById("autLoja")?.value || "";
+      const cpfDigits = onlyDigits(document.getElementById("autCpf")?.value || "");
+      const nome = (document.getElementById("autNome")?.value || "").trim();
+      const cargo = (document.getElementById("autCargo")?.value || "").trim();
+      const ativo = (document.getElementById("autAtivo")?.value || "true") === "true";
+
+      if(!lojaSel){ showNotice(notice, "Selecione a loja."); return; }
+      if(!cpfDigits || cpfDigits.length !== 11 || !isValidCPF(cpfDigits)){ showNotice(notice, "Informe um CPF válido."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome."); return; }
+      if(!cargo){ showNotice(notice, "Informe o cargo."); return; }
+
+      try{
+        if(!lockUI("save_aut", "Salvando…", "Cadastrando/atualizando autorizador.")) return;
+
+        const lojasAlvo = (lojaSel==="__ALL__") ? state.lojas.map(l=>l.id) : [lojaSel];
+
+        for(const lojaId of lojasAlvo){
+          const id = autorizadorDocId(lojaId, cpfDigits);
+          await setDoc(doc(db, Collections.AUTORIZADORES, id), {
+            lojaId,
+            cpf: cpfDigits,
+            nome,
+            cargo,
+            ativo,
+            atualizadoEm: new Date(),
+            atualizadoPorUid: state.authUser.uid,
+            atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+          }, { merge:true });
+        }
+
+        await refreshAfterWrite();
+        showNotice(notice, "Autorizador salvo com sucesso.", "success");
+        toast("Autorizador salvo com sucesso.", "success", 2200);
+        renderAutorizadores();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Falha ao salvar. (${e?.code || e?.message || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
+    }
+
+    function renderGestaoLojas(){
+      if(!canManageLojas()){
+        renderPanel("Acesso restrito","Somente gerente geral.",`<div class="empty">Acesso negado.</div>`);
+        return;
+      }
+
+      const rows = state.lojas.map(l=>`
+        <tr>
+          <td>${l.id}</td>
+          <td>${l.nome||"-"}</td>
+          <td>${l.ativo===false ? "Não" : "Sim"}</td>
+        </tr>
+      `).join("");
+
+      renderPanel(
+        "Gestão de lojas",
+        "Crie ou atualize lojas. O ID é o documento (ex.: 0001) e o nome é o visível.",
+        `
+          <div class="grid">
+            <div class="form-group">
+              <label for="lojaIdNovo">ID da loja <span class="req">*</span></label>
+              <input class="input" id="lojaIdNovo" maxlength="40" placeholder="Ex.: 0001">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaNomeNovo">Nome da loja <span class="req">*</span></label>
+              <input class="input" id="lojaNomeNovo" maxlength="80" placeholder="Ex.: Vigorito - Matriz">
+            </div>
+
+            <div class="form-group">
+              <label for="lojaAtivaNovo">Ativa</label>
+              <select class="select" id="lojaAtivaNovo">
+                <option value="true">Sim</option>
+                <option value="false">Não</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <button class="btn btn-success" id="btnSalvarLoja">Salvar loja</button>
+            </div>
+          </div>
+
+          <div id="lojasNotice" class="notice"></div>
+
+          <div class="section-title">Lojas cadastradas</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Ativa</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || `<tr><td colspan="3">Nenhuma loja cadastrada.</td></tr>`}
+              </tbody>
+            </table>
+          </div>
+        `
+      );
+
+      document.getElementById("btnSalvarLoja").addEventListener("click", salvarLojaAdmin);
+    }
+
+    async function salvarLojaAdmin(){
+      const notice = document.getElementById("lojasNotice");
+      clearNotice(notice);
+
+      const lojaId = (document.getElementById("lojaIdNovo")?.value || "").trim();
+      const nome = (document.getElementById("lojaNomeNovo")?.value || "").trim();
+      const ativo = (document.getElementById("lojaAtivaNovo")?.value || "true") === "true";
+
+      if(!lojaId){ showNotice(notice, "Informe o ID da loja."); return; }
+      if(!/^[a-zA-Z0-9_-]+$/.test(lojaId)){ showNotice(notice, "ID inválido. Use apenas letras, números, _ ou -."); return; }
+      if(!nome){ showNotice(notice, "Informe o nome da loja."); return; }
+
+      try{
+        if(!lockUI("save_loja", "Salvando…", "Cadastrando/atualizando loja.")) return;
+
+        await setDoc(doc(db, Collections.LOJAS, lojaId), {
+          nome,
+          ativo,
+          atualizadoEm: new Date(),
+          atualizadoPorUid: state.authUser?.uid || "",
+          atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+        }, { merge:true });
+
+        await refreshAfterWrite();
+        showNotice(notice, "Loja salva com sucesso.", "success");
+        toast("Loja salva com sucesso.", "success", 2200);
+        renderGestaoLojas();
+      }catch(e){
+        console.error(e);
+        showNotice(notice, `Não foi possível salvar a loja. (${e?.code || e?.message || "erro"})`, "error");
+      }finally{
+        unlockUI();
+      }
+    }
+
+    /* ========= refresh / auth ========= */
     async function refreshAfterWrite(){
       await loadLojas();
       await loadOperationalCollections();
@@ -2267,7 +3058,7 @@
       const senha = el.loginSenha.value;
 
       if(!email || !senha){
-        showNotice(el.loginNotice, "Preencha e-mail e senha.");
+        showNotice(el.loginNotice, "Preencha e-mail e senha.", "error");
         return;
       }
 
@@ -2275,7 +3066,7 @@
       try{
         await signInWithEmailAndPassword(auth, email, senha);
       }catch(error){
-        showNotice(el.loginNotice, `Não foi possível entrar. (${error?.code || "erro"})`);
+        showNotice(el.loginNotice, `Não foi possível entrar. (${error?.code || "erro"})`, "error");
       }finally{
         el.btnLogin.disabled = false;
       }
@@ -2307,10 +3098,13 @@
         if(btn){
           btn.addEventListener("click", async () => {
             try{
+              if(!lockUI("reload", "Carregando…", "Recarregando dados.")) return;
               await refreshAfterWrite();
               renderDashboardHome();
             }catch(e){
               showFatalAppError(e);
+            }finally{
+              unlockUI();
             }
           });
         }
@@ -2326,6 +3120,7 @@
       el.appView.style.display = "block";
 
       try{
+        if(!lockUI("init", "Carregando…", "Lendo perfil e dados da loja.")) return;
         await loadUserProfile(user.uid);
         await loadLojas();
         await loadOperationalCollections();
@@ -2336,6 +3131,8 @@
         renderDashboardHome();
       }catch(err){
         showFatalAppError(err);
+      }finally{
+        unlockUI();
       }
     }
 
@@ -2349,7 +3146,8 @@
       state.autorizadores = [];
       state.selectedMovimento = null;
       state.editMode = false;
-      state.isBusy = false;
+      state.lock.busy = false;
+      state.lock.busyKey = "";
 
       el.topbar.style.display = "none";
       el.footerbar.style.display = "none";
@@ -2367,9 +3165,10 @@
         </div>
       `;
       closeDetailModal();
+      unlockUI();
     }
 
-    // ========= Eventos =========
+    /* ========= Eventos ========= */
     el.btnLogin.addEventListener("click", login);
     el.btnLogout.addEventListener("click", logout);
 
@@ -2385,19 +3184,18 @@
 
     el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
 
+    // ✅ EDITAR DE VOLTA (SEM POPUP PLACEHOLDER)
     el.btnEditRegistro.addEventListener("click", () => {
       const item = state.selectedMovimento;
       if(!item) return;
       state.editMode = true;
       el.btnEditRegistro.classList.add("hidden");
       el.btnSaveRegistro.classList.remove("hidden");
-      // renderDetailEdit(item); // mantém seu fluxo original
-      alert("Edição está no seu código original; aqui eu só corrigi o salvar entrada/saída e a trava.");
+      renderDetailEdit(item);
+      syncResolveAlertButton();
     });
 
-    el.btnSaveRegistro.addEventListener("click", () => {
-      alert("Salvar edição está no seu código original; aqui eu só corrigi o salvar entrada/saída e a trava.");
-    });
+    el.btnSaveRegistro.addEventListener("click", saveEditedRegistro);
 
     if(el.btnResolveAlert){
       el.btnResolveAlert.addEventListener("click", resolveSelectedAlert);

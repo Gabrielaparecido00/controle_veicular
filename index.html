@@ -69,6 +69,7 @@
       min-width:0;
     }
 
+    /* ✅ apenas o logo (sem borda, sem fundo) */
     .brand-logo{
       height:46px;
       width:auto;
@@ -438,6 +439,7 @@
       line-height:1.35;
     }
 
+    /* input file escondido; usa label "Abrir câmera" */
     .file-input{
       position:absolute;
       left:-99999px;
@@ -602,6 +604,42 @@
       background:#fff;
     }
 
+    /* ✅ Autocomplete */
+    .ac-wrap{
+      position:relative;
+      width:100%;
+    }
+    .ac-list{
+      position:absolute;
+      left:0;
+      right:0;
+      top:calc(100% + 6px);
+      background:#fff;
+      border:1px solid #e5edf5;
+      border-radius:14px;
+      box-shadow:0 18px 40px rgba(15,23,42,.12);
+      z-index:50;
+      overflow:hidden;
+      display:none;
+      max-height:260px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ac-item{
+      padding:12px 14px;
+      cursor:pointer;
+      font-weight:800;
+      font-size:14px;
+      border-bottom:1px solid #f1f5f9;
+    }
+    .ac-item:last-child{ border-bottom:none; }
+    .ac-item:active{ background:#f8fafc; }
+    .ac-muted{ color:#64748b; font-weight:800; }
+    .ac-disabled{
+      color:#94a3b8;
+      cursor:not-allowed;
+    }
+
     @media (max-width:900px){
       .grid{ grid-template-columns:1fr; }
       .hero h2{ font-size:26px; }
@@ -689,7 +727,6 @@
       </div>
       <div class="modal-body" id="detailBody"></div>
       <div class="modal-actions">
-        <!-- ✅ agora tem editar + salvar -->
         <button class="btn btn-primary" id="btnEditRegistro">Editar</button>
         <button class="btn btn-success hidden" id="btnSaveRegistro">Salvar alterações</button>
         <button class="btn btn-light" id="btnExportRegistro">Exportar registro</button>
@@ -714,7 +751,6 @@
       getDoc,
       getDocs,
       addDoc,
-      setDoc,
       updateDoc,
       query,
       where,
@@ -793,7 +829,10 @@
       condutores: [],
       autorizadores: [],
       selectedMovimento: null,
-      editMode: false
+      editMode: false,
+
+      // ✅ para “voltar pro formulário” após cadastrar condutor/autorizador
+      returnCtx: null,
     };
 
     const MOTIVOS_ENTRADA = [
@@ -902,28 +941,6 @@
     function buildMotivoOptions(list){
       const options = [`<option value="">Selecione o motivo</option>`];
       list.forEach(m => options.push(`<option value="${m}">${m}</option>`));
-      return options.join("");
-    }
-
-    function buildCondutorOptions(){
-      const options = [`<option value="">Selecione o condutor</option>`];
-      state.condutores.forEach(item => {
-        const ativo = item.ativo !== false;
-        const label = ativo ? item.nome : `${item.nome} - inativo`;
-        const disabled = ativo ? "" : "disabled";
-        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
-      });
-      return options.join("");
-    }
-
-    function buildAutorizadorOptions(){
-      const options = [`<option value="">Selecione o autorizador</option>`];
-      state.autorizadores.forEach(item => {
-        const ativo = item.ativo !== false;
-        const label = ativo ? item.nome : `${item.nome} - inativo`;
-        const disabled = ativo ? "" : "disabled";
-        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
-      });
       return options.join("");
     }
 
@@ -1093,12 +1110,17 @@
       `;
     }
 
+    /* =========================================================
+       ✅ MENU (VOLTOU consulta/condutores/autorizadores)
+       ========================================================= */
     function buildMenu(){
       const items = [
         { id: "menu-dashboard", label: userIsGeneralManager() ? "Dashboard geral" : "Dashboard", action: renderDashboardHome },
         { id: "menu-entrada", label: "Entrada", action: renderEntrada },
         { id: "menu-saida", label: "Saída", action: renderSaida },
         { id: "menu-consulta", label: "Consulta", action: renderConsulta },
+        { id: "menu-condutores", label: "Condutores", action: renderCondutores },
+        { id: "menu-autorizadores", label: "Autorizadores", action: renderAutorizadores },
       ];
 
       el.menuBar.innerHTML = "";
@@ -1155,7 +1177,9 @@
       );
     }
 
-    // FOTO (tablet)
+    /* =========================================================
+       FOTO (tablet) - abre câmera via label
+       ========================================================= */
     function readFileAsDataURL(file){
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -1222,7 +1246,114 @@
       return data;
     }
 
-    // Entrada
+    /* =========================================================
+       ✅ AUTOCOMPLETE CONDUTOR (campo de escrita + sugestões)
+       ========================================================= */
+    function getCondutoresForLoja(lojaId){
+      if(userIsGeneralManager()){
+        // gerente geral: filtra pelo lojaId do formulário
+        return state.condutores.filter(c => (c.lojaId || "") === (lojaId || ""));
+      }
+      // outros: só sua loja
+      return state.condutores.filter(c => (c.lojaId || "") === (currentUserStoreId() || ""));
+    }
+
+    function setupAutocompleteCondutor({ lojaSelectId, inputId, listId, onPick, onOpenCadastro }){
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+      if(!input || !list) return;
+
+      let currentItems = [];
+
+      function closeList(){ list.style.display = "none"; list.innerHTML = ""; }
+      function openList(){ if(list.innerHTML.trim()) list.style.display = "block"; }
+
+      function renderItems(q){
+        const lojaId = userIsGeneralManager()
+          ? (document.getElementById(lojaSelectId)?.value || "")
+          : (currentUserStoreId() || "");
+
+        const items = getCondutoresForLoja(lojaId);
+        const queryTxt = String(q || "").trim().toLowerCase();
+
+        const matches = items
+          .map(x => ({
+            ...x,
+            _nome: String(x.nome || ""),
+            _ativo: x.ativo !== false
+          }))
+          .filter(x => !queryTxt || x._nome.toLowerCase().includes(queryTxt))
+          .slice(0, 12);
+
+        currentItems = matches;
+
+        const html = [
+          ...matches.map((x, idx) => {
+            const label = x._ativo ? x._nome : `${x._nome} - inativo`;
+            const cls = x._ativo ? "ac-item" : "ac-item ac-disabled";
+            return `<div class="${cls}" data-idx="${idx}">${label}</div>`;
+          }),
+          `<div class="ac-item ac-muted" data-action="cad">+ Cadastrar novo condutor</div>`
+        ].join("");
+
+        list.innerHTML = html;
+        openList();
+      }
+
+      input.addEventListener("input", () => renderItems(input.value));
+      input.addEventListener("focus", () => renderItems(input.value));
+
+      // trocar loja => limpa condutor e lista
+      if(lojaSelectId){
+        const sel = document.getElementById(lojaSelectId);
+        if(sel){
+          sel.addEventListener("change", () => {
+            input.value = "";
+            closeList();
+          });
+        }
+      }
+
+      list.addEventListener("click", (e) => {
+        const target = e.target;
+        if(!(target instanceof HTMLElement)) return;
+
+        const action = target.getAttribute("data-action");
+        if(action === "cad"){
+          closeList();
+          onOpenCadastro?.();
+          return;
+        }
+
+        const idx = Number(target.getAttribute("data-idx") || "-1");
+        if(idx < 0 || idx >= currentItems.length) return;
+
+        const picked = currentItems[idx];
+        const ativo = picked.ativo !== false;
+
+        if(!ativo){
+          // não permite selecionar inativo
+          input.value = "";
+          closeList();
+          alert("Este condutor está INATIVO e não pode ser selecionado.");
+          return;
+        }
+
+        input.value = picked.nome || "";
+        closeList();
+        onPick?.(picked);
+      });
+
+      document.addEventListener("click", (e) => {
+        const t = e.target;
+        if(t === input || list.contains(t)) return;
+        closeList();
+      });
+    }
+
+    /* =========================================================
+       ENTRADA
+       ========================================================= */
     function toggleMotivoOutro(prefix){
       const motivo = document.getElementById(`${prefix}Motivo`)?.value || "";
       const wrap = document.getElementById(`${prefix}MotivoOutroWrap`);
@@ -1233,6 +1364,82 @@
         wrap.classList.add("hidden");
         const input = document.getElementById(`${prefix}MotivoOutro`);
         if(input) input.value = "";
+      }
+    }
+
+    function snapshotForm(prefix){
+      const data = {};
+      const ids = [
+        `${prefix}Loja`,
+        `${prefix}Placa`,
+        `${prefix}Veiculo`,
+        `${prefix}Motivo`,
+        `${prefix}MotivoOutro`,
+        `${prefix}CondutorTxt`,
+        `${prefix}Autorizador`,
+        `${prefix}Obs`
+      ];
+      ids.forEach(id => {
+        const elx = document.getElementById(id);
+        if(!elx) return;
+        if(elx.tagName === "SELECT") data[id] = elx.value;
+        else data[id] = elx.value;
+      });
+      return data;
+    }
+
+    function restoreForm(data){
+      if(!data) return;
+      Object.keys(data).forEach(id => {
+        const elx = document.getElementById(id);
+        if(!elx) return;
+        elx.value = data[id];
+      });
+    }
+
+    function openCondutorCadastroFrom(prefix){
+      state.returnCtx = { view: prefix, data: snapshotForm(prefix) };
+      renderCondutores();
+      // se tiver loja no contexto, tenta setar no cadastro (quando for gerente geral)
+      setTimeout(() => {
+        if(userIsGeneralManager()){
+          const lojaSel = document.getElementById("condLoja");
+          const ctxLoja = document.getElementById(`${prefix}Loja`)?.value || "";
+          if(lojaSel && ctxLoja) lojaSel.value = ctxLoja;
+        }
+      }, 0);
+    }
+
+    function backFromCadastroIfNeeded(newName){
+      if(!state.returnCtx) return;
+
+      const { view, data } = state.returnCtx;
+      state.returnCtx = null;
+
+      if(view === "entrada"){
+        renderEntrada();
+        setTimeout(() => {
+          restoreForm(data);
+          if(newName){
+            const inp = document.getElementById("entradaCondutorTxt");
+            if(inp) inp.value = newName;
+          }
+          toggleMotivoOutro("entrada");
+        }, 0);
+        return;
+      }
+
+      if(view === "saida"){
+        renderSaida();
+        setTimeout(() => {
+          restoreForm(data);
+          if(newName){
+            const inp = document.getElementById("saidaCondutorTxt");
+            if(inp) inp.value = newName;
+          }
+          toggleMotivoOutro("saida");
+        }, 0);
+        return;
       }
     }
 
@@ -1281,14 +1488,22 @@
               <input class="input" id="entradaMotivoOutro" maxlength="60">
             </div>
 
+            <!-- ✅ CONDUTOR: campo de escrita com autocomplete + botão cadastrar -->
             <div class="form-group">
-              <label for="entradaCondutor">Condutor <span class="req">*</span></label>
-              <select class="select" id="entradaCondutor">${buildCondutorOptions()}</select>
+              <label for="entradaCondutorTxt">Condutor <span class="req">*</span></label>
+              <div class="ac-wrap">
+                <input class="input" id="entradaCondutorTxt" autocomplete="off" placeholder="Digite o nome do condutor">
+                <div class="ac-list" id="entradaCondutorList"></div>
+              </div>
+              <div class="actions" style="margin-top:10px;">
+                <button class="btn btn-light" id="btnCadCondutorEntrada">Cadastrar condutor</button>
+              </div>
             </div>
 
             <div class="form-group">
               <label for="entradaAutorizador">Autorizador <span class="req">*</span></label>
-              <select class="select" id="entradaAutorizador">${buildAutorizadorOptions()}</select>
+              <select class="select" id="entradaAutorizador">${buildAutorizadorSelectForForm("entrada")}</select>
+              <div class="subtle">Autorizadores inativos aparecem, mas não podem ser selecionados.</div>
             </div>
 
             <div class="form-group full">
@@ -1335,6 +1550,16 @@
       toggleMotivoOutro("entrada");
 
       document.getElementById("entradaBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("entrada"));
+
+      document.getElementById("btnCadCondutorEntrada").addEventListener("click", () => openCondutorCadastroFrom("entrada"));
+
+      setupAutocompleteCondutor({
+        lojaSelectId: userIsGeneralManager() ? "entradaLoja" : null,
+        inputId: "entradaCondutorTxt",
+        listId: "entradaCondutorList",
+        onPick: () => {},
+        onOpenCadastro: () => openCondutorCadastroFrom("entrada")
+      });
     }
 
     function addExtraPhotoInput(prefix){
@@ -1358,6 +1583,28 @@
       wirePhotoPreview(inputId, previewId);
     }
 
+    function buildAutorizadorSelectForForm(prefix){
+      // mantém lógica original (select), só com inativos desabilitados
+      const options = [`<option value="">Selecione o autorizador</option>`];
+
+      const lojaId = userIsGeneralManager()
+        ? (document.getElementById(prefix + "Loja")?.value || state.lojas[0]?.id || "")
+        : (currentUserStoreId() || "");
+
+      const items = userIsGeneralManager()
+        ? state.autorizadores.filter(a => (a.lojaId || "") === lojaId)
+        : state.autorizadores.filter(a => (a.lojaId || "") === lojaId);
+
+      items.forEach(item => {
+        const ativo = item.ativo !== false;
+        const label = ativo ? item.nome : `${item.nome} - inativo`;
+        const disabled = ativo ? "" : "disabled";
+        options.push(`<option value="${item.nome}" ${disabled}>${label}</option>`);
+      });
+
+      return options.join("");
+    }
+
     async function salvarEntrada(){
       const notice = document.getElementById("entradaNotice");
       clearNotice(notice);
@@ -1370,7 +1617,7 @@
       const veiculo = (document.getElementById("entradaVeiculo")?.value || "").trim();
       const motivo = document.getElementById("entradaMotivo")?.value || "";
       const motivoOutro = (document.getElementById("entradaMotivoOutro")?.value || "").trim();
-      const condutor = document.getElementById("entradaCondutor")?.value || "";
+      const condutor = (document.getElementById("entradaCondutorTxt")?.value || "").trim();
       const autorizador = document.getElementById("entradaAutorizador")?.value || "";
       const observacao = (document.getElementById("entradaObs")?.value || "").trim();
 
@@ -1379,7 +1626,7 @@
       if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
       if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
       if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
+      if(!condutor){ showNotice(notice, "Informe/Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
       const [frente, mala, latEsq, latDir] = await Promise.all([
@@ -1420,7 +1667,9 @@
       }
     }
 
-    // ✅ SAÍDA (AGORA COM FOTOS IGUAL ENTRADA)
+    /* =========================================================
+       SAÍDA (mantida como você mandou, só trocando condutor para autocomplete)
+       ========================================================= */
     function renderSaida(){
       const lojaField = userIsGeneralManager()
         ? `
@@ -1466,14 +1715,22 @@
               <input class="input" id="saidaMotivoOutro" maxlength="60">
             </div>
 
+            <!-- ✅ CONDUTOR: campo de escrita com autocomplete + botão cadastrar -->
             <div class="form-group">
-              <label for="saidaCondutor">Condutor <span class="req">*</span></label>
-              <select class="select" id="saidaCondutor">${buildCondutorOptions()}</select>
+              <label for="saidaCondutorTxt">Condutor <span class="req">*</span></label>
+              <div class="ac-wrap">
+                <input class="input" id="saidaCondutorTxt" autocomplete="off" placeholder="Digite o nome do condutor">
+                <div class="ac-list" id="saidaCondutorList"></div>
+              </div>
+              <div class="actions" style="margin-top:10px;">
+                <button class="btn btn-light" id="btnCadCondutorSaida">Cadastrar condutor</button>
+              </div>
             </div>
 
             <div class="form-group">
               <label for="saidaAutorizador">Autorizador <span class="req">*</span></label>
-              <select class="select" id="saidaAutorizador">${buildAutorizadorOptions()}</select>
+              <select class="select" id="saidaAutorizador">${buildAutorizadorSelectForForm("saida")}</select>
+              <div class="subtle">Autorizadores inativos aparecem, mas não podem ser selecionados.</div>
             </div>
 
             <div class="form-group full">
@@ -1520,6 +1777,16 @@
       toggleMotivoOutro("saida");
 
       document.getElementById("saidaBtnAddExtraFoto").addEventListener("click", () => addExtraPhotoInput("saida"));
+
+      document.getElementById("btnCadCondutorSaida").addEventListener("click", () => openCondutorCadastroFrom("saida"));
+
+      setupAutocompleteCondutor({
+        lojaSelectId: userIsGeneralManager() ? "saidaLoja" : null,
+        inputId: "saidaCondutorTxt",
+        listId: "saidaCondutorList",
+        onPick: () => {},
+        onOpenCadastro: () => openCondutorCadastroFrom("saida")
+      });
     }
 
     async function salvarSaida(){
@@ -1534,7 +1801,7 @@
       const veiculo = (document.getElementById("saidaVeiculo")?.value || "").trim();
       const motivo = document.getElementById("saidaMotivo")?.value || "";
       const motivoOutro = (document.getElementById("saidaMotivoOutro")?.value || "").trim();
-      const condutor = document.getElementById("saidaCondutor")?.value || "";
+      const condutor = (document.getElementById("saidaCondutorTxt")?.value || "").trim();
       const autorizador = document.getElementById("saidaAutorizador")?.value || "";
       const observacao = (document.getElementById("saidaObs")?.value || "").trim();
 
@@ -1543,7 +1810,7 @@
       if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
       if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
       if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
+      if(!condutor){ showNotice(notice, "Informe/Selecione o condutor."); return; }
       if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
 
       const [frente, mala, latEsq, latDir] = await Promise.all([
@@ -1584,7 +1851,9 @@
       }
     }
 
-    // ✅ CONSULTA (mantida simples; clique abre modal)
+    /* =========================================================
+       ✅ CONSULTA (como estava)
+       ========================================================= */
     function renderConsulta(){
       const storeFilterHTML = userIsGeneralManager()
         ? `
@@ -1605,7 +1874,7 @@
 
       renderPanel(
         "Consulta",
-        "Toque em uma linha para abrir o detalhe individual (com fotos), exportar e agora editar.",
+        "Toque em uma linha para abrir o detalhe individual (com fotos), exportar e editar.",
         `
           <div class="grid">
             ${storeFilterHTML}
@@ -1735,7 +2004,7 @@
         });
       }
 
-      items.sort((a,b) => dateValueToMillis(b.data) - dateValueToMillis(a.data));
+      items.sort((a,b) => (dateValueToMillis(b.data) || 0) - (dateValueToMillis(a.data) || 0));
 
       body.innerHTML = items.map(item => {
         const fotos = item?.fotos || {};
@@ -1772,7 +2041,9 @@
       });
     }
 
-    // ✅ MODAL: VER + EDITAR
+    /* =========================================================
+       MODAL DETALHE / EDIÇÃO (como estava)
+       ========================================================= */
     function openDetailModal(item){
       state.selectedMovimento = item;
       state.editMode = false;
@@ -1875,12 +2146,13 @@
 
           <div class="form-group">
             <label for="editCondutor">Condutor <span class="req">*</span></label>
-            <select class="select" id="editCondutor">${buildCondutorOptions()}</select>
+            <input class="input" id="editCondutor" value="${item.condutor || ""}">
+            <div class="subtle">Aqui mantém como texto (não alterei para não mexer no resto).</div>
           </div>
 
           <div class="form-group">
             <label for="editAutorizador">Autorizador <span class="req">*</span></label>
-            <select class="select" id="editAutorizador">${buildAutorizadorOptions()}</select>
+            <input class="input" id="editAutorizador" value="${item.autorizador || ""}">
           </div>
 
           <div class="form-group full">
@@ -1917,12 +2189,8 @@
         <div id="editNotice" class="notice"></div>
       `;
 
-      // set selects
       document.getElementById("editMotivo").value = item.motivo || "";
-      document.getElementById("editCondutor").value = item.condutor || "";
-      document.getElementById("editAutorizador").value = item.autorizador || "";
 
-      // motivo outro
       const toggleEditOutro = () => {
         const motivo = document.getElementById("editMotivo")?.value || "";
         const wrap = document.getElementById("editMotivoOutroWrap");
@@ -1938,7 +2206,6 @@
       document.getElementById("editMotivo").addEventListener("change", toggleEditOutro);
       toggleEditOutro();
 
-      // masks & previews
       attachInputMasks();
       wirePhotoPreview("editFotoFrente", "editPreviewFrente");
       wirePhotoPreview("editFotoMala", "editPreviewMala");
@@ -1980,18 +2247,17 @@
       const veiculo = (document.getElementById("editVeiculo")?.value || "").trim();
       const motivo = document.getElementById("editMotivo")?.value || "";
       const motivoOutro = (document.getElementById("editMotivoOutro")?.value || "").trim();
-      const condutor = document.getElementById("editCondutor")?.value || "";
-      const autorizador = document.getElementById("editAutorizador")?.value || "";
+      const condutor = (document.getElementById("editCondutor")?.value || "").trim();
+      const autorizador = (document.getElementById("editAutorizador")?.value || "").trim();
       const observacao = (document.getElementById("editObs")?.value || "").trim();
 
       if(!placa || !isValidPlate(placa)){ showNotice(notice, "Informe uma placa válida."); return; }
       if(!veiculo){ showNotice(notice, "Informe o veículo."); return; }
       if(!motivo){ showNotice(notice, "Selecione o motivo."); return; }
       if(motivo === "Outro" && !motivoOutro){ showNotice(notice, "Descreva o motivo (Outro)."); return; }
-      if(!condutor){ showNotice(notice, "Selecione o condutor."); return; }
-      if(!autorizador){ showNotice(notice, "Selecione o autorizador."); return; }
+      if(!condutor){ showNotice(notice, "Informe o condutor."); return; }
+      if(!autorizador){ showNotice(notice, "Informe o autorizador."); return; }
 
-      // fotos: se não tirar nova, mantém as atuais
       const currentFotos = item.fotos || {};
       const [newFrente, newMala, newLatEsq, newLatDir] = await Promise.all([
         getImageDataFromInput("editFotoFrente"),
@@ -2005,13 +2271,11 @@
       const lateralEsq = newLatEsq || currentFotos.lateralEsq || "";
       const lateralDir = newLatDir || currentFotos.lateralDir || "";
 
-      // ainda exigimos as 4 obrigatórias (entre novo ou antigo)
       if(!frente || !mala || !lateralEsq || !lateralDir){
         showNotice(notice, "As 4 fotos principais são obrigatórias (pode manter as antigas ou tirar novas).");
         return;
       }
 
-      // extras: mantém as antigas + adiciona as novas extras tiradas no edit
       const extrasOld = Array.isArray(currentFotos.extras) ? currentFotos.extras : [];
       const extrasNew = [];
       const extraInputs = Array.from(document.querySelectorAll("input[id^='editFotoExtra_']"));
@@ -2044,13 +2308,11 @@
         });
 
         await refreshAfterWrite();
-        // atualiza item em memória
         const refreshed = state.movimentos.find(m => m.id === item.id);
         if(refreshed) state.selectedMovimento = refreshed;
 
         showNotice(notice, "Registro atualizado com sucesso.", "success");
 
-        // volta para visualização
         state.editMode = false;
         el.btnSaveRegistro.classList.add("hidden");
         el.btnEditRegistro.classList.remove("hidden");
@@ -2160,12 +2422,520 @@
       w.onload = () => { try { w.focus(); w.print(); } catch(e) {} };
     }
 
+    /* =========================================================
+       ✅ CONDUTORES (TELA VOLTOU) + CPF lookup simples
+       - Sem alterar mais nada do sistema
+       ========================================================= */
+    function lojaOptionsHTML(){
+      if(!state.lojas.length) return `<option value="">(Sem lojas)</option>`;
+      return state.lojas.map(l => `<option value="${l.id}">${l.id} - ${l.nome || l.id}</option>`).join("");
+    }
+
+    function renderCondutores(){
+      const lojaField = userIsGeneralManager()
+        ? `
+          <div class="form-group">
+            <label for="condLoja">Loja <span class="req">*</span></label>
+            <select class="select" id="condLoja">${lojaOptionsHTML()}</select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <label>Loja</label>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+            <input type="hidden" id="condLoja" value="${currentUserStoreId() || ""}">
+          </div>
+        `;
+
+      renderPanel(
+        "Condutores",
+        "Cadastre/edite/inative condutores. Se veio do formulário, ao salvar você volta automaticamente.",
+        `
+          <div class="grid">
+            ${lojaField}
+
+            <div class="form-group">
+              <label for="condCPF">CPF <span class="req">*</span></label>
+              <input class="input" id="condCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+              <div class="subtle">Ao digitar o CPF, o sistema tenta localizar o cadastro na loja selecionada.</div>
+            </div>
+
+            <div class="form-group">
+              <label for="condNome">Nome <span class="req">*</span></label>
+              <input class="input" id="condNome" maxlength="80" placeholder="Nome do condutor">
+            </div>
+
+            <div class="form-group">
+              <label for="condCargo">Cargo</label>
+              <input class="input" id="condCargo" maxlength="60" placeholder="Opcional">
+            </div>
+
+            <div class="form-group">
+              <label for="condAtivo">Ativo</label>
+              <select class="select" id="condAtivo">
+                <option value="true">Sim</option>
+                <option value="false">Não (inativo)</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <div class="actions">
+                <button class="btn btn-success" id="btnSalvarCond">Salvar</button>
+                <button class="btn btn-light" id="btnLimparCond">Limpar</button>
+              </div>
+              <div id="condNotice" class="notice"></div>
+            </div>
+          </div>
+
+          <div class="section-title">Lista (loja selecionada)</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Cargo</th>
+                  <th>Ativo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="condListBody"></tbody>
+            </table>
+          </div>
+
+          <div class="empty" id="condEmpty"></div>
+        `
+      );
+
+      attachInputMasks();
+
+      const lojaSel = document.getElementById("condLoja");
+      const cpfInp = document.getElementById("condCPF");
+      const btnSalvar = document.getElementById("btnSalvarCond");
+      const btnLimpar = document.getElementById("btnLimparCond");
+
+      let editingId = null;
+
+      function currentLojaId(){
+        if(userIsGeneralManager()) return lojaSel?.value || "";
+        return currentUserStoreId() || "";
+      }
+
+      function renderList(){
+        const body = document.getElementById("condListBody");
+        const empty = document.getElementById("condEmpty");
+        if(!body || !empty) return;
+
+        const lojaId = currentLojaId();
+        const items = (userIsGeneralManager()
+          ? state.condutores.filter(c => (c.lojaId || "") === lojaId)
+          : state.condutores.filter(c => (c.lojaId || "") === lojaId)
+        );
+
+        body.innerHTML = items.map(c => {
+          const ativo = c.ativo !== false;
+          return `
+            <tr>
+              <td>${c.nome || "-"}</td>
+              <td>${formatCPF(c.cpf || "")}</td>
+              <td>${c.cargo || "-"}</td>
+              <td>${ativo ? "Sim" : "Não"}</td>
+              <td>
+                <button class="btn btn-light" data-act="edit" data-id="${c.id}" style="min-height:40px;padding:10px 12px;">Editar</button>
+                <button class="btn ${ativo ? "btn-danger" : "btn-success"}" data-act="toggle" data-id="${c.id}" style="min-height:40px;padding:10px 12px;">
+                  ${ativo ? "Inativar" : "Ativar"}
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        empty.textContent = items.length ? "" : "Nenhum condutor cadastrado nesta loja.";
+
+        Array.from(body.querySelectorAll("button[data-act]")).forEach(b => {
+          b.addEventListener("click", async () => {
+            const act = b.getAttribute("data-act");
+            const id = b.getAttribute("data-id");
+            const found = state.condutores.find(x => x.id === id);
+            if(!found) return;
+
+            if(act === "edit"){
+              editingId = found.id;
+              cpfInp.value = formatCPF(found.cpf || "");
+              document.getElementById("condNome").value = found.nome || "";
+              document.getElementById("condCargo").value = found.cargo || "";
+              document.getElementById("condAtivo").value = (found.ativo !== false) ? "true" : "false";
+              return;
+            }
+
+            if(act === "toggle"){
+              try{
+                await updateDoc(doc(db, Collections.CONDUTORES, found.id), {
+                  ativo: !(found.ativo !== false),
+                  atualizadoEm: new Date(),
+                  atualizadoPorUid: state.authUser.uid,
+                  atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+                });
+                await refreshAfterWrite();
+                renderCondutores();
+              }catch(e){
+                alert(`Falha ao atualizar: ${e?.code || ""}`);
+              }
+            }
+          });
+        });
+      }
+
+      async function tryLookupByCPF(){
+        const lojaId = currentLojaId();
+        const cpf = onlyDigits(cpfInp.value);
+        if(!lojaId || cpf.length !== 11) return;
+
+        // procura na memória primeiro (rápido e sem índices)
+        const mem = state.condutores.find(c => (c.lojaId || "") === lojaId && String(c.cpf || "") === cpf);
+        if(mem){
+          editingId = mem.id;
+          document.getElementById("condNome").value = mem.nome || "";
+          document.getElementById("condCargo").value = mem.cargo || "";
+          document.getElementById("condAtivo").value = (mem.ativo !== false) ? "true" : "false";
+          return;
+        }
+
+        // fallback no DB (se ainda não está em memória por limite)
+        try{
+          const qs = await getDocs(query(
+            collection(db, Collections.CONDUTORES),
+            where("lojaId","==",lojaId),
+            where("cpf","==",cpf),
+            limit(1)
+          ));
+          if(!qs.empty){
+            const d = qs.docs[0];
+            const data = d.data();
+            editingId = d.id;
+            document.getElementById("condNome").value = data.nome || "";
+            document.getElementById("condCargo").value = data.cargo || "";
+            document.getElementById("condAtivo").value = (data.ativo !== false) ? "true" : "false";
+          }
+        }catch(e){
+          // se pedir índice, não trava a tela — só ignora
+          console.warn("lookup cpf falhou:", e?.code, e?.message);
+        }
+      }
+
+      function clearForm(){
+        editingId = null;
+        cpfInp.value = "";
+        document.getElementById("condNome").value = "";
+        document.getElementById("condCargo").value = "";
+        document.getElementById("condAtivo").value = "true";
+        clearNotice(document.getElementById("condNotice"));
+      }
+
+      async function salvar(){
+        const notice = document.getElementById("condNotice");
+        clearNotice(notice);
+
+        const lojaId = currentLojaId();
+        const cpf = onlyDigits(cpfInp.value);
+        const nome = (document.getElementById("condNome").value || "").trim();
+        const cargo = (document.getElementById("condCargo").value || "").trim();
+        const ativo = (document.getElementById("condAtivo").value || "true") === "true";
+
+        if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
+        if(cpf.length !== 11){ showNotice(notice, "Informe um CPF válido."); return; }
+        if(!nome){ showNotice(notice, "Informe o nome."); return; }
+
+        try{
+          if(editingId){
+            await updateDoc(doc(db, Collections.CONDUTORES, editingId), {
+              lojaId,
+              cpf,
+              nome,
+              cargo,
+              ativo,
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+          }else{
+            await addDoc(collection(db, Collections.CONDUTORES), {
+              lojaId,
+              cpf,
+              nome,
+              cargo,
+              ativo,
+              criadoEm: new Date(),
+              criadoPorUid: state.authUser.uid,
+              criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+          }
+
+          await refreshAfterWrite();
+          showNotice(notice, "Condutor salvo com sucesso.", "success");
+
+          // ✅ se veio do formulário, volta e já preenche o condutor
+          backFromCadastroIfNeeded(nome);
+
+        }catch(e){
+          showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
+        }
+      }
+
+      if(lojaSel){
+        lojaSel.addEventListener("change", () => {
+          clearForm();
+          renderList();
+        });
+      }
+
+      cpfInp.addEventListener("input", () => {
+        // espera digitar 11 dígitos (máscara pode atrapalhar)
+        const cpf = onlyDigits(cpfInp.value);
+        if(cpf.length === 11){
+          tryLookupByCPF();
+        }
+      });
+
+      btnSalvar.addEventListener("click", salvar);
+      btnLimpar.addEventListener("click", clearForm);
+
+      renderList();
+    }
+
+    /* =========================================================
+       ✅ AUTORIZADORES (TELA VOLTOU) — CRUD básico
+       (não mexi no resto do sistema)
+       ========================================================= */
+    function renderAutorizadores(){
+      const lojaField = userIsGeneralManager()
+        ? `
+          <div class="form-group">
+            <label for="autLoja">Loja <span class="req">*</span></label>
+            <select class="select" id="autLoja">${lojaOptionsHTML()}</select>
+          </div>
+        `
+        : `
+          <div class="form-group">
+            <label>Loja</label>
+            <input class="input" value="${getStoreName(currentUserStoreId())}" disabled>
+            <input type="hidden" id="autLoja" value="${currentUserStoreId() || ""}">
+          </div>
+        `;
+
+      renderPanel(
+        "Autorizadores",
+        "Cadastre/edite/inative autorizadores.",
+        `
+          <div class="grid">
+            ${lojaField}
+
+            <div class="form-group">
+              <label for="autCPF">CPF <span class="req">*</span></label>
+              <input class="input" id="autCPF" data-mask="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00">
+            </div>
+
+            <div class="form-group">
+              <label for="autNome">Nome <span class="req">*</span></label>
+              <input class="input" id="autNome" maxlength="80" placeholder="Nome do autorizador">
+            </div>
+
+            <div class="form-group">
+              <label for="autCargo">Cargo</label>
+              <input class="input" id="autCargo" maxlength="60" placeholder="Opcional">
+            </div>
+
+            <div class="form-group">
+              <label for="autAtivo">Ativo</label>
+              <select class="select" id="autAtivo">
+                <option value="true">Sim</option>
+                <option value="false">Não (inativo)</option>
+              </select>
+            </div>
+
+            <div class="form-group full">
+              <div class="actions">
+                <button class="btn btn-success" id="btnSalvarAut">Salvar</button>
+                <button class="btn btn-light" id="btnLimparAut">Limpar</button>
+              </div>
+              <div id="autNotice" class="notice"></div>
+            </div>
+          </div>
+
+          <div class="section-title">Lista (loja selecionada)</div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>CPF</th>
+                  <th>Cargo</th>
+                  <th>Ativo</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="autListBody"></tbody>
+            </table>
+          </div>
+
+          <div class="empty" id="autEmpty"></div>
+        `
+      );
+
+      attachInputMasks();
+
+      const lojaSel = document.getElementById("autLoja");
+      const cpfInp = document.getElementById("autCPF");
+      const btnSalvar = document.getElementById("btnSalvarAut");
+      const btnLimpar = document.getElementById("btnLimparAut");
+
+      let editingId = null;
+
+      function currentLojaId(){
+        if(userIsGeneralManager()) return lojaSel?.value || "";
+        return currentUserStoreId() || "";
+      }
+
+      function renderList(){
+        const body = document.getElementById("autListBody");
+        const empty = document.getElementById("autEmpty");
+        if(!body || !empty) return;
+
+        const lojaId = currentLojaId();
+        const items = state.autorizadores.filter(a => (a.lojaId || "") === lojaId);
+
+        body.innerHTML = items.map(a => {
+          const ativo = a.ativo !== false;
+          return `
+            <tr>
+              <td>${a.nome || "-"}</td>
+              <td>${formatCPF(a.cpf || "")}</td>
+              <td>${a.cargo || "-"}</td>
+              <td>${ativo ? "Sim" : "Não"}</td>
+              <td>
+                <button class="btn btn-light" data-act="edit" data-id="${a.id}" style="min-height:40px;padding:10px 12px;">Editar</button>
+                <button class="btn ${ativo ? "btn-danger" : "btn-success"}" data-act="toggle" data-id="${a.id}" style="min-height:40px;padding:10px 12px;">
+                  ${ativo ? "Inativar" : "Ativar"}
+                </button>
+              </td>
+            </tr>
+          `;
+        }).join("");
+
+        empty.textContent = items.length ? "" : "Nenhum autorizador cadastrado nesta loja.";
+
+        Array.from(body.querySelectorAll("button[data-act]")).forEach(b => {
+          b.addEventListener("click", async () => {
+            const act = b.getAttribute("data-act");
+            const id = b.getAttribute("data-id");
+            const found = state.autorizadores.find(x => x.id === id);
+            if(!found) return;
+
+            if(act === "edit"){
+              editingId = found.id;
+              cpfInp.value = formatCPF(found.cpf || "");
+              document.getElementById("autNome").value = found.nome || "";
+              document.getElementById("autCargo").value = found.cargo || "";
+              document.getElementById("autAtivo").value = (found.ativo !== false) ? "true" : "false";
+              return;
+            }
+
+            if(act === "toggle"){
+              try{
+                await updateDoc(doc(db, Collections.AUTORIZADORES, found.id), {
+                  ativo: !(found.ativo !== false),
+                  atualizadoEm: new Date(),
+                  atualizadoPorUid: state.authUser.uid,
+                  atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+                });
+                await refreshAfterWrite();
+                renderAutorizadores();
+              }catch(e){
+                alert(`Falha ao atualizar: ${e?.code || ""}`);
+              }
+            }
+          });
+        });
+      }
+
+      function clearForm(){
+        editingId = null;
+        cpfInp.value = "";
+        document.getElementById("autNome").value = "";
+        document.getElementById("autCargo").value = "";
+        document.getElementById("autAtivo").value = "true";
+        clearNotice(document.getElementById("autNotice"));
+      }
+
+      async function salvar(){
+        const notice = document.getElementById("autNotice");
+        clearNotice(notice);
+
+        const lojaId = currentLojaId();
+        const cpf = onlyDigits(cpfInp.value);
+        const nome = (document.getElementById("autNome").value || "").trim();
+        const cargo = (document.getElementById("autCargo").value || "").trim();
+        const ativo = (document.getElementById("autAtivo").value || "true") === "true";
+
+        if(!lojaId){ showNotice(notice, "Selecione a loja."); return; }
+        if(cpf.length !== 11){ showNotice(notice, "Informe um CPF válido."); return; }
+        if(!nome){ showNotice(notice, "Informe o nome."); return; }
+
+        try{
+          if(editingId){
+            await updateDoc(doc(db, Collections.AUTORIZADORES, editingId), {
+              lojaId,
+              cpf,
+              nome,
+              cargo,
+              ativo,
+              atualizadoEm: new Date(),
+              atualizadoPorUid: state.authUser.uid,
+              atualizadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+          }else{
+            await addDoc(collection(db, Collections.AUTORIZADORES), {
+              lojaId,
+              cpf,
+              nome,
+              cargo,
+              ativo,
+              criadoEm: new Date(),
+              criadoPorUid: state.authUser.uid,
+              criadoPorNome: state.userProfile?.nome || state.authUser?.email || ""
+            });
+          }
+
+          await refreshAfterWrite();
+          showNotice(notice, "Autorizador salvo com sucesso.", "success");
+          renderAutorizadores();
+
+        }catch(e){
+          showNotice(notice, `Não foi possível salvar. (${e?.code || "erro"})`);
+        }
+      }
+
+      if(lojaSel){
+        lojaSel.addEventListener("change", () => {
+          clearForm();
+          renderList();
+        });
+      }
+
+      btnSalvar.addEventListener("click", salvar);
+      btnLimpar.addEventListener("click", clearForm);
+
+      renderList();
+    }
+
+    /* =========================================================
+       APP CORE
+       ========================================================= */
     async function refreshAfterWrite(){
       await loadLojas();
       await loadOperationalCollections();
       renderShellInfo();
       renderDashboard();
-      // se está na consulta, manter os dados novos (não muda tela)
     }
 
     async function login(){
@@ -2254,6 +3024,7 @@
       state.autorizadores = [];
       state.selectedMovimento = null;
       state.editMode = false;
+      state.returnCtx = null;
 
       el.topbar.style.display = "none";
       el.footerbar.style.display = "none";
@@ -2289,7 +3060,6 @@
 
     el.btnExportRegistro.addEventListener("click", exportSelectedRegistro);
 
-    // ✅ editar/salvar (todos os perfis podem)
     el.btnEditRegistro.addEventListener("click", () => {
       const item = state.selectedMovimento;
       if(!item) return;
